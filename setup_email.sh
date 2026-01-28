@@ -31,8 +31,16 @@ fi
 
 # 2. Demander les infos
 echo -e "Nous allons configurer votre compte Gmail."
-echo -e "${YELLOW}NOTE : Vous devez avoir un 'Mot de passe d'application' Google.${NC}"
-echo -e "Si vous n'en avez pas, créez-le ici : https://myaccount.google.com/apppasswords"
+echo -e "${YELLOW}IMPORTANT : Vous devez utiliser un 'Mot de passe d'application' (pas votre mot de passe habituel).${NC}"
+echo ""
+echo -e "${BLUE}--- Procédure pour obtenir ce mot de passe ---${NC}"
+echo "1. Allez sur : https://myaccount.google.com"
+echo "2. Cliquez sur 'Sécurité' (menu de gauche)"
+echo "3. Cherchez 'Comment vous connecter à Google' -> 'Validation en deux étapes'"
+echo "4. Tout en bas, cliquez sur 'Mots de passe d'application' (ou cherchez 'Mots de passe d'application' dans la barre de recherche)"
+echo "5. Donnez un nom (ex: Alizé) et cliquez sur 'Créer'"
+echo "6. Copiez le code de 16 lettres généré (sans les espaces)"
+echo -e "${BLUE}---------------------------------------------${NC}"
 echo ""
 
 read -p "Votre adresse email (ex: moi@gmail.com) : " EMAIL
