@@ -73,21 +73,25 @@ cat > "$CONFIG_FILE" << EOF
 [accounts.default]
 email = "$EMAIL"
 display-name = "$NAME"
+default = true
+
+# IMAP Configuration (Réception)
 backend.type = "imap"
 backend.host = "imap.gmail.com"
 backend.port = 993
-backend.encryption = "tls"
 backend.login = "$EMAIL"
-# backend.passwd.cmd = "security find-generic-password -s himalaya -a $EMAIL -w"
-backend.passwd.cmd = "echo '$PASSWORD'"
+backend.auth.type = "password"
+backend.auth.cmd = "echo '$PASSWORD'"
+backend.encryption.type = "tls"
 
-sender.type = "smtp"
-sender.host = "smtp.gmail.com"
-sender.port = 465
-sender.encryption = "tls"
-sender.login = "$EMAIL"
-# sender.passwd.cmd = "security find-generic-password -s himalaya -a $EMAIL -w"
-sender.passwd.cmd = "echo '$PASSWORD'"
+# SMTP Configuration (Envoi)
+message.send.backend.type = "smtp"
+message.send.backend.host = "smtp.gmail.com"
+message.send.backend.port = 587
+message.send.backend.login = "$EMAIL"
+message.send.backend.auth.type = "password"
+message.send.backend.auth.cmd = "echo '$PASSWORD'"
+message.send.backend.encryption.type = "start-tls"
 EOF
 
 chmod 600 "$CONFIG_FILE"
