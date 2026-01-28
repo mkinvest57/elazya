@@ -61,7 +61,7 @@ export function installTestEnv(): { cleanup: () => void; tempHome: string } {
     { key: "XDG_DATA_HOME", value: process.env.XDG_DATA_HOME },
     { key: "XDG_STATE_HOME", value: process.env.XDG_STATE_HOME },
     { key: "XDG_CACHE_HOME", value: process.env.XDG_CACHE_HOME },
-    { key: "CLAWDBOT_STATE_DIR", value: process.env.CLAWDBOT_STATE_DIR },
+    { key: "ALIZE_STATE_DIR", value: process.env.ALIZE_STATE_DIR },
     { key: "CLAWDBOT_CONFIG_PATH", value: process.env.CLAWDBOT_CONFIG_PATH },
     { key: "CLAWDBOT_GATEWAY_PORT", value: process.env.CLAWDBOT_GATEWAY_PORT },
     { key: "CLAWDBOT_BRIDGE_ENABLED", value: process.env.CLAWDBOT_BRIDGE_ENABLED },
@@ -80,7 +80,7 @@ export function installTestEnv(): { cleanup: () => void; tempHome: string } {
     { key: "NODE_OPTIONS", value: process.env.NODE_OPTIONS },
   ];
 
-  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), "moltbot-test-home-"));
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), "alize-test-home-"));
 
   process.env.HOME = tempHome;
   process.env.USERPROFILE = tempHome;
@@ -90,7 +90,7 @@ export function installTestEnv(): { cleanup: () => void; tempHome: string } {
   // Ensure test runs never touch the developer's real config/state, even if they have overrides set.
   delete process.env.CLAWDBOT_CONFIG_PATH;
   // Prefer deriving state dir from HOME so nested tests that change HOME also isolate correctly.
-  delete process.env.CLAWDBOT_STATE_DIR;
+  delete process.env.ALIZE_STATE_DIR;
   // Prefer test-controlled ports over developer overrides (avoid port collisions across tests/workers).
   delete process.env.CLAWDBOT_GATEWAY_PORT;
   delete process.env.CLAWDBOT_BRIDGE_ENABLED;
@@ -111,7 +111,7 @@ export function installTestEnv(): { cleanup: () => void; tempHome: string } {
 
   // Windows: prefer the legacy default state dir so auth/profile tests match real paths.
   if (process.platform === "win32") {
-    process.env.CLAWDBOT_STATE_DIR = path.join(tempHome, ".clawdbot");
+    process.env.ALIZE_STATE_DIR = path.join(tempHome, ".alize");
   }
 
   process.env.XDG_CONFIG_HOME = path.join(tempHome, ".config");
