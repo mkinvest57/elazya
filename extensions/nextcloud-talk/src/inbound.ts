@@ -3,7 +3,7 @@ import {
   resolveControlCommandGate,
   type MoltbotConfig,
   type RuntimeEnv,
-} from "clawdbot/plugin-sdk";
+} from "alize/plugin-sdk";
 
 import type { ResolvedNextcloudTalkAccount } from "./accounts.js";
 import {

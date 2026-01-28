@@ -2,8 +2,8 @@ import type {
   ChannelMessageActionAdapter,
   ChannelMessageActionName,
   MoltbotConfig,
-} from "clawdbot/plugin-sdk";
-import { jsonResult, readStringParam } from "clawdbot/plugin-sdk";
+} from "alize/plugin-sdk";
+import { jsonResult, readStringParam } from "alize/plugin-sdk";
 
 import { listEnabledZaloAccounts } from "./accounts.js";
 import { sendMessageZalo } from "./send.js";

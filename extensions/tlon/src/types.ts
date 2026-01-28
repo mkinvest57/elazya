@@ -1,4 +1,4 @@
-import type { MoltbotConfig } from "clawdbot/plugin-sdk";
+import type { MoltbotConfig } from "alize/plugin-sdk";
 
 export type TlonResolvedAccount = {
   accountId: string;

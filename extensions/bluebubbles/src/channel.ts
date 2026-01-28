@@ -1,4 +1,4 @@
-import type { ChannelAccountSnapshot, ChannelPlugin, MoltbotConfig } from "clawdbot/plugin-sdk";
+import type { ChannelAccountSnapshot, ChannelPlugin, MoltbotConfig } from "alize/plugin-sdk";
 import {
   applyAccountNameToChannelSection,
   buildChannelConfigSchema,
@@ -12,7 +12,7 @@ import {
   resolveBlueBubblesGroupRequireMention,
   resolveBlueBubblesGroupToolPolicy,
   setAccountEnabledInConfigSection,
-} from "clawdbot/plugin-sdk";
+} from "alize/plugin-sdk";
 
 import {
   listBlueBubblesAccountIds,

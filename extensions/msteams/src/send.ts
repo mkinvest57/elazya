@@ -1,5 +1,5 @@
-import { loadWebMedia, resolveChannelMediaMaxBytes } from "clawdbot/plugin-sdk";
-import type { MoltbotConfig } from "clawdbot/plugin-sdk";
+import { loadWebMedia, resolveChannelMediaMaxBytes } from "alize/plugin-sdk";
+import type { MoltbotConfig } from "alize/plugin-sdk";
 import { createMSTeamsConversationStoreFs } from "./conversation-store-fs.js";
 import {
   classifyMSTeamsSendError,

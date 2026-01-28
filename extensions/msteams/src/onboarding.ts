@@ -4,13 +4,13 @@ import type {
   MoltbotConfig,
   DmPolicy,
   WizardPrompter,
-} from "clawdbot/plugin-sdk";
+} from "alize/plugin-sdk";
 import {
   addWildcardAllowFrom,
   DEFAULT_ACCOUNT_ID,
   formatDocsLink,
   promptChannelAccessConfig,
-} from "clawdbot/plugin-sdk";
+} from "alize/plugin-sdk";
 
 import { resolveMSTeamsCredentials } from "./token.js";
 import {

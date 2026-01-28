@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { EventEmitter } from "node:events";
 
-import { removeAckReactionAfterReply, shouldAckReaction } from "clawdbot/plugin-sdk";
-import type { MoltbotConfig, PluginRuntime } from "clawdbot/plugin-sdk";
+import { removeAckReactionAfterReply, shouldAckReaction } from "alize/plugin-sdk";
+import type { MoltbotConfig, PluginRuntime } from "alize/plugin-sdk";
 import {
   handleBlueBubblesWebhookRequest,
   registerBlueBubblesWebhookTarget,

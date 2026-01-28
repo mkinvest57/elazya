@@ -1,4 +1,4 @@
-import type { ChannelDirectoryEntry } from "clawdbot/plugin-sdk";
+import type { ChannelDirectoryEntry } from "alize/plugin-sdk";
 
 import { GRAPH_ROOT } from "./attachments/shared.js";
 import { loadMSTeamsSdkWithAuth } from "./sdk.js";
