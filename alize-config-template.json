@@ -1,0 +1,68 @@
+{
+    "$schema": "./dist/config-schema.json",
+    "_comment": "Configuration Alizé - Le premier assistant IA français haute performance",
+    "_credits": "Basé sur Moltbot (https://github.com/moltbot/moltbot) par Peter Steinberger",
+    "workspace": "~/.alize",
+    "agent": {
+        "name": "Alizé",
+        "description": "Votre assistant IA personnel français haute performance",
+        "language": "fr"
+    },
+    "models": {
+        "default": "google/gemini-2.5-flash",
+        "_note": "Gemini 2.5 Flash est GRATUIT via Google AI Studio - 2 millions tokens/mois",
+        "chat": "google/gemini-2.5-flash",
+        "coding": "google/gemini-2.5-flash",
+        "image": "google/gemini-2.5-flash"
+    },
+    "providers": {
+        "google": {
+            "enabled": true,
+            "priority": 1,
+            "_note": "Obtenez votre clé gratuite sur https://aistudio.google.com/apikey"
+        },
+        "anthropic": {
+            "enabled": false,
+            "priority": 2,
+            "_note": "Claude - Payant (~20€/mois)"
+        },
+        "openai": {
+            "enabled": false,
+            "priority": 3,
+            "_note": "GPT - Payant (~20€/mois)"
+        }
+    },
+    "gateway": {
+        "port": 18789,
+        "host": "127.0.0.1"
+    },
+    "channels": {
+        "_note": "Configurez vos canaux de messagerie ici",
+        "telegram": {
+            "enabled": false
+        },
+        "whatsapp": {
+            "enabled": false
+        },
+        "discord": {
+            "enabled": false
+        },
+        "slack": {
+            "enabled": false
+        }
+    },
+    "skills": {
+        "enabled": true,
+        "autoLoad": true
+    },
+    "memory": {
+        "enabled": true
+    },
+    "tts": {
+        "enabled": false
+    },
+    "locale": {
+        "language": "fr",
+        "timezone": "Europe/Paris"
+    }
+}
