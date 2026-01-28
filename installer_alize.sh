@@ -112,6 +112,36 @@ else
 fi
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ÉTAPE 2b: Installation des outils optionnels (macOS)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+if [[ "$OS_NAME" == "macos" ]]; then
+    step "2b" "Installation des outils système optionnels..."
+
+    if command -v brew &> /dev/null; then
+        # Himalaya (Email)
+        if ! command -v himalaya &> /dev/null; then
+            info "Installation de himalaya (Client Email)..."
+            brew install himalaya
+            success "himalaya installé"
+        else
+            success "himalaya déjà installé"
+        fi
+
+        # GitHub CLI
+        if ! command -v gh &> /dev/null; then
+            info "Installation de gh (GitHub CLI)..."
+            brew install gh
+            success "gh installé"
+        else
+            success "gh déjà installé"
+        fi
+    else
+        warning "Homebrew non détecté, saut de l'installation des outils optionnels."
+    fi
+fi
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # ÉTAPE 3: Installation des dépendances
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
