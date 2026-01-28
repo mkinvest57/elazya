@@ -33,7 +33,10 @@ export async function dashboardCommand(
   });
   const authedUrl = token ? `${links.httpUrl}?token=${encodeURIComponent(token)}` : links.httpUrl;
 
-  runtime.log(`Dashboard URL: ${authedUrl}`);
+  runtime.log("");
+  runtime.log("🎨 Dashboard Alizé prêt !");
+  runtime.log(`👉 ${authedUrl}`);
+  runtime.log("");
 
   const copied = await copyToClipboard(authedUrl).catch(() => false);
   runtime.log(copied ? "Copied to clipboard." : "Copy to clipboard unavailable.");

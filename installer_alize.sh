@@ -282,5 +282,16 @@ else
 fi
 
 echo ""
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}${BOLD}🎉 Installation d'Alizé terminée!${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+echo -e "🔎 ${BOLD}ACCÈS AU TABLEAU DE BORD (DASHBOARD)${NC}"
+echo -e "   Une fois Alizé démarré, ouvrez ce lien dans votre navigateur :"
+echo ""
+echo -e "   👉 ${BOLD}${BLUE}http://127.0.0.1:18789${NC} 👈"
+echo ""
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
 echo -e "${GREEN}Merci d'avoir installé Alizé! 🌬️${NC}"
 echo ""
