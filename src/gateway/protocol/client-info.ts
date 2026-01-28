@@ -1,6 +1,8 @@
 export const GATEWAY_CLIENT_IDS = {
   WEBCHAT_UI: "webchat-ui",
   CONTROL_UI: "alize-control-ui",
+  // Legacy / Back-compat
+  CONTROL_UI_LEGACY: "moltbot-control-ui",
   WEBCHAT: "webchat",
   CLI: "cli",
   GATEWAY_CLIENT: "gateway-client",
