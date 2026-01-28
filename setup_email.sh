@@ -57,6 +57,9 @@ if [[ -z "$EMAIL" || -z "$PASSWORD" ]]; then
     exit 1
 fi
 
+# Nettoyer le mot de passe (enlever les espaces)
+PASSWORD=${PASSWORD// /}
+
 # 3. Créer le dossier et le fichier config
 CONFIG_DIR="$HOME/.config/himalaya"
 CONFIG_FILE="$CONFIG_DIR/config.toml"
@@ -73,12 +76,15 @@ display-name = "$NAME"
 backend.type = "imap"
 backend.host = "imap.gmail.com"
 backend.port = 993
+backend.encryption = "tls"
 backend.login = "$EMAIL"
 # backend.passwd.cmd = "security find-generic-password -s himalaya -a $EMAIL -w"
 backend.passwd.cmd = "echo '$PASSWORD'"
+
 sender.type = "smtp"
 sender.host = "smtp.gmail.com"
 sender.port = 465
+sender.encryption = "tls"
 sender.login = "$EMAIL"
 # sender.passwd.cmd = "security find-generic-password -s himalaya -a $EMAIL -w"
 sender.passwd.cmd = "echo '$PASSWORD'"
