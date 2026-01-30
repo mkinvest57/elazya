@@ -1,6 +1,6 @@
 # 🌬️ Alizé - Le Premier Agent IA Français Haute Performance
 
-![Alizé Header](README-header.png)
+
 
 **Alizé** est un assistant IA personnel open source qui fonctionne sur votre ordinateur. Il connecte les principaux fournisseurs d'IA (Claude, ChatGPT, Gemini) aux canaux de messagerie (WhatsApp, Telegram, iMessage, Discord, Slack, Signal) et outils de productivité.
 
