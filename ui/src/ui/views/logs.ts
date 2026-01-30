@@ -50,77 +50,77 @@ export function renderLogs(props: LogsProps) {
     <section class="card">
       <div class="row" style="justify-content: space-between;">
         <div>
-          <div class="card-title">Logs</div>
-          <div class="card-sub">Gateway file logs (JSONL).</div>
+          <div class="card-title">Journaux</div>
+          <div class="card-sub">Logs fichiers de la passerelle (JSONL).</div>
         </div>
         <div class="row" style="gap: 8px;">
           <button class="btn" ?disabled=${props.loading} @click=${props.onRefresh}>
-            ${props.loading ? "Loading…" : "Refresh"}
+            ${props.loading ? "Chargement…" : "Actualiser"}
           </button>
           <button
             class="btn"
             ?disabled=${filtered.length === 0}
             @click=${() => props.onExport(filtered.map((entry) => entry.raw), exportLabel)}
           >
-            Export ${exportLabel}
+            Exporter ${exportLabel}
           </button>
         </div>
       </div>
 
       <div class="filters" style="margin-top: 14px;">
         <label class="field" style="min-width: 220px;">
-          <span>Filter</span>
+          <span>Filtre</span>
           <input
             .value=${props.filterText}
             @input=${(e: Event) =>
-              props.onFilterTextChange((e.target as HTMLInputElement).value)}
-            placeholder="Search logs"
+      props.onFilterTextChange((e.target as HTMLInputElement).value)}
+            placeholder="Rechercher des logs"
           />
         </label>
         <label class="field checkbox">
-          <span>Auto-follow</span>
+          <span>Suivi auto</span>
           <input
             type="checkbox"
             .checked=${props.autoFollow}
             @change=${(e: Event) =>
-              props.onToggleAutoFollow((e.target as HTMLInputElement).checked)}
+      props.onToggleAutoFollow((e.target as HTMLInputElement).checked)}
           />
         </label>
       </div>
 
       <div class="chip-row" style="margin-top: 12px;">
         ${LEVELS.map(
-          (level) => html`
+        (level) => html`
             <label class="chip log-chip ${level}">
               <input
                 type="checkbox"
                 .checked=${props.levelFilters[level]}
                 @change=${(e: Event) =>
-                  props.onLevelToggle(level, (e.target as HTMLInputElement).checked)}
+            props.onLevelToggle(level, (e.target as HTMLInputElement).checked)}
               />
               <span>${level}</span>
             </label>
           `,
-        )}
+      )}
       </div>
 
       ${props.file
-        ? html`<div class="muted" style="margin-top: 10px;">File: ${props.file}</div>`
-        : nothing}
+      ? html`<div class="muted" style="margin-top: 10px;">File: ${props.file}</div>`
+      : nothing}
       ${props.truncated
-        ? html`<div class="callout" style="margin-top: 10px;">
+      ? html`<div class="callout" style="margin-top: 10px;">
             Log output truncated; showing latest chunk.
           </div>`
-        : nothing}
+      : nothing}
       ${props.error
-        ? html`<div class="callout danger" style="margin-top: 10px;">${props.error}</div>`
-        : nothing}
+      ? html`<div class="callout danger" style="margin-top: 10px;">${props.error}</div>`
+      : nothing}
 
       <div class="log-stream" style="margin-top: 12px;" @scroll=${props.onScroll}>
         ${filtered.length === 0
-          ? html`<div class="muted" style="padding: 12px;">No log entries.</div>`
-          : filtered.map(
-              (entry) => html`
+      ? html`<div class="muted" style="padding: 12px;">No log entries.</div>`
+      : filtered.map(
+        (entry) => html`
                 <div class="log-row">
                   <div class="log-time mono">${formatTime(entry.time)}</div>
                   <div class="log-level ${entry.level ?? ""}">${entry.level ?? ""}</div>
@@ -128,7 +128,7 @@ export function renderLogs(props: LogsProps) {
                   <div class="log-message mono">${entry.message ?? entry.raw}</div>
                 </div>
               `,
-            )}
+      )}
       </div>
     </section>
   `;

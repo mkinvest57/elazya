@@ -37,9 +37,9 @@ export async function configureGatewayForOnboarding(
       : Number.parseInt(
           String(
             await prompter.text({
-              message: "Gateway port",
+              message: "Port de la passerelle",
               initialValue: String(localPort),
-              validate: (value) => (Number.isFinite(Number(value)) ? undefined : "Invalid port"),
+              validate: (value) => (Number.isFinite(Number(value)) ? undefined : "Port invalide"),
             }),
           ),
           10,
@@ -49,13 +49,13 @@ export async function configureGatewayForOnboarding(
     flow === "quickstart"
       ? quickstartGateway.bind
       : ((await prompter.select({
-          message: "Gateway bind",
+          message: "Liaison réseau (Bind)",
           options: [
-            { value: "loopback", label: "Loopback (127.0.0.1)" },
-            { value: "lan", label: "LAN (0.0.0.0)" },
-            { value: "tailnet", label: "Tailnet (Tailscale IP)" },
-            { value: "auto", label: "Auto (Loopback → LAN)" },
-            { value: "custom", label: "Custom IP" },
+            { value: "loopback", label: "Boucle locale (127.0.0.1)" },
+            { value: "lan", label: "Réseau local (LAN)" },
+            { value: "tailnet", label: "Tailnet (IP Tailscale)" },
+            { value: "auto", label: "Auto (Local → LAN)" },
+            { value: "custom", label: "IP personnalisée" },
           ],
         })) as "loopback" | "lan" | "auto" | "custom" | "tailnet")
   ) as "loopback" | "lan" | "auto" | "custom" | "tailnet";
@@ -65,14 +65,14 @@ export async function configureGatewayForOnboarding(
     const needsPrompt = flow !== "quickstart" || !customBindHost;
     if (needsPrompt) {
       const input = await prompter.text({
-        message: "Custom IP address",
+        message: "Adresse IP personnalisée",
         placeholder: "192.168.1.100",
         initialValue: customBindHost ?? "",
         validate: (value) => {
-          if (!value) return "IP address is required for custom bind mode";
+          if (!value) return "L'adresse IP est requise pour le mode personnalisé";
           const trimmed = value.trim();
           const parts = trimmed.split(".");
-          if (parts.length !== 4) return "Invalid IPv4 address (e.g., 192.168.1.100)";
+          if (parts.length !== 4) return "Adresse IPv4 invalide (ex: 192.168.1.100)";
           if (
             parts.every((part) => {
               const n = parseInt(part, 10);
@@ -80,7 +80,7 @@ export async function configureGatewayForOnboarding(
             })
           )
             return undefined;
-          return "Invalid IPv4 address (each octet must be 0-255)";
+          return "Adresse IPv4 invalide (chaque octet doit être entre 0-255)";
         },
       });
       customBindHost = typeof input === "string" ? input.trim() : undefined;
@@ -91,14 +91,14 @@ export async function configureGatewayForOnboarding(
     flow === "quickstart"
       ? quickstartGateway.authMode
       : ((await prompter.select({
-          message: "Gateway auth",
+          message: "Authentification de la passerelle",
           options: [
             {
               value: "token",
-              label: "Token",
-              hint: "Recommended default (local + remote)",
+              label: "Jeton (Token)",
+              hint: "Recommandé (accès local et distant)",
             },
-            { value: "password", label: "Password" },
+            { value: "password", label: "Mot de passe" },
           ],
           initialValue: "token",
         })) as GatewayAuthChoice)
@@ -108,18 +108,18 @@ export async function configureGatewayForOnboarding(
     flow === "quickstart"
       ? quickstartGateway.tailscaleMode
       : ((await prompter.select({
-          message: "Tailscale exposure",
+          message: "Exposition Tailscale",
           options: [
-            { value: "off", label: "Off", hint: "No Tailscale exposure" },
+            { value: "off", label: "Désactivé", hint: "Pas d'exposition Tailscale" },
             {
               value: "serve",
               label: "Serve",
-              hint: "Private HTTPS for your tailnet (devices on Tailscale)",
+              hint: "HTTPS privé pour votre réseau Tailscale",
             },
             {
               value: "funnel",
               label: "Funnel",
-              hint: "Public HTTPS via Tailscale Funnel (internet)",
+              hint: "HTTPS public via Tailscale Funnel (Internet)",
             },
           ],
         })) as "off" | "serve" | "funnel")
@@ -131,13 +131,13 @@ export async function configureGatewayForOnboarding(
     if (!tailscaleBin) {
       await prompter.note(
         [
-          "Tailscale binary not found in PATH or /Applications.",
-          "Ensure Tailscale is installed from:",
+          "Binaire Tailscale non trouvé (PATH ou /Applications).",
+          "Assurez-vous que Tailscale est installé :",
           "  https://tailscale.com/download/mac",
           "",
-          "You can continue setup, but serve/funnel will fail at runtime.",
+          "Vous pouvez continuer, mais les modes Serve/Funnel risquent d'échouer.",
         ].join("\n"),
-        "Tailscale Warning",
+        "Avertissement Tailscale",
       );
     }
   }
@@ -150,7 +150,7 @@ export async function configureGatewayForOnboarding(
     );
     tailscaleResetOnExit = Boolean(
       await prompter.confirm({
-        message: "Reset Tailscale serve/funnel on exit?",
+        message: "Réinitialiser Tailscale Serve/Funnel lors de la fermeture ?",
         initialValue: false,
       }),
     );
@@ -160,13 +160,19 @@ export async function configureGatewayForOnboarding(
   // - Tailscale wants bind=loopback so we never expose a non-loopback server + tailscale serve/funnel at once.
   // - Funnel requires password auth.
   if (tailscaleMode !== "off" && bind !== "loopback") {
-    await prompter.note("Tailscale requires bind=loopback. Adjusting bind to loopback.", "Note");
+    await prompter.note(
+      "Tailscale nécessite une liaison locale (loopback). Ajustement automatique.",
+      "Note",
+    );
     bind = "loopback";
     customBindHost = undefined;
   }
 
   if (tailscaleMode === "funnel" && authMode !== "password") {
-    await prompter.note("Tailscale funnel requires password auth.", "Note");
+    await prompter.note(
+      "Tailscale Funnel nécessite une authentification par mot de passe.",
+      "Note",
+    );
     authMode = "password";
   }
 
@@ -176,8 +182,8 @@ export async function configureGatewayForOnboarding(
       gatewayToken = quickstartGateway.token ?? randomToken();
     } else {
       const tokenInput = await prompter.text({
-        message: "Gateway token (blank to generate)",
-        placeholder: "Needed for multi-machine or non-loopback access",
+        message: "Jeton (Token) de la passerelle (laisser vide pour générer)",
+        placeholder: "Nécessaire pour l'accès multi-machines ou distant",
         initialValue: quickstartGateway.token ?? "",
       });
       gatewayToken = String(tokenInput).trim() || randomToken();
@@ -189,8 +195,8 @@ export async function configureGatewayForOnboarding(
       flow === "quickstart" && quickstartGateway.password
         ? quickstartGateway.password
         : await prompter.text({
-            message: "Gateway password",
-            validate: (value) => (value?.trim() ? undefined : "Required"),
+            message: "Mot de passe de la passerelle",
+            validate: (value) => (value?.trim() ? undefined : "Requis"),
           });
     nextConfig = {
       ...nextConfig,

@@ -41,10 +41,10 @@ export function renderOverview(props: OverviewProps) {
     if (!hasToken && !hasPassword) {
       return html`
         <div class="muted" style="margin-top: 8px;">
-          This gateway requires auth. Add a token or password, then click Connect.
+          Cette passerelle nécessite une authentification. Ajoutez un jeton ou un mot de passe, puis cliquez sur Connexion.
           <div style="margin-top: 6px;">
-            <span class="mono">alize dashboard --no-open</span> → tokenized URL<br />
-            <span class="mono">alize doctor --generate-gateway-token</span> → set token
+            <span class="mono">alize dashboard --no-open</span> → URL avec jeton<br />
+            <span class="mono">alize doctor --generate-gateway-token</span> → définir le jeton
           </div>
           <div style="margin-top: 6px;">
             <a
@@ -52,8 +52,8 @@ export function renderOverview(props: OverviewProps) {
               href="https://docs.molt.bot/web/dashboard"
               target="_blank"
               rel="noreferrer"
-              title="Control UI auth docs (opens in new tab)"
-              >Docs: Control UI auth</a
+              title="Documentation auth UI (nouvel onglet)"
+              >Docs : Auth Control UI</a
             >
           </div>
         </div>
@@ -61,17 +61,17 @@ export function renderOverview(props: OverviewProps) {
     }
     return html`
       <div class="muted" style="margin-top: 8px;">
-        Auth failed. Re-copy a tokenized URL with
-        <span class="mono">alize dashboard --no-open</span>, or update the token,
-        then click Connect.
+        Auth échouée. Copiez l'URL avec jeton via
+        <span class="mono">alize dashboard --no-open</span>, ou mettez à jour la clé,
+        puis Connecter.
         <div style="margin-top: 6px;">
           <a
             class="session-link"
             href="https://docs.molt.bot/web/dashboard"
             target="_blank"
             rel="noreferrer"
-            title="Control UI auth docs (opens in new tab)"
-            >Docs: Control UI auth</a
+            title="Documentation Auth (nouvel onglet)"
+            >Docs : Auth Control UI</a
           >
         </div>
       </div>
@@ -87,11 +87,11 @@ export function renderOverview(props: OverviewProps) {
     }
     return html`
       <div class="muted" style="margin-top: 8px;">
-        This page is HTTP, so the browser blocks device identity. Use HTTPS (Tailscale Serve) or
-        open <span class="mono">http://127.0.0.1:18789</span> on the gateway host.
+        Navigateur non sécurisé (HTTP). L'identité de l'appareil est bloquée.
+        Utilisez HTTPS (Tailscale Serve) ou l'hôte local <span class="mono">http://127.0.0.1:18789</span>.
         <div style="margin-top: 6px;">
-          If you must stay on HTTP, set
-          <span class="mono">gateway.controlUi.allowInsecureAuth: true</span> (token-only).
+          Alternative : autorisez l'auth non sécurisée via
+          <span class="mono">gateway.controlUi.allowInsecureAuth: true</span>.
         </div>
         <div style="margin-top: 6px;">
           <a
@@ -99,8 +99,8 @@ export function renderOverview(props: OverviewProps) {
             href="https://docs.molt.bot/gateway/tailscale"
             target="_blank"
             rel="noreferrer"
-            title="Tailscale Serve docs (opens in new tab)"
-            >Docs: Tailscale Serve</a
+            title="Docs Tailscale Serve"
+            >Docs : Tailscale Serve</a
           >
           <span class="muted"> · </span>
           <a
@@ -108,8 +108,8 @@ export function renderOverview(props: OverviewProps) {
             href="https://docs.molt.bot/web/control-ui#insecure-http"
             target="_blank"
             rel="noreferrer"
-            title="Insecure HTTP docs (opens in new tab)"
-            >Docs: Insecure HTTP</a
+            title="Docs HTTP Insecure"
+            >Docs : Insecure HTTP</a
           >
         </div>
       </div>
@@ -119,69 +119,69 @@ export function renderOverview(props: OverviewProps) {
   return html`
     <section class="grid grid-cols-2">
       <div class="card">
-        <div class="card-title">Gateway Access</div>
-        <div class="card-sub">Where the dashboard connects and how it authenticates.</div>
+        <div class="card-title">Accès Passerelle</div>
+        <div class="card-sub">Connexion au dashboard.</div>
         <div class="form-grid" style="margin-top: 16px;">
           <label class="field">
-            <span>WebSocket URL</span>
+            <span>URL WebSocket</span>
             <input
               .value=${props.settings.gatewayUrl}
               @input=${(e: Event) => {
-                const v = (e.target as HTMLInputElement).value;
-                props.onSettingsChange({ ...props.settings, gatewayUrl: v });
-              }}
+      const v = (e.target as HTMLInputElement).value;
+      props.onSettingsChange({ ...props.settings, gatewayUrl: v });
+    }}
               placeholder="ws://100.x.y.z:18789"
             />
           </label>
           <label class="field">
-            <span>Gateway Token</span>
+            <span>Jeton (Token)</span>
             <input
               .value=${props.settings.token}
               @input=${(e: Event) => {
-                const v = (e.target as HTMLInputElement).value;
-                props.onSettingsChange({ ...props.settings, token: v });
-              }}
+      const v = (e.target as HTMLInputElement).value;
+      props.onSettingsChange({ ...props.settings, token: v });
+    }}
               placeholder="CLAWDBOT_GATEWAY_TOKEN"
             />
           </label>
           <label class="field">
-            <span>Password (not stored)</span>
+            <span>Mot de passe (non stocké)</span>
             <input
               type="password"
               .value=${props.password}
               @input=${(e: Event) => {
-                const v = (e.target as HTMLInputElement).value;
-                props.onPasswordChange(v);
-              }}
-              placeholder="system or shared password"
+      const v = (e.target as HTMLInputElement).value;
+      props.onPasswordChange(v);
+    }}
+              placeholder="mot de passe système"
             />
           </label>
           <label class="field">
-            <span>Default Session Key</span>
+            <span>Clé de Session par défaut</span>
             <input
               .value=${props.settings.sessionKey}
               @input=${(e: Event) => {
-                const v = (e.target as HTMLInputElement).value;
-                props.onSessionKeyChange(v);
-              }}
+      const v = (e.target as HTMLInputElement).value;
+      props.onSessionKeyChange(v);
+    }}
             />
           </label>
         </div>
         <div class="row" style="margin-top: 14px;">
-          <button class="btn" @click=${() => props.onConnect()}>Connect</button>
-          <button class="btn" @click=${() => props.onRefresh()}>Refresh</button>
-          <span class="muted">Click Connect to apply connection changes.</span>
+          <button class="btn" @click=${() => props.onConnect()}>Connexion</button>
+          <button class="btn" @click=${() => props.onRefresh()}>Actualiser</button>
+          <span class="muted">Connectez-vous pour appliquer.</span>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-title">Snapshot</div>
-        <div class="card-sub">Latest gateway handshake information.</div>
+        <div class="card-title">État</div>
+        <div class="card-sub">Informations de connexion.</div>
         <div class="stat-grid" style="margin-top: 16px;">
           <div class="stat">
-            <div class="stat-label">Status</div>
+            <div class="stat-label">Statut</div>
             <div class="stat-value ${props.connected ? "ok" : "warn"}">
-              ${props.connected ? "Connected" : "Disconnected"}
+              ${props.connected ? "Connecté" : "Déconnecté"}
             </div>
           </div>
           <div class="stat">
@@ -189,26 +189,26 @@ export function renderOverview(props: OverviewProps) {
             <div class="stat-value">${uptime}</div>
           </div>
           <div class="stat">
-            <div class="stat-label">Tick Interval</div>
+            <div class="stat-label">Tick Rate</div>
             <div class="stat-value">${tick}</div>
           </div>
           <div class="stat">
-            <div class="stat-label">Last Channels Refresh</div>
+            <div class="stat-label">Dernière MAJ</div>
             <div class="stat-value">
               ${props.lastChannelsRefresh
-                ? formatAgo(props.lastChannelsRefresh)
-                : "n/a"}
+      ? formatAgo(props.lastChannelsRefresh)
+      : "n/a"}
             </div>
           </div>
         </div>
         ${props.lastError
-          ? html`<div class="callout danger" style="margin-top: 14px;">
+      ? html`<div class="callout danger" style="margin-top: 14px;">
               <div>${props.lastError}</div>
               ${authHint ?? ""}
               ${insecureContextHint ?? ""}
             </div>`
-          : html`<div class="callout" style="margin-top: 14px;">
-              Use Channels to link WhatsApp, Telegram, Discord, Signal, or iMessage.
+      : html`<div class="callout" style="margin-top: 14px;">
+              Utilisez l'onglet Canaux pour connecter WhatsApp, Telegram, etc.
             </div>`}
       </div>
     </section>
@@ -217,43 +217,43 @@ export function renderOverview(props: OverviewProps) {
       <div class="card stat-card">
         <div class="stat-label">Instances</div>
         <div class="stat-value">${props.presenceCount}</div>
-        <div class="muted">Presence beacons in the last 5 minutes.</div>
+        <div class="muted">Clients connectés (5min).</div>
       </div>
       <div class="card stat-card">
         <div class="stat-label">Sessions</div>
         <div class="stat-value">${props.sessionsCount ?? "n/a"}</div>
-        <div class="muted">Recent session keys tracked by the gateway.</div>
+        <div class="muted">Clés actives.</div>
       </div>
       <div class="card stat-card">
         <div class="stat-label">Cron</div>
         <div class="stat-value">
           ${props.cronEnabled == null
-            ? "n/a"
-            : props.cronEnabled
-              ? "Enabled"
-              : "Disabled"}
+      ? "n/a"
+      : props.cronEnabled
+        ? "Activé"
+        : "Désactivé"}
         </div>
-        <div class="muted">Next wake ${formatNextRun(props.cronNext)}</div>
+        <div class="muted">Prochain: ${formatNextRun(props.cronNext)}</div>
       </div>
     </section>
 
     <section class="card" style="margin-top: 18px;">
       <div class="card-title">Notes</div>
-      <div class="card-sub">Quick reminders for remote control setups.</div>
+      <div class="card-sub">Astuces de configuration.</div>
       <div class="note-grid" style="margin-top: 14px;">
         <div>
-          <div class="note-title">Tailscale serve</div>
+          <div class="note-title">Tailscale</div>
           <div class="muted">
-            Prefer serve mode to keep the gateway on loopback with tailnet auth.
+            Utilisez "serve" pour sécuriser l'accès et simplifier l'auth.
           </div>
         </div>
         <div>
-          <div class="note-title">Session hygiene</div>
-          <div class="muted">Use /new or sessions.patch to reset context.</div>
+          <div class="note-title">Sessions</div>
+          <div class="muted">Utilisez /new pour réinitialiser le contexte d'une conversation.</div>
         </div>
         <div>
-          <div class="note-title">Cron reminders</div>
-          <div class="muted">Use isolated sessions for recurring runs.</div>
+          <div class="note-title">Tâches Cron</div>
+          <div class="muted">Isolez les tâches récurrentes dans des sessions dédiées.</div>
         </div>
       </div>
     </section>

@@ -20,7 +20,7 @@ function formatSkillHint(skill: {
   const desc = skill.description?.trim();
   const installLabel = skill.install[0]?.label?.trim();
   const combined = desc && installLabel ? `${desc} — ${installLabel}` : desc || installLabel;
-  if (!combined) return "install";
+  if (!combined) return "installation";
   const maxLen = 90;
   return combined.length > maxLen ? `${combined.slice(0, maxLen - 1)}…` : combined;
 }
@@ -60,15 +60,15 @@ export async function setupSkills(
 
   await prompter.note(
     [
-      `Eligible: ${eligible.length}`,
-      `Missing requirements: ${missing.length}`,
-      `Blocked by allowlist: ${blocked.length}`,
+      `Éligibles : ${eligible.length}`,
+      `Prérequis manquants : ${missing.length}`,
+      `Bloqué par la liste blanche : ${blocked.length}`,
     ].join("\n"),
-    "Skills status",
+    "État des Compétences (Skills)",
   );
 
   const shouldConfigure = await prompter.confirm({
-    message: "Configure skills now? (recommended)",
+    message: "Configurer les compétences maintenant ? (recommandé)",
     initialValue: true,
   });
   if (!shouldConfigure) return cfg;
@@ -76,28 +76,28 @@ export async function setupSkills(
   if (needsBrewPrompt) {
     await prompter.note(
       [
-        "Many skill dependencies are shipped via Homebrew.",
-        "Without brew, you'll need to build from source or download releases manually.",
+        "De nombreuses dépendances sont installées via Homebrew.",
+        "Sans brew, vous devrez compiler les sources ou installer les binaires manuellement.",
       ].join("\n"),
-      "Homebrew recommended",
+      "Homebrew recommandé",
     );
     const showBrewInstall = await prompter.confirm({
-      message: "Show Homebrew install command?",
+      message: "Afficher la commande d'installation de Homebrew ?",
       initialValue: true,
     });
     if (showBrewInstall) {
       await prompter.note(
         [
-          "Run:",
+          "Lancez :",
           '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
         ].join("\n"),
-        "Homebrew install",
+        "Installation Homebrew",
       );
     }
   }
 
   const nodeManager = (await prompter.select({
-    message: "Preferred node manager for skill installs",
+    message: "Gestionnaire Node préféré pour les compétences (skills)",
     options: resolveNodeManagerOptions(),
   })) as "npm" | "pnpm" | "bun";
 
@@ -117,12 +117,12 @@ export async function setupSkills(
   );
   if (installable.length > 0) {
     const toInstall = await prompter.multiselect({
-      message: "Install missing skill dependencies",
+      message: "Installer les dépendances de compétences manquantes",
       options: [
         {
           value: "__skip__",
-          label: "Skip for now",
-          hint: "Continue without installing dependencies",
+          label: "Passer pour le moment",
+          hint: "Continuer sans installer les dépendances",
         },
         ...installable.map((skill) => ({
           value: skill.name,
@@ -138,7 +138,7 @@ export async function setupSkills(
       if (!target || target.install.length === 0) continue;
       const installId = target.install[0]?.id;
       if (!installId) continue;
-      const spin = prompter.progress(`Installing ${name}…`);
+      const spin = prompter.progress(`Installation de ${name}…`);
       const result = await installSkill({
         workspaceDir,
         skillName: target.name,
@@ -146,17 +146,17 @@ export async function setupSkills(
         config: next,
       });
       if (result.ok) {
-        spin.stop(`Installed ${name}`);
+        spin.stop(`Installé : ${name}`);
       } else {
-        const code = result.code == null ? "" : ` (exit ${result.code})`;
+        const code = result.code == null ? "" : ` (erreur ${result.code})`;
         const detail = summarizeInstallFailure(result.message);
-        spin.stop(`Install failed: ${name}${code}${detail ? ` — ${detail}` : ""}`);
+        spin.stop(`Échec de l'installation : ${name}${code}${detail ? ` — ${detail}` : ""}`);
         if (result.stderr) runtime.log(result.stderr.trim());
         else if (result.stdout) runtime.log(result.stdout.trim());
         runtime.log(
-          `Tip: run \`${formatCliCommand("alize doctor")}\` to review skills + requirements.`,
+          `Astuce : lancez \`${formatCliCommand("alize doctor")}\` pour vérifier les compétences et les prérequis.`,
         );
-        runtime.log("Docs: https://docs.molt.bot/skills");
+        runtime.log("Docs : https://docs.molt.bot/skills");
       }
     }
   }
@@ -164,14 +164,14 @@ export async function setupSkills(
   for (const skill of missing) {
     if (!skill.primaryEnv || skill.missing.env.length === 0) continue;
     const wantsKey = await prompter.confirm({
-      message: `Set ${skill.primaryEnv} for ${skill.name}?`,
+      message: `Configurer la clé ${skill.primaryEnv} pour ${skill.name} ?`,
       initialValue: false,
     });
     if (!wantsKey) continue;
     const apiKey = String(
       await prompter.text({
-        message: `Enter ${skill.primaryEnv}`,
-        validate: (value) => (value?.trim() ? undefined : "Required"),
+        message: `Entrez votre clé ${skill.primaryEnv}`,
+        validate: (value) => (value?.trim() ? undefined : "Requis"),
       }),
     );
     next = upsertSkillEntry(next, skill.skillKey, { apiKey: apiKey.trim() });

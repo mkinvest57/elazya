@@ -33,27 +33,27 @@ function setTelegramDmPolicy(cfg: AlizeConfig, dmPolicy: DmPolicy) {
 async function noteTelegramTokenHelp(prompter: WizardPrompter): Promise<void> {
   await prompter.note(
     [
-      "1) Open Telegram and chat with @BotFather",
-      "2) Run /newbot (or /mybots)",
-      "3) Copy the token (looks like 123456:ABC...)",
-      "Tip: you can also set TELEGRAM_BOT_TOKEN in your env.",
-      `Docs: ${formatDocsLink("/telegram")}`,
-      "Website: https://molt.bot",
+      "1) Ouvrez Telegram et discutez avec @BotFather",
+      "2) Lancez la commande /newbot (ou /mybots)",
+      "3) Copiez le jeton (ressemble à 123456:ABC...)",
+      "Astuce : vous pouvez aussi régler TELEGRAM_BOT_TOKEN dans votre environnement.",
+      `Docs : ${formatDocsLink("/telegram")}`,
+      "Site web : https://alize.ai",
     ].join("\n"),
-    "Telegram bot token",
+    "Jeton du bot Telegram",
   );
 }
 
 async function noteTelegramUserIdHelp(prompter: WizardPrompter): Promise<void> {
   await prompter.note(
     [
-      `1) DM your bot, then read from.id in \`${formatCliCommand("alize logs --follow")}\` (safest)`,
-      "2) Or call https://api.telegram.org/bot<bot_token>/getUpdates and read message.from.id",
-      "3) Third-party: DM @userinfobot or @getidsbot",
-      `Docs: ${formatDocsLink("/telegram")}`,
-      "Website: https://molt.bot",
+      `1) Envoyez un DM à votre bot, puis lisez l'ID dans \`${formatCliCommand("alize logs --follow")}\` (le plus sûr)`,
+      "2) Ou appelez https://api.telegram.org/bot<bot_token>/getUpdates et lisez message.from.id",
+      "3) Alternative : envoyez un DM à @userinfobot ou @getidsbot",
+      `Docs : ${formatDocsLink("/telegram")}`,
+      "Site web : https://alize.ai",
     ].join("\n"),
-    "Telegram user id",
+    "ID utilisateur Telegram",
   );
 }
 
@@ -69,7 +69,10 @@ async function promptTelegramAllowFrom(params: {
 
   const token = resolved.token;
   if (!token) {
-    await prompter.note("Telegram token missing; username lookup is unavailable.", "Telegram");
+    await prompter.note(
+      "Jeton Telegram manquant ; la recherche par pseudo est indisponible.",
+      "Telegram",
+    );
   }
 
   const resolveTelegramUserId = async (raw: string): Promise<string | null> => {
@@ -105,18 +108,18 @@ async function promptTelegramAllowFrom(params: {
   let resolvedIds: string[] = [];
   while (resolvedIds.length === 0) {
     const entry = await prompter.text({
-      message: "Telegram allowFrom (username or user id)",
-      placeholder: "@username",
+      message: "Liste blanche Telegram (pseudo ou ID utilisateur)",
+      placeholder: "@pseudo",
       initialValue: existingAllowFrom[0] ? String(existingAllowFrom[0]) : undefined,
-      validate: (value) => (String(value ?? "").trim() ? undefined : "Required"),
+      validate: (value) => (String(value ?? "").trim() ? undefined : "Requis"),
     });
     const parts = parseInput(String(entry));
     const results = await Promise.all(parts.map((part) => resolveTelegramUserId(part)));
     const unresolved = parts.filter((_, idx) => !results[idx]);
     if (unresolved.length > 0) {
       await prompter.note(
-        `Could not resolve: ${unresolved.join(", ")}. Use @username or numeric id.`,
-        "Telegram allowlist",
+        `Impossible de résoudre : ${unresolved.join(", ")}. Utilisez @pseudo ou ID numérique.`,
+        "Liste blanche Telegram",
       );
       continue;
     }
@@ -200,8 +203,8 @@ export const telegramOnboardingAdapter: ChannelOnboardingAdapter = {
     return {
       channel,
       configured,
-      statusLines: [`Telegram: ${configured ? "configured" : "needs token"}`],
-      selectionHint: configured ? "recommended · configured" : "recommended · newcomer-friendly",
+      statusLines: [`Telegram : ${configured ? "configuré" : "jeton requis"}`],
+      selectionHint: configured ? "recommandé · configuré" : "recommandé · facile à installer",
       quickstartScore: configured ? 1 : 10,
     };
   },
@@ -246,7 +249,7 @@ export const telegramOnboardingAdapter: ChannelOnboardingAdapter = {
     }
     if (canUseEnv && !resolvedAccount.config.botToken) {
       const keepEnv = await prompter.confirm({
-        message: "TELEGRAM_BOT_TOKEN detected. Use env var?",
+        message: "TELEGRAM_BOT_TOKEN détecté. Utiliser la variable d'environnement ?",
         initialValue: true,
       });
       if (keepEnv) {
@@ -263,29 +266,29 @@ export const telegramOnboardingAdapter: ChannelOnboardingAdapter = {
       } else {
         token = String(
           await prompter.text({
-            message: "Enter Telegram bot token",
-            validate: (value) => (value?.trim() ? undefined : "Required"),
+            message: "Entrez le jeton du bot Telegram",
+            validate: (value) => (value?.trim() ? undefined : "Requis"),
           }),
         ).trim();
       }
     } else if (hasConfigToken) {
       const keep = await prompter.confirm({
-        message: "Telegram token already configured. Keep it?",
+        message: "Jeton Telegram déjà configuré. Le conserver ?",
         initialValue: true,
       });
       if (!keep) {
         token = String(
           await prompter.text({
-            message: "Enter Telegram bot token",
-            validate: (value) => (value?.trim() ? undefined : "Required"),
+            message: "Entrez le jeton du bot Telegram",
+            validate: (value) => (value?.trim() ? undefined : "Requis"),
           }),
         ).trim();
       }
     } else {
       token = String(
         await prompter.text({
-          message: "Enter Telegram bot token",
-          validate: (value) => (value?.trim() ? undefined : "Required"),
+          message: "Entrez le jeton du bot Telegram",
+          validate: (value) => (value?.trim() ? undefined : "Requis"),
         }),
       ).trim();
     }

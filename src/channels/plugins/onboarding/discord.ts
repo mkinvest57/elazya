@@ -45,12 +45,12 @@ async function noteDiscordTokenHelp(prompter: WizardPrompter): Promise<void> {
   await prompter.note(
     [
       "1) Discord Developer Portal → Applications → New Application",
-      "2) Bot → Add Bot → Reset Token → copy token",
-      "3) OAuth2 → URL Generator → scope 'bot' → invite to your server",
-      "Tip: enable Message Content Intent if you need message text. (Bot → Privileged Gateway Intents → Message Content Intent)",
-      `Docs: ${formatDocsLink("/discord", "discord")}`,
+      "2) Bot → Add Bot → Reset Token → copiez le jeton",
+      "3) OAuth2 → URL Generator → scope 'bot' → invitez-le sur votre serveur",
+      "Astuce : activez 'Message Content Intent' si vous avez besoin du texte des messages. (Bot → Privileged Gateway Intents → Message Content Intent)",
+      `Docs : ${formatDocsLink("/discord", "discord")}`,
     ].join("\n"),
-    "Discord bot token",
+    "Jeton du bot Discord",
   );
 }
 
@@ -187,15 +187,15 @@ async function promptDiscordAllowFrom(params: {
   const existing = params.cfg.channels?.discord?.dm?.allowFrom ?? [];
   await params.prompter.note(
     [
-      "Allowlist Discord DMs by username (we resolve to user ids).",
-      "Examples:",
+      "Ajoutez des utilisateurs Discord à la liste blanche par pseudo (on retrouve les IDs).",
+      "Exemples :",
       "- 123456789012345678",
       "- @alice",
       "- alice#1234",
-      "Multiple entries: comma-separated.",
-      `Docs: ${formatDocsLink("/discord", "discord")}`,
+      "Plusieurs entrées : séparées par des virgules.",
+      `Docs : ${formatDocsLink("/discord", "discord")}`,
     ].join("\n"),
-    "Discord allowlist",
+    "Liste blanche Discord",
   );
 
   const parseInputs = (value: string) => parseDiscordAllowFromInput(value);
@@ -211,18 +211,18 @@ async function promptDiscordAllowFrom(params: {
 
   while (true) {
     const entry = await params.prompter.text({
-      message: "Discord allowFrom (usernames or ids)",
+      message: "Liste blanche Discord (pseudos ou ids)",
       placeholder: "@alice, 123456789012345678",
       initialValue: existing[0] ? String(existing[0]) : undefined,
-      validate: (value) => (String(value ?? "").trim() ? undefined : "Required"),
+      validate: (value) => (String(value ?? "").trim() ? undefined : "Requis"),
     });
     const parts = parseInputs(String(entry));
     if (!token) {
       const ids = parts.map(parseId).filter(Boolean) as string[];
       if (ids.length !== parts.length) {
         await params.prompter.note(
-          "Bot token missing; use numeric user ids (or mention form) only.",
-          "Discord allowlist",
+          "Jeton du bot manquant ; utilisez uniquement des IDs numériques (ou la forme @mention).",
+          "Liste blanche Discord",
         );
         continue;
       }
@@ -237,14 +237,17 @@ async function promptDiscordAllowFrom(params: {
       entries: parts,
     }).catch(() => null);
     if (!results) {
-      await params.prompter.note("Failed to resolve usernames. Try again.", "Discord allowlist");
+      await params.prompter.note(
+        "Échec de la résolution des pseudos. Réessayez.",
+        "Liste blanche Discord",
+      );
       continue;
     }
     const unresolved = results.filter((res) => !res.resolved || !res.id);
     if (unresolved.length > 0) {
       await params.prompter.note(
-        `Could not resolve: ${unresolved.map((res) => res.input).join(", ")}`,
-        "Discord allowlist",
+        `Impossible de résoudre : ${unresolved.map((res) => res.input).join(", ")}`,
+        "Liste blanche Discord",
       );
       continue;
     }
@@ -273,8 +276,8 @@ export const discordOnboardingAdapter: ChannelOnboardingAdapter = {
     return {
       channel,
       configured,
-      statusLines: [`Discord: ${configured ? "configured" : "needs token"}`],
-      selectionHint: configured ? "configured" : "needs token",
+      statusLines: [`Discord : ${configured ? "configuré" : "jeton requis"}`],
+      selectionHint: configured ? "configuré" : "jeton requis",
       quickstartScore: configured ? 2 : 1,
     };
   },
@@ -311,7 +314,7 @@ export const discordOnboardingAdapter: ChannelOnboardingAdapter = {
     }
     if (canUseEnv && !resolvedAccount.config.token) {
       const keepEnv = await prompter.confirm({
-        message: "DISCORD_BOT_TOKEN detected. Use env var?",
+        message: "DISCORD_BOT_TOKEN détecté. Utiliser la variable d'environnement ?",
         initialValue: true,
       });
       if (keepEnv) {
@@ -325,14 +328,14 @@ export const discordOnboardingAdapter: ChannelOnboardingAdapter = {
       } else {
         token = String(
           await prompter.text({
-            message: "Enter Discord bot token",
-            validate: (value) => (value?.trim() ? undefined : "Required"),
+            message: "Entrez le jeton du bot Discord",
+            validate: (value) => (value?.trim() ? undefined : "Requis"),
           }),
         ).trim();
       }
     } else if (hasConfigToken) {
       const keep = await prompter.confirm({
-        message: "Discord token already configured. Keep it?",
+        message: "Jeton Discord déjà configuré. Le conserver ?",
         initialValue: true,
       });
       if (!keep) {
@@ -346,8 +349,8 @@ export const discordOnboardingAdapter: ChannelOnboardingAdapter = {
     } else {
       token = String(
         await prompter.text({
-          message: "Enter Discord bot token",
-          validate: (value) => (value?.trim() ? undefined : "Required"),
+          message: "Entrez le jeton du bot Discord",
+          validate: (value) => (value?.trim() ? undefined : "Requis"),
         }),
       ).trim();
     }
@@ -393,7 +396,7 @@ export const discordOnboardingAdapter: ChannelOnboardingAdapter = {
     );
     const accessConfig = await promptChannelAccessConfig({
       prompter,
-      label: "Discord channels",
+      label: "canaux Discord",
       currentPolicy: resolvedAccount.config.groupPolicy ?? "allowlist",
       currentEntries,
       placeholder: "My Server/#general, guildId/channelId, #support",
@@ -428,7 +431,7 @@ export const discordOnboardingAdapter: ChannelOnboardingAdapter = {
               const summary: string[] = [];
               if (resolvedChannels.length > 0) {
                 summary.push(
-                  `Resolved channels: ${resolvedChannels
+                  `Canaux résolus : ${resolvedChannels
                     .map((entry) => entry.channelId)
                     .filter(Boolean)
                     .join(", ")}`,
@@ -436,21 +439,21 @@ export const discordOnboardingAdapter: ChannelOnboardingAdapter = {
               }
               if (resolvedGuilds.length > 0) {
                 summary.push(
-                  `Resolved guilds: ${resolvedGuilds
+                  `Serveurs (Guilds) résolus : ${resolvedGuilds
                     .map((entry) => entry.guildId)
                     .filter(Boolean)
                     .join(", ")}`,
                 );
               }
               if (unresolved.length > 0) {
-                summary.push(`Unresolved (kept as typed): ${unresolved.join(", ")}`);
+                summary.push(`Non résolu (conservé tel quel) : ${unresolved.join(", ")}`);
               }
-              await prompter.note(summary.join("\n"), "Discord channels");
+              await prompter.note(summary.join("\n"), "Canaux Discord");
             }
           } catch (err) {
             await prompter.note(
-              `Channel lookup failed; keeping entries as typed. ${String(err)}`,
-              "Discord channels",
+              `Échec de la recherche de canal ; conservation des entrées telles quelles. ${String(err)}`,
+              "Canaux Discord",
             );
           }
         }

@@ -20,9 +20,34 @@ View Notes
 - Search notes (fuzzy): `memo notes -s "query"`
 
 Create Notes
-- Add a new note: `memo notes -a`
-  - Opens an interactive editor to compose the note.
-- Quick add with title: `memo notes -a "Note Title"`
+
+> [!CAUTION]
+> ## ⚠️ POUR CRÉER UNE NOTE (NON-INTERACTIF):
+>
+> **`memo notes -a` ouvre un éditeur interactif et NE FONCTIONNE PAS avec exec!**
+>
+> **Utilisez AppleScript avec `osascript` à la place:**
+> ```bash
+> osascript -e 'tell application "Notes" to make new note at folder "Notes" with properties {name:"TITRE", body:"CONTENU DE LA NOTE"}'
+> ```
+>
+> **Exemple avec formatage (HTML supporté):**
+> ```bash
+> osascript -e 'tell application "Notes" to make new note at folder "Notes" with properties {name:"Titre Note", body:"<h1>Grand Titre</h1><p>Paragraphe avec <b>gras</b>.</p><ul><li>Liste 1</li><li>Liste 2</li></ul><br><table border=\"1\"><tr><th>Col 1</th><th>Col 2</th></tr><tr><td>Val A</td><td>Val B</td></tr></table>"}'
+> ```
+>
+> ⚠️ **IMPORTANT: Apple Notes does NOT support Markdown inside the body!**
+> - ❌ DO NOT use `| Col 1 | Col 2 |` (Markdown tables) - it will render as raw text.
+> - ✅ YOU MUST USE HTML `<table>`, `<tr>`, `<td>` for tables.
+> - ✅ YOU MUST USE HTML `<h1>`, `<b>`, `<ul>`, `<li>` for formatting.
+>
+> **Exemple complet (simplifié):**
+> ```bash
+> osascript -e 'tell application "Notes" to make new note at folder "Notes" with properties {name:"Ma Note", body:"Contenu simple.\n\nNouvelle ligne."}'
+> ```
+
+- Interactive (NE PAS UTILISER): `memo notes -a` - Opens an interactive editor
+- **Non-interactive (UTILISER CECI)**: `osascript -e 'tell application "Notes"...'`
 
 Edit Notes
 - Edit existing note: `memo notes -e`

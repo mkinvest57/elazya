@@ -1,3 +1,9 @@
+---
+name: canvas
+description: Display HTML content on connected Alizé nodes (Mac app, iOS, Android).
+metadata: {"alize":{"emoji":"🎨","requires":{"config":["canvasHost.enabled"]}}}
+---
+
 # Canvas Skill
 
 Display HTML content on connected Alizé nodes (Mac app, iOS, Android).

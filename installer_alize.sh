@@ -2,7 +2,7 @@
 #
 # 🌬️ Installateur Alizé
 # Le premier agent IA français haute performance
-# Basé sur Moltbot (https://github.com/moltbot/moltbot)
+# Basé sur la technologie Alizé (https://alize.ai)
 #
 
 set -e
@@ -16,42 +16,76 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
 
-# Fonction pour afficher les messages
+# Fonction pour afficher les messages de manière portable
+say() {
+    # On utilise printf pour éviter les problèmes de echo -e sur certains shells (sh, dash)
+    printf "%b\n" "$1"
+}
+
 info() {
-    echo -e "${CYAN}ℹ️  $1${NC}"
+    say "${CYAN}ℹ️  $1${NC}"
 }
 
 success() {
-    echo -e "${GREEN}✅ $1${NC}"
+    say "${GREEN}✅ $1${NC}"
 }
 
 warning() {
-    echo -e "${YELLOW}⚠️  $1${NC}"
+    say "${YELLOW}⚠️  $1${NC}"
 }
 
 error() {
-    echo -e "${RED}❌ $1${NC}"
+    say "${RED}❌ $1${NC}"
 }
 
 step() {
-    echo -e "\n${BLUE}${BOLD}[$1/5]${NC} $2"
+    say "\n${BLUE}${BOLD}[$1/7]${NC} $2"
 }
 
 # Bannière
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BOLD}🌬️  Bienvenue dans l'installation d'Alizé!${NC}"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo -e "    ${BOLD}Le premier assistant IA français haute performance${NC}"
-echo -e "    Basé sur Moltbot par Peter Steinberger"
-echo ""
+say ""
+say "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+say "${BOLD}🌬️  Bienvenue dans l'installation d'Alizé!${NC}"
+say "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+say ""
+say "    ${BOLD}Le premier assistant IA français haute performance${NC}"
+say "    Propulsé par le moteur d'autonomie Alizé"
+say ""
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# ÉTAPE 1: Détection du système
+# ÉTAPE 1: Détection de l'environnement et du système
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 step "1" "Détection de votre système..."
+
+# Détecter si on est dans un pipe ou si le script est sur le disque
+IS_REMOTE=false
+if [[ -z "${BASH_SOURCE[0]}" ]] || [[ "${BASH_SOURCE[0]}" == "/dev/stdin" ]]; then
+    IS_REMOTE=true
+fi
+
+# Répertoire cible par défaut pour l'installation
+TARGET_DIR="$HOME/alize"
+
+# Pour le développement local, on privilégie le code source modifié
+DEV_SOURCE="/Users/sashimi/Documents/moltbot-main"
+if [[ -d "$DEV_SOURCE" ]]; then
+    REPO_URL="file://$DEV_SOURCE"
+    # info "Mode développement détecté : source locale $REPO_URL"
+else
+    # Fallback sur le dépôt public (qui sera openclaw/moltbot pour l'instant)
+    REPO_URL="https://github.com/moltbot/moltbot.git" 
+fi
+
+if $IS_REMOTE; then
+    info "Installation à distance détectée (pipe)."
+else
+    # Si on est en local, on vérifie si on est dans le dépôt
+    if [[ -f "package.json" ]] && grep -q '"name": "alize"' package.json; then
+        TARGET_DIR="$(pwd)"
+        info "Installation locale détectée dans : $TARGET_DIR"
+    fi
+fi
 
 OS_TYPE=$(uname -s)
 SHELL_TYPE=$(basename "$SHELL")
@@ -65,17 +99,51 @@ elif [[ "$OS_TYPE" == "Linux" ]]; then
     OS_NAME="linux"
 else
     error "Système non supporté: $OS_TYPE"
-    echo "Alizé supporte macOS et Linux."
+    say "Alizé supporte macOS et Linux."
     exit 1
 fi
 
 info "Shell: $SHELL_TYPE"
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# ÉTAPE 2: Vérification des dépendances
+# ÉTAPE 2: Préparation du répertoire (Clonage si nécessaire)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-step "2" "Vérification de Node.js..."
+step "2" "Préparation du répertoire d'installation..."
+
+if $IS_REMOTE || [[ ! -d "$TARGET_DIR/.git" ]]; then
+    if [[ -d "$TARGET_DIR" ]]; then
+        warning "Le répertoire $TARGET_DIR existe déjà."
+        read -p "Voulez-vous le supprimer et recommencer ? (o/n) " -n 1 -r < /dev/tty
+        say ""
+        if [[ $REPLY =~ ^[Oo]$ ]]; then
+            info "Suppression de $TARGET_DIR..."
+            rm -rf "$TARGET_DIR"
+        else
+            error "Installation annulée par l'utilisateur."
+            exit 1
+        fi
+    fi
+
+    info "Clonage d'Alizé dans $TARGET_DIR..."
+    if ! command -v git &> /dev/null; then
+        error "Git n'est pas installé. Veuillez installer Git avant de continuer."
+        exit 1
+    fi
+    
+    git clone "$REPO_URL" "$TARGET_DIR"
+    success "Dépôt cloné avec succès."
+fi
+
+# On se place dans le répertoire cible pour le reste de l'installation
+cd "$TARGET_DIR"
+SCRIPT_DIR="$(pwd)"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ÉTAPE 3: Vérification des dépendances
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+step "3" "Vérification de Node.js..."
 
 if ! command -v node &> /dev/null; then
     warning "Node.js n'est pas installé"
@@ -87,12 +155,12 @@ if ! command -v node &> /dev/null; then
             success "Node.js installé"
         else
             error "Homebrew n'est pas installé."
-            echo "Installez Node.js manuellement: https://nodejs.org/"
+            say "Installez Node.js manuellement: https://nodejs.org/"
             exit 1
         fi
     else
         error "Veuillez installer Node.js manuellement."
-        echo "Visitez: https://nodejs.org/"
+        say "Visitez: https://nodejs.org/"
         exit 1
     fi
 else
@@ -112,11 +180,11 @@ else
 fi
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# ÉTAPE 2b: Installation des outils optionnels (macOS)
+# ÉTAPE 4: Installation des outils optionnels (macOS)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 if [[ "$OS_NAME" == "macos" ]]; then
-    step "2b" "Installation des outils système optionnels..."
+    step "4" "Installation des outils système optionnels..."
 
     if command -v brew &> /dev/null; then
         # Himalaya (Email)
@@ -142,17 +210,13 @@ if [[ "$OS_NAME" == "macos" ]]; then
 fi
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# ÉTAPE 3: Installation des dépendances
+# ÉTAPE 5: Installation des dépendances
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-step "3" "Installation des dépendances..."
-
-# Aller dans le répertoire du script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+step "5" "Installation des dépendances..."
 
 info "Assemblage d'Alizé en cours... ⏳"
-echo ""
+say ""
 
 if pnpm install --silent 2>/dev/null; then
     success "Dépendances installées"
@@ -163,10 +227,10 @@ else
 fi
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# ÉTAPE 4: Compilation
+# ÉTAPE 6: Compilation
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-step "4" "Compilation d'Alizé..."
+step "6" "Compilation d'Alizé..."
 
 if pnpm build --silent 2>/dev/null; then
     success "Alizé compilé avec succès"
@@ -177,10 +241,10 @@ else
 fi
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# ÉTAPE 5: Configuration du PATH
+# ÉTAPE 7: Configuration du PATH
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-step "5" "Configuration du PATH..."
+step "7" "Configuration du PATH..."
 
 ALIZE_BIN="$SCRIPT_DIR"
 
@@ -220,78 +284,118 @@ EOF
 fi
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# FINALISATION
+# ÉTAPE OPTIONNELLE: Configuration des skills
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}${BOLD}🎉 Installation d'Alizé terminée!${NC}"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo -e "${BOLD}Prochaines étapes:${NC}"
-echo ""
-echo -e "  1. ${CYAN}source $RC_FILE${NC}     (recharger le shell)"
-echo -e "  2. ${CYAN}alize onboard${NC}       (configuration guidée)"
-echo -e "  3. ${CYAN}alize daemon start${NC}  (démarrer le serveur)"
-echo ""
-echo -e "${BOLD}Commandes utiles:${NC}"
-echo ""
-echo -e "  ${CYAN}alize --help${NC}         Afficher l'aide"
-echo -e "  ${CYAN}alize doctor${NC}         Vérifier l'installation"
-echo -e "  ${CYAN}alize dashboard${NC}      Ouvrir l'interface web"
-echo ""
-echo -e "${BOLD}💡 Astuce:${NC} Utilisez Gemini 2.5 Flash (gratuit) pour commencer!"
-echo -e "   Obtenez votre clé: ${BLUE}https://aistudio.google.com/apikey${NC}"
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+say ""
+say "${BLUE}${BOLD}[Optionnel]${NC} Configuration des compétences (skills)..."
 
-# Demander si l'utilisateur veut démarrer le daemon
-echo ""
-read -p "Voulez-vous démarrer Alizé maintenant? (o/n) " -n 1 -r
-echo ""
+say ""
+say "${BOLD}🔍 Recherche Web (Brave Search)${NC}"
+say "   Permet à Alizé de faire des recherches sur Internet."
+say "   ${CYAN}Obtenez une clé gratuite:${NC} https://brave.com/search/api/"
+say ""
+
+read -p "Voulez-vous configurer la recherche web maintenant? (o/n) " -n 1 -r < /dev/tty
+say ""
 
 if [[ $REPLY =~ ^[Oo]$ ]]; then
-    info "Démarrage d'Alizé..."
+    say ""
+    read -p "Collez votre clé API Brave Search (ou appuyez Entrée pour ignorer): " BRAVE_KEY < /dev/tty
     
-    # Charger l'alias pour cette session
-    source "$RC_FILE" 2>/dev/null || true
-    
-    # Démarrer le daemon
-    node "$SCRIPT_DIR/alize.mjs" daemon start &
-    DAEMON_PID=$!
-    
-    sleep 2
-    
-    if kill -0 $DAEMON_PID 2>/dev/null; then
-        success "Alizé démarré! (PID: $DAEMON_PID)"
+    if [[ -n "$BRAVE_KEY" ]]; then
+        # Créer/mettre à jour le fichier de config
+        CONFIG_DIR="$HOME/.config/alize"
+        CONFIG_FILE="$CONFIG_DIR/config.json5"
         
-        # Ouvrir le navigateur si possible
-        if command -v open &> /dev/null; then
-            sleep 1
-            open "http://127.0.0.1:18789" 2>/dev/null || true
-        elif command -v xdg-open &> /dev/null; then
-            sleep 1
-            xdg-open "http://127.0.0.1:18789" 2>/dev/null || true
+        mkdir -p "$CONFIG_DIR"
+        
+        if [[ -f "$CONFIG_FILE" ]]; then
+            # Ajouter à la config existante (basique - le wizard fera mieux)
+            info "Configuration stockée. Utilisez 'alize configure --section web' pour les options avancées."
+        else
+            # Créer une config minimale
+            cat > "$CONFIG_FILE" << EOF
+{
+  // Configuration Alizé
+  tools: {
+    web: {
+      search: {
+        enabled: true,
+        apiKey: "$BRAVE_KEY"
+      },
+      fetch: {
+        enabled: true
+      }
+    }
+  }
+}
+EOF
         fi
+        success "Recherche web configurée!"
     else
-        warning "Le daemon ne semble pas avoir démarré correctement."
-        echo "Essayez: alize daemon start"
+        info "Recherche web ignorée. Configurez-la plus tard avec: alize configure --section web"
     fi
 else
-    info "Vous pouvez démarrer Alizé plus tard avec: alize daemon start"
+    info "Configuration des skills ignorée. Utilisez 'alize configure' plus tard."
 fi
 
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}${BOLD}🎉 Installation d'Alizé terminée!${NC}"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo -e "🔎 ${BOLD}ACCÈS AU TABLEAU DE BORD (DASHBOARD)${NC}"
-echo -e "   Une fois Alizé démarré, ouvrez ce lien dans votre navigateur :"
-echo ""
-echo -e "   👉 ${BOLD}${BLUE}http://127.0.0.1:18789${NC} 👈"
-echo ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo -e "${GREEN}Merci d'avoir installé Alizé! 🌬️${NC}"
-echo ""
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ÉTAPE FINALE: Mise en service automatique 🚀
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+step "Finale" "Mise en service d'Alizé..."
+
+say ""
+info "Alivons l'intelligence Alizé sur votre système..."
+
+# Définir le chemin absolu vers le binaire pour éviter les erreurs d'alias
+if [[ -f "$TARGET_DIR/alize.mjs" ]]; then
+    ALIZE_EXEC="node $TARGET_DIR/alize.mjs"
+else
+    ALIZE_EXEC="node $TARGET_DIR/dist/index.js"
+fi
+
+# 1. Onboarding automatique
+say ""
+say "${BOLD}Configuration initiale en cours...${NC}"
+# On redirige stdin vers le terminal pour que l'onboarding soit interactif
+$ALIZE_EXEC onboard < /dev/tty
+
+# 2. Démarrage du daemon
+say ""
+info "Démarrage du moteur d'autonomie..."
+$ALIZE_EXEC daemon start &
+DAEMON_PID=$!
+
+# Attendre que le serveur démarre
+sleep 3
+
+# 3. Ouverture du Dashboard
+say ""
+info "Ouverture de votre Tableau de Bord..."
+DASH_URL="http://127.0.0.1:18789"
+
+if command -v open &> /dev/null; then
+    open "$DASH_URL" 2>/dev/null || true
+elif command -v xdg-open &> /dev/null; then
+    xdg-open "$DASH_URL" 2>/dev/null || true
+fi
+
+say ""
+say "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+say "${GREEN}${BOLD}🎉 Félicitations ! Alizé est maintenant opérationnel.${NC}"
+say "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+say ""
+say "   👉 Votre Tableau de Bord : ${BOLD}${BLUE}$DASH_URL${NC}"
+say "   💡 Votre assistant IA français est prêt à vous servir."
+say ""
+say "   ${BOLD}Note:${NC} Pour utiliser Alizé depuis n'importe quel terminal,"
+say "   ouvrez une nouvelle fenêtre ou tapez : ${CYAN}source $RC_FILE${NC}"
+say ""
+say "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+say ""
+say "${GREEN}Alizé vous remercie de votre confiance. 🌬️🇫🇷✨⚖️${NC}"
+say ""
+
+exit 0

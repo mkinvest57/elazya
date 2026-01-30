@@ -9,6 +9,31 @@ metadata: {"alize":{"emoji":"📧","requires":{"bins":["himalaya"]},"install":[{
 
 Himalaya is a CLI email client that lets you manage emails from the terminal using IMAP, SMTP, Notmuch, or Sendmail backends.
 
+> [!IMPORTANT]
+> ## 🛡️ SAFEST WAY TO SEND EMAILS (Avoids "Unmatched Quote" Errors)
+>
+> **Do NOT use `printf` for complex bodies!** It fails with quotes (`'`).
+>
+> **✅ ALWAYS USE THIS method:**
+> 1. **Create a temporary file** (e.g., `email_draft.txt`) containing the full email.
+> 2. **Pipe the file** to Himalaya.
+>
+> **Steps for Alizé:**
+> 1. Use `write_to_file` (or `exec` with `cat <<'EOF'`) to create `email_draft.txt`:
+>    ```
+>    From: nanashinfinite@gmail.com
+>    To: RECIPIENT@example.com
+>    Subject: My Subject
+>
+>    Hello,
+>    Here is the body with symbols like ' and " !
+>    ```
+> 2. Run the command:
+>    ```bash
+>    cat email_draft.txt | himalaya template send -a default
+>    ```
+> 3. Delete the file: `rm email_draft.txt`
+
 ## References
 
 - `references/configuration.md` (config file setup + IMAP/SMTP authentication)
@@ -114,26 +139,84 @@ himalaya message forward 42
 
 ### Write a New Email
 
-Interactive compose (opens $EDITOR):
+**IMPORTANT FOR AUTOMATION (non-interactive usage):**
+
+Do NOT use `himalaya message write` - it opens $EDITOR interactively!
+
+**Use `template send` with the template as ARGUMENT (most reliable):**
+
 ```bash
-himalaya message write
+# Template as argument (preferred for automation - avoids stdin issues)
+himalaya template send "From: you@example.com
+To: recipient@example.com
+Subject: Test Message
+
+Hello from Himalaya!"
+
+# With a specific account (use -a flag with template send)
+himalaya template send -a work "From: you@example.com
+To: recipient@example.com
+Subject: Test
+
+Body here"
 ```
 
-Send directly using template:
+**Using heredoc (alternative):**
+
 ```bash
-cat << 'EOF' | himalaya template send
+himalaya template send << 'TEMPLATE'
 From: you@example.com
 To: recipient@example.com
 Subject: Test Message
 
 Hello from Himalaya!
-EOF
+TEMPLATE
 ```
 
-Or with headers flag:
+**With attachments (MML format):**
+
 ```bash
-himalaya message write -H "To:recipient@example.com" -H "Subject:Test" "Message body here"
+himalaya template send "From: you@example.com
+To: recipient@example.com
+Subject: Document attached
+
+Please find the attachment.
+
+<#part filename=\"/path/to/file.pdf\">"
 ```
+
+**TROUBLESHOOTING:**
+
+**"cannot prompt item from list":**
+1. You have a default account: `himalaya account list` (should show one with `yes` in DEFAULT column)
+2. Use `-a <account_name>` to specify account explicitly
+3. Pass template as argument, not via stdin pipe
+
+**"Folder doesn't exist" (but email was sent!):**
+
+This is a FALSE NEGATIVE! The email IS sent successfully via SMTP, but Himalaya fails to save a copy to the "Sent" folder. This happens when:
+- The Sent folder doesn't exist or has a different name on your IMAP server
+- Common folder names: "Sent", "Sent Items", "Envoyés", "[Gmail]/Sent Mail"
+
+**Fix:** Configure the correct folder in `~/.config/himalaya/config.toml`:
+
+```toml
+[accounts.default]
+# ... other settings ...
+
+# Specify the correct Sent folder name for your email provider
+folder.alias.sent = "Sent"  # or "Sent Items", "[Gmail]/Sent Mail", etc.
+
+# OR disable saving to Sent folder entirely:
+message.send.save-copy = false
+```
+
+**To find the correct folder name:**
+```bash
+himalaya folder list
+```
+
+**IMPORTANT FOR AGENTS:** If you see "Folder doesn't exist" error, tell the user the email was likely sent successfully - only the copy to Sent folder failed.
 
 ### Move/Copy Emails
 
@@ -172,9 +255,16 @@ List accounts:
 himalaya account list
 ```
 
-Use a specific account:
+**IMPORTANT:** The `--account` flag must come BEFORE the command, not after!
+
 ```bash
+# ✅ CORRECT: --account before the command
 himalaya --account work envelope list
+himalaya --account personal template send
+
+# ❌ WRONG: --account after the command (will error!)
+himalaya envelope list --account work
+himalaya template send --account personal
 ```
 
 ## Attachments

@@ -51,36 +51,31 @@ async function requireRiskAcknowledgement(params: {
 
   await params.prompter.note(
     [
-      "Security warning — please read.",
+      "⚠️  Avertissement de Sécurité",
       "",
-      "Alizé is a hobby project and still in beta. Expect sharp edges.",
-      "This bot can read files and run actions if tools are enabled.",
-      "A bad prompt can trick it into doing unsafe things.",
+      "Alizé est un agent puissant qui peut lire vos fichiers et agir en votre nom.",
+      "C'est ce qui fait sa force, mais cela demande une utilisation responsable.",
+      "En local, vos données restent chez vous, mais gardez le contrôle sur les outils activés.",
       "",
-      "If you’re not comfortable with basic security and access control, don’t run Alizé.",
-      "Ask someone experienced to help before enabling tools or exposing it to the internet.",
+      "Conseils de base :",
+      "- N'activez que les accès dont vous avez réellement besoin.",
+      "- Utilisez un modèle d'IA robuste (comme Gemini 1.5 Pro) pour plus de fiabilité.",
+      "- Gardez vos secrets et mots de passe hors de portée de l'agent.",
       "",
-      "Recommended baseline:",
-      "- Pairing/allowlists + mention gating.",
-      "- Sandbox + least-privilege tools.",
-      "- Keep secrets out of the agent’s reachable filesystem.",
-      "- Use the strongest available model for any bot with tools or untrusted inboxes.",
+      "Pour vérifier votre sécurité à tout moment :",
+      "alize security audit",
       "",
-      "Run regularly:",
-      "alize security audit --deep",
-      "alize security audit --fix",
-      "",
-      "Must read: https://docs.molt.bot/gateway/security",
+      "En savoir plus : https://docs.molt.bot/gateway/security",
     ].join("\n"),
-    "Security",
+    "Sécurité & Vigilance",
   );
 
   const ok = await params.prompter.confirm({
-    message: "I understand this is powerful and inherently risky. Continue?",
+    message: "J'ai bien compris la puissance d'Alizé et je souhaite continuer.",
     initialValue: false,
   });
   if (!ok) {
-    throw new WizardCancelledError("risk not accepted");
+    throw new WizardCancelledError("risque non accepté");
   }
 }
 
@@ -90,14 +85,14 @@ export async function runOnboardingWizard(
   prompter: WizardPrompter,
 ) {
   printWizardHeader(runtime);
-  await prompter.intro("Alizé onboarding");
+  await prompter.intro("Bienvenue dans l'univers Alizé");
   await requireRiskAcknowledgement({ opts, prompter });
 
   const snapshot = await readConfigFileSnapshot();
   let baseConfig: AlizeConfig = snapshot.valid ? snapshot.config : {};
 
   if (snapshot.exists && !snapshot.valid) {
-    await prompter.note(summarizeExistingConfig(baseConfig), "Invalid config");
+    await prompter.note(summarizeExistingConfig(baseConfig), "Configuration invalide");
     if (snapshot.issues.length > 0) {
       await prompter.note(
         [
@@ -105,18 +100,18 @@ export async function runOnboardingWizard(
           "",
           "Docs: https://docs.molt.bot/gateway/configuration",
         ].join("\n"),
-        "Config issues",
+        "Erreurs détectées",
       );
     }
     await prompter.outro(
-      `Config invalid. Run \`${formatCliCommand("alize doctor")}\` to repair it, then re-run onboarding.`,
+      `Votre configuration semble corrompue. Lancez \`${formatCliCommand("alize doctor")}\` pour la réparer.`,
     );
     runtime.exit(1);
     return;
   }
 
-  const quickstartHint = `Configure details later via ${formatCliCommand("alize configure")}.`;
-  const manualHint = "Configure port, network, Tailscale, and auth options.";
+  const quickstartHint = `Configuration rapide. Vous pourrez tout affiner plus tard via ${formatCliCommand("alize configure")}.`;
+  const manualHint = "Paramétrage manuel des ports, réseaux et authentification.";
   const explicitFlowRaw = opts.flow?.trim();
   const normalizedExplicitFlow = explicitFlowRaw === "manual" ? "advanced" : explicitFlowRaw;
   if (
@@ -124,7 +119,7 @@ export async function runOnboardingWizard(
     normalizedExplicitFlow !== "quickstart" &&
     normalizedExplicitFlow !== "advanced"
   ) {
-    runtime.error("Invalid --flow (use quickstart, manual, or advanced).");
+    runtime.error("Flux invalide (utilisez quickstart, manual ou advanced).");
     runtime.exit(1);
     return;
   }
@@ -135,10 +130,10 @@ export async function runOnboardingWizard(
   let flow: WizardFlow =
     explicitFlow ??
     ((await prompter.select({
-      message: "Onboarding mode",
+      message: "Comment souhaitez-vous configurer Alizé ?",
       options: [
-        { value: "quickstart", label: "QuickStart", hint: quickstartHint },
-        { value: "advanced", label: "Manual", hint: manualHint },
+        { value: "quickstart", label: "QuickStart (Recommandé)", hint: quickstartHint },
+        { value: "advanced", label: "Manuel (Expert)", hint: manualHint },
       ],
       initialValue: "quickstart",
     })) as "quickstart" | "advanced");
@@ -152,14 +147,14 @@ export async function runOnboardingWizard(
   }
 
   if (snapshot.exists) {
-    await prompter.note(summarizeExistingConfig(baseConfig), "Existing config detected");
+    await prompter.note(summarizeExistingConfig(baseConfig), "Configuration existante détectée");
 
     const action = (await prompter.select({
-      message: "Config handling",
+      message: "Que souhaitez-vous faire de votre configuration actuelle ?",
       options: [
-        { value: "keep", label: "Use existing values" },
-        { value: "modify", label: "Update values" },
-        { value: "reset", label: "Reset" },
+        { value: "keep", label: "Conserver les réglages actuels" },
+        { value: "modify", label: "Modifier les valeurs" },
+        { value: "reset", label: "Réinitialiser" },
       ],
     })) as "keep" | "modify" | "reset";
 
@@ -254,22 +249,22 @@ export async function runOnboardingWizard(
     };
     const quickstartLines = quickstartGateway.hasExisting
       ? [
-          "Keeping your current gateway settings:",
-          `Gateway port: ${quickstartGateway.port}`,
-          `Gateway bind: ${formatBind(quickstartGateway.bind)}`,
+          "Conservation de vos réglages actuels :",
+          `Port de la passerelle : ${quickstartGateway.port}`,
+          `Liaison (Bind) : ${formatBind(quickstartGateway.bind)}`,
           ...(quickstartGateway.bind === "custom" && quickstartGateway.customBindHost
-            ? [`Gateway custom IP: ${quickstartGateway.customBindHost}`]
+            ? [`IP personnalisée : ${quickstartGateway.customBindHost}`]
             : []),
-          `Gateway auth: ${formatAuth(quickstartGateway.authMode)}`,
-          `Tailscale exposure: ${formatTailscale(quickstartGateway.tailscaleMode)}`,
-          "Direct to chat channels.",
+          `Authentification : ${formatAuth(quickstartGateway.authMode)}`,
+          `Exposition Tailscale : ${formatTailscale(quickstartGateway.tailscaleMode)}`,
+          "Connexion directe aux canaux de discussion.",
         ]
       : [
-          `Gateway port: ${DEFAULT_GATEWAY_PORT}`,
-          "Gateway bind: Loopback (127.0.0.1)",
-          "Gateway auth: Token (default)",
-          "Tailscale exposure: Off",
-          "Direct to chat channels.",
+          `Port de la passerelle : ${DEFAULT_GATEWAY_PORT}`,
+          "Liaison : Local (127.0.0.1)",
+          "Authentification : Jeton (Token)",
+          "Exposition Tailscale : Off",
+          "Connexion directe aux canaux de discussion.",
         ];
     await prompter.note(quickstartLines.join("\n"), "QuickStart");
   }
@@ -294,23 +289,23 @@ export async function runOnboardingWizard(
     (flow === "quickstart"
       ? "local"
       : ((await prompter.select({
-          message: "What do you want to set up?",
+          message: "Quel type d'installation souhaitez-vous réaliser ?",
           options: [
             {
               value: "local",
-              label: "Local gateway (this machine)",
+              label: "Passerelle Locale (sur cette machine)",
               hint: localProbe.ok
-                ? `Gateway reachable (${localUrl})`
-                : `No gateway detected (${localUrl})`,
+                ? `Passerelle accessible (${localUrl})`
+                : `Aucune passerelle détectée (${localUrl})`,
             },
             {
               value: "remote",
-              label: "Remote gateway (info-only)",
+              label: "Passerelle Distante (connexion seule)",
               hint: !remoteUrl
-                ? "No remote URL configured yet"
+                ? "Aucune URL distante configurée"
                 : remoteProbe?.ok
-                  ? `Gateway reachable (${remoteUrl})`
-                  : `Configured but unreachable (${remoteUrl})`,
+                  ? `Passerelle accessible (${remoteUrl})`
+                  : `Configurée mais inaccessible (${remoteUrl})`,
             },
           ],
         })) as OnboardMode));
@@ -329,7 +324,7 @@ export async function runOnboardingWizard(
     (flow === "quickstart"
       ? (baseConfig.agents?.defaults?.workspace ?? DEFAULT_WORKSPACE)
       : await prompter.text({
-          message: "Workspace directory",
+          message: "Dossier de travail (Workspace)",
           initialValue: baseConfig.agents?.defaults?.workspace ?? DEFAULT_WORKSPACE,
         }));
 
@@ -403,7 +398,7 @@ export async function runOnboardingWizard(
   const settings = gateway.settings;
 
   if (opts.skipChannels ?? opts.skipProviders) {
-    await prompter.note("Skipping channel setup.", "Channels");
+    await prompter.note("Configuration des canaux ignorée.", "Canaux");
   } else {
     const quickstartAllowFromChannels =
       flow === "quickstart"
@@ -427,7 +422,7 @@ export async function runOnboardingWizard(
   });
 
   if (opts.skipSkills) {
-    await prompter.note("Skipping skills setup.", "Skills");
+    await prompter.note("Configuration des compétences ignorée.", "Skills");
   } else {
     nextConfig = await setupSkills(nextConfig, workspaceDir, runtime, prompter);
   }

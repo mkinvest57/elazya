@@ -12,6 +12,27 @@ import type { EmbeddedContextFile } from "./pi-embedded-helpers.js";
  */
 export type PromptMode = "full" | "minimal" | "none";
 
+export const SYSTEM_PROMPT = `Tu es Alizé, ton assistant IA personnel en français.
+
+Capacités:
+- Email, Calendar, Web Search, Twitter, GitHub, etc.
+
+Instructions:
+1. Parle en français.
+2. Sois direct et concis.
+3. Une tâche à la fois.
+4. Si tu ne sais pas, dis-le.
+5. Utilise les outils disponibles pour répondre aux demandes.
+
+Format de réponse:
+- Pas de bla-bla inutile.
+- Utilise Markdown pour la clarté.
+- Pour les listes, sois compact.
+
+Commandes Spéciales:
+- Si l'utilisateur demande "Audit" ou "Vérification", exécute les scripts de test.
+`;
+
 function buildSkillsSection(params: {
   skillsPrompt?: string;
   isMinimal: boolean;
@@ -328,37 +349,11 @@ export function buildAgentSystemPrompt(params: {
   }
 
   const lines = [
-    "You are a personal assistant running inside Alizé.",
+    SYSTEM_PROMPT,
     "",
-    "## Tooling",
-    "Tool availability (filtered by policy):",
-    "Tool names are case-sensitive. Call tools exactly as listed.",
-    toolLines.length > 0
-      ? toolLines.join("\n")
-      : [
-          "Pi lists the standard tools above. This runtime enables:",
-          "- grep: search file contents for patterns",
-          "- find: find files by glob pattern",
-          "- ls: list directory contents",
-          "- apply_patch: apply multi-file patches",
-          `- ${execToolName}: run shell commands (supports background via yieldMs/background)`,
-          `- ${processToolName}: manage background exec sessions`,
-          "- browser: control clawd's dedicated browser",
-          "- canvas: present/eval/snapshot the Canvas",
-          "- nodes: list/describe/notify/camera/screen on paired nodes",
-          "- cron: manage cron jobs and wake events (use for reminders; when scheduling a reminder, write the systemEvent text as something that will read like a reminder when it fires, and mention that it is a reminder depending on the time gap between setting and firing; include recent context in reminder text if appropriate)",
-          "- sessions_list: list sessions",
-          "- sessions_history: fetch session history",
-          "- sessions_send: send to another session",
-        ].join("\n"),
-    "TOOLS.md does not control tool availability; it is user guidance for how to use external tools.",
-    "If a task is more complex or takes longer, spawn a sub-agent. It will do the work for you and ping you when it's done. You can always check up on it.",
-    "",
-    "## Tool Call Style",
-    "Default: do not narrate routine, low-risk tool calls (just call the tool).",
-    "Narrate only when it helps: multi-step work, complex/challenging problems, sensitive actions (e.g., deletions), or when the user explicitly asks.",
-    "Keep narration brief and value-dense; avoid repeating obvious steps.",
-    "Use plain human language for narration unless in a technical context.",
+    "## Outils Disponibles",
+    "Utilise uniquement ces outils. Respecte la casse.",
+    toolLines.length > 0 ? toolLines.join("\n") : "Aucun outil disponible.",
     "",
     "## Alizé CLI Quick Reference",
     "Alizé is controlled via subcommands. Do not invent commands.",

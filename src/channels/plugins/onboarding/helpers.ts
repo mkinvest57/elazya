@@ -5,13 +5,13 @@ export const promptAccountId: PromptAccountId = async (params: PromptAccountIdPa
   const existingIds = params.listAccountIds(params.cfg);
   const initial = params.currentId?.trim() || params.defaultAccountId || DEFAULT_ACCOUNT_ID;
   const choice = (await params.prompter.select({
-    message: `${params.label} account`,
+    message: `Compte ${params.label}`,
     options: [
       ...existingIds.map((id) => ({
         value: id,
-        label: id === DEFAULT_ACCOUNT_ID ? "default (primary)" : id,
+        label: id === DEFAULT_ACCOUNT_ID ? "défaut (principal)" : id,
       })),
-      { value: "__new__", label: "Add a new account" },
+      { value: "__new__", label: "Ajouter un nouveau compte" },
     ],
     initialValue: initial,
   })) as string;
@@ -19,14 +19,14 @@ export const promptAccountId: PromptAccountId = async (params: PromptAccountIdPa
   if (choice !== "__new__") return normalizeAccountId(choice);
 
   const entered = await params.prompter.text({
-    message: `New ${params.label} account id`,
-    validate: (value) => (value?.trim() ? undefined : "Required"),
+    message: `Nouvel identifiant de compte ${params.label}`,
+    validate: (value) => (value?.trim() ? undefined : "Requis"),
   });
   const normalized = normalizeAccountId(String(entered));
   if (String(entered).trim() !== normalized) {
     await params.prompter.note(
-      `Normalized account id to "${normalized}".`,
-      `${params.label} account`,
+      `Identifiant de compte normalisé en "${normalized}".`,
+      `Compte ${params.label}`,
     );
   }
   return normalized;

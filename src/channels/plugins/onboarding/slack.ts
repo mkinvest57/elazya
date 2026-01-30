@@ -41,7 +41,7 @@ function buildSlackManifest(botName: string) {
   const manifest = {
     display_information: {
       name: safeName,
-      description: `${safeName} connector for Alizé`,
+      description: `Connecteur ${safeName} pour Alizé`,
     },
     features: {
       bot_user: {
@@ -54,8 +54,8 @@ function buildSlackManifest(botName: string) {
       },
       slash_commands: [
         {
-          command: "/clawd",
-          description: "Send a message to Alizé",
+          command: "/alize",
+          description: "Envoyer un message à Alizé",
           should_escape: false,
         },
       ],
@@ -110,17 +110,17 @@ async function noteSlackTokenHelp(prompter: WizardPrompter, botName: string): Pr
   await prompter.note(
     [
       "1) Slack API → Create App → From scratch",
-      "2) Add Socket Mode + enable it to get the app-level token (xapp-...)",
-      "3) OAuth & Permissions → install app to workspace (xoxb- bot token)",
-      "4) Enable Event Subscriptions (socket) for message events",
-      "5) App Home → enable the Messages tab for DMs",
-      "Tip: set SLACK_BOT_TOKEN + SLACK_APP_TOKEN in your env.",
-      `Docs: ${formatDocsLink("/slack", "slack")}`,
+      "2) Activez le Socket Mode pour obtenir le jeton de l'application (xapp-...)",
+      "3) OAuth & Permissions → Installez l'application dans l'espace (jeton xoxb-)",
+      "4) Activez les Event Subscriptions (socket) pour les événements de message",
+      "5) App Home → activez l'onglet Messages pour les DMs",
+      "Astuce : vous pouvez aussi régler SLACK_BOT_TOKEN + SLACK_APP_TOKEN dans l'environnement.",
+      `Docs : ${formatDocsLink("/slack", "slack")}`,
       "",
-      "Manifest (JSON):",
+      "Manifeste (JSON) :",
       manifest,
     ].join("\n"),
-    "Slack socket mode tokens",
+    "Jetons Slack (Socket Mode)",
   );
 }
 
@@ -239,14 +239,14 @@ async function promptSlackAllowFrom(params: {
   const existing = params.cfg.channels?.slack?.dm?.allowFrom ?? [];
   await params.prompter.note(
     [
-      "Allowlist Slack DMs by username (we resolve to user ids).",
-      "Examples:",
+      "Ajoutez des utilisateurs Slack à la liste blanche par pseudo (on retrouve les IDs).",
+      "Exemples :",
       "- U12345678",
       "- @alice",
-      "Multiple entries: comma-separated.",
-      `Docs: ${formatDocsLink("/slack", "slack")}`,
+      "Plusieurs entrées : séparées par des virgules.",
+      `Docs : ${formatDocsLink("/slack", "slack")}`,
     ].join("\n"),
-    "Slack allowlist",
+    "Liste blanche Slack",
   );
   const parseInputs = (value: string) => parseSlackAllowFromInput(value);
   const parseId = (value: string) => {
@@ -261,18 +261,18 @@ async function promptSlackAllowFrom(params: {
 
   while (true) {
     const entry = await params.prompter.text({
-      message: "Slack allowFrom (usernames or ids)",
+      message: "Liste blanche Slack (pseudos ou ids)",
       placeholder: "@alice, U12345678",
       initialValue: existing[0] ? String(existing[0]) : undefined,
-      validate: (value) => (String(value ?? "").trim() ? undefined : "Required"),
+      validate: (value) => (String(value ?? "").trim() ? undefined : "Requis"),
     });
     const parts = parseInputs(String(entry));
     if (!token) {
       const ids = parts.map(parseId).filter(Boolean) as string[];
       if (ids.length !== parts.length) {
         await params.prompter.note(
-          "Slack token missing; use user ids (or mention form) only.",
-          "Slack allowlist",
+          "Jeton Slack manquant ; utilisez uniquement des IDs utilisateur (ou la forme @mention).",
+          "Liste blanche Slack",
         );
         continue;
       }
@@ -287,14 +287,17 @@ async function promptSlackAllowFrom(params: {
       entries: parts,
     }).catch(() => null);
     if (!results) {
-      await params.prompter.note("Failed to resolve usernames. Try again.", "Slack allowlist");
+      await params.prompter.note(
+        "Échec de la résolution des pseudos. Réessayez.",
+        "Liste blanche Slack",
+      );
       continue;
     }
     const unresolved = results.filter((res) => !res.resolved || !res.id);
     if (unresolved.length > 0) {
       await params.prompter.note(
-        `Could not resolve: ${unresolved.map((res) => res.input).join(", ")}`,
-        "Slack allowlist",
+        `Impossible de résoudre : ${unresolved.map((res) => res.input).join(", ")}`,
+        "Liste blanche Slack",
       );
       continue;
     }
@@ -324,8 +327,8 @@ export const slackOnboardingAdapter: ChannelOnboardingAdapter = {
     return {
       channel,
       configured,
-      statusLines: [`Slack: ${configured ? "configured" : "needs tokens"}`],
-      selectionHint: configured ? "configured" : "needs tokens",
+      statusLines: [`Slack : ${configured ? "configuré" : "jetons requis"}`],
+      selectionHint: configured ? "configuré" : "jetons requis",
       quickstartScore: configured ? 2 : 1,
     };
   },
@@ -363,7 +366,7 @@ export const slackOnboardingAdapter: ChannelOnboardingAdapter = {
     let appToken: string | null = null;
     const slackBotName = String(
       await prompter.text({
-        message: "Slack bot display name (used for manifest)",
+        message: "Nom d'affichage du bot Slack (utilisé pour le manifeste)",
         initialValue: "Alizé",
       }),
     ).trim();
@@ -372,7 +375,8 @@ export const slackOnboardingAdapter: ChannelOnboardingAdapter = {
     }
     if (canUseEnv && (!resolvedAccount.config.botToken || !resolvedAccount.config.appToken)) {
       const keepEnv = await prompter.confirm({
-        message: "SLACK_BOT_TOKEN + SLACK_APP_TOKEN detected. Use env vars?",
+        message:
+          "SLACK_BOT_TOKEN + SLACK_APP_TOKEN détectés. Utiliser les variables d'environnement ?",
         initialValue: true,
       });
       if (keepEnv) {
@@ -386,47 +390,47 @@ export const slackOnboardingAdapter: ChannelOnboardingAdapter = {
       } else {
         botToken = String(
           await prompter.text({
-            message: "Enter Slack bot token (xoxb-...)",
-            validate: (value) => (value?.trim() ? undefined : "Required"),
+            message: "Entrez le jeton du bot Slack (xoxb-...)",
+            validate: (value) => (value?.trim() ? undefined : "Requis"),
           }),
         ).trim();
         appToken = String(
           await prompter.text({
-            message: "Enter Slack app token (xapp-...)",
-            validate: (value) => (value?.trim() ? undefined : "Required"),
+            message: "Entrez le jeton de l'application Slack (xapp-...)",
+            validate: (value) => (value?.trim() ? undefined : "Requis"),
           }),
         ).trim();
       }
     } else if (hasConfigTokens) {
       const keep = await prompter.confirm({
-        message: "Slack tokens already configured. Keep them?",
+        message: "Jetons Slack déjà configurés. Les conserver ?",
         initialValue: true,
       });
       if (!keep) {
         botToken = String(
           await prompter.text({
-            message: "Enter Slack bot token (xoxb-...)",
-            validate: (value) => (value?.trim() ? undefined : "Required"),
+            message: "Entrez le jeton du bot Slack (xoxb-...)",
+            validate: (value) => (value?.trim() ? undefined : "Requis"),
           }),
         ).trim();
         appToken = String(
           await prompter.text({
-            message: "Enter Slack app token (xapp-...)",
-            validate: (value) => (value?.trim() ? undefined : "Required"),
+            message: "Entrez le jeton de l'application Slack (xapp-...)",
+            validate: (value) => (value?.trim() ? undefined : "Requis"),
           }),
         ).trim();
       }
     } else {
       botToken = String(
         await prompter.text({
-          message: "Enter Slack bot token (xoxb-...)",
-          validate: (value) => (value?.trim() ? undefined : "Required"),
+          message: "Entrez le jeton du bot Slack (xoxb-...)",
+          validate: (value) => (value?.trim() ? undefined : "Requis"),
         }),
       ).trim();
       appToken = String(
         await prompter.text({
-          message: "Enter Slack app token (xapp-...)",
-          validate: (value) => (value?.trim() ? undefined : "Required"),
+          message: "Entrez le jeton de l'application Slack (xapp-...)",
+          validate: (value) => (value?.trim() ? undefined : "Requis"),
         }),
       ).trim();
     }
@@ -470,7 +474,7 @@ export const slackOnboardingAdapter: ChannelOnboardingAdapter = {
 
     const accessConfig = await promptChannelAccessConfig({
       prompter,
-      label: "Slack channels",
+      label: "canaux Slack",
       currentPolicy: resolvedAccount.config.groupPolicy ?? "allowlist",
       currentEntries: Object.entries(resolvedAccount.config.channels ?? {})
         .filter(([, value]) => value?.allow !== false && value?.enabled !== false)
@@ -503,20 +507,20 @@ export const slackOnboardingAdapter: ChannelOnboardingAdapter = {
             if (resolvedKeys.length > 0 || unresolved.length > 0) {
               await prompter.note(
                 [
-                  resolvedKeys.length > 0 ? `Resolved: ${resolvedKeys.join(", ")}` : undefined,
+                  resolvedKeys.length > 0 ? `Résolu : ${resolvedKeys.join(", ")}` : undefined,
                   unresolved.length > 0
-                    ? `Unresolved (kept as typed): ${unresolved.join(", ")}`
+                    ? `Non résolu (conservé tel quel) : ${unresolved.join(", ")}`
                     : undefined,
                 ]
                   .filter(Boolean)
                   .join("\n"),
-                "Slack channels",
+                "Canaux Slack",
               );
             }
           } catch (err) {
             await prompter.note(
-              `Channel lookup failed; keeping entries as typed. ${String(err)}`,
-              "Slack channels",
+              `Échec de la recherche de canal ; conservation des entrées telles quelles. ${String(err)}`,
+              "Canaux Slack",
             );
           }
         }

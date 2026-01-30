@@ -7,6 +7,7 @@ import type {
   AgentsListResult,
   ChannelsStatusSnapshot,
   ConfigSnapshot,
+  ConfigUiHints,
   CronJob,
   CronRunLogEntry,
   CronStatus,
@@ -56,7 +57,16 @@ export type AppViewState = {
   chatRunId: string | null;
   chatAvatarUrl: string | null;
   chatThinkingLevel: string | null;
+
   chatQueue: ChatQueueItem[];
+  chatStreamStartedAt: number | null;
+  compactionStatus: import("./app-tool-stream").CompactionStatus | null;
+  resetToolStream: () => void;
+  resetChatScroll: () => void;
+  handleChatScroll: (event: Event) => void;
+  handleSendChat: (messageOverride?: string, opts?: unknown) => Promise<void>;
+  handleAbortChat: () => Promise<void>;
+  removeQueuedMessage: (id: string) => void;
   nodesLoading: boolean;
   nodes: Array<Record<string, unknown>>;
   devicesLoading: boolean;
@@ -81,13 +91,18 @@ export type AppViewState = {
   configSaving: boolean;
   configApplying: boolean;
   updateRunning: boolean;
+  applySessionKey: string;
   configSnapshot: ConfigSnapshot | null;
   configSchema: unknown | null;
+  configSchemaVersion: string;
   configSchemaLoading: boolean;
-  configUiHints: Record<string, unknown>;
+  configUiHints: ConfigUiHints;
   configForm: Record<string, unknown> | null;
   configFormOriginal: Record<string, unknown> | null;
   configFormMode: "form" | "raw";
+  configSearchQuery: string;
+  configActiveSection: string | null;
+  configActiveSubsection: string | null;
   channelsLoading: boolean;
   channelsSnapshot: ChannelsStatusSnapshot | null;
   channelsError: string | null;
@@ -127,7 +142,15 @@ export type AppViewState = {
   skillsFilter: string;
   skillEdits: Record<string, string>;
   skillMessages: Record<string, SkillMessage>;
+
   skillsBusyKey: string | null;
+  sidebarOpen: boolean;
+  sidebarContent: string | null;
+  sidebarError: string | null;
+  splitRatio: number;
+  handleOpenSidebar: (content: string) => void;
+  handleCloseSidebar: () => void;
+  handleSplitRatioChange: (ratio: number) => void;
   debugLoading: boolean;
   debugStatus: StatusSummary | null;
   debugHealth: HealthSnapshot | null;
@@ -142,9 +165,15 @@ export type AppViewState = {
   logsFile: string | null;
   logsEntries: LogEntry[];
   logsFilterText: string;
+  exportLogs: (lines: string[], label: string) => void;
+  handleLogsScroll: (event: Event) => void;
   logsLevelFilters: Record<LogLevel, boolean>;
   logsAutoFollow: boolean;
   logsTruncated: boolean;
+  logsCursor: number | null;
+  logsLastFetchAt: number | null;
+  logsLimit: number;
+  logsMaxBytes: number;
   client: GatewayBrowserClient | null;
   connect: () => void;
   setTab: (tab: Tab) => void;

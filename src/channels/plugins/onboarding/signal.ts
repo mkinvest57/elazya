@@ -33,11 +33,7 @@ function setSignalDmPolicy(cfg: AlizeConfig, dmPolicy: DmPolicy) {
   };
 }
 
-function setSignalAllowFrom(
-  cfg: AlizeConfig,
-  accountId: string,
-  allowFrom: string[],
-): AlizeConfig {
+function setSignalAllowFrom(cfg: AlizeConfig, accountId: string, allowFrom: string[]): AlizeConfig {
   if (accountId === DEFAULT_ACCOUNT_ID) {
     return {
       ...cfg,
@@ -92,31 +88,31 @@ async function promptSignalAllowFrom(params: {
   const existing = resolved.config.allowFrom ?? [];
   await params.prompter.note(
     [
-      "Allowlist Signal DMs by sender id.",
-      "Examples:",
-      "- +15555550123",
+      "Ajoutez des utilisateurs Signal à la liste blanche par identifiant.",
+      "Exemples :",
+      "- +33612345678",
       "- uuid:123e4567-e89b-12d3-a456-426614174000",
-      "Multiple entries: comma-separated.",
-      `Docs: ${formatDocsLink("/signal", "signal")}`,
+      "Plusieurs entrées : séparées par des virgules.",
+      `Docs : ${formatDocsLink("/signal", "signal")}`,
     ].join("\n"),
-    "Signal allowlist",
+    "Liste blanche Signal",
   );
   const entry = await params.prompter.text({
-    message: "Signal allowFrom (E.164 or uuid)",
-    placeholder: "+15555550123, uuid:123e4567-e89b-12d3-a456-426614174000",
+    message: "Liste blanche Signal (E.164 ou uuid)",
+    placeholder: "+33612345678, uuid:123e4567-e89b-12d3-a456-426614174000",
     initialValue: existing[0] ? String(existing[0]) : undefined,
     validate: (value) => {
       const raw = String(value ?? "").trim();
-      if (!raw) return "Required";
+      if (!raw) return "Requis";
       const parts = parseSignalAllowFromInput(raw);
       for (const part of parts) {
         if (part === "*") continue;
         if (part.toLowerCase().startsWith("uuid:")) {
-          if (!part.slice("uuid:".length).trim()) return "Invalid uuid entry";
+          if (!part.slice("uuid:".length).trim()) return "UUID invalide";
           continue;
         }
         if (isUuidLike(part)) continue;
-        if (!normalizeE164(part)) return `Invalid entry: ${part}`;
+        if (!normalizeE164(part)) return `Entrée invalide : ${part}`;
       }
       return undefined;
     },
@@ -156,10 +152,10 @@ export const signalOnboardingAdapter: ChannelOnboardingAdapter = {
       channel,
       configured,
       statusLines: [
-        `Signal: ${configured ? "configured" : "needs setup"}`,
-        `signal-cli: ${signalCliDetected ? "found" : "missing"} (${signalCliPath})`,
+        `Signal : ${configured ? "configuré" : "nécessite une installation"}`,
+        `signal-cli : ${signalCliDetected ? "trouvé" : "manquant"} (${signalCliPath})`,
       ],
-      selectionHint: signalCliDetected ? "signal-cli found" : "signal-cli missing",
+      selectionHint: signalCliDetected ? "signal-cli trouvé" : "signal-cli manquant",
       quickstartScore: signalCliDetected ? 1 : 0,
     };
   },
@@ -198,8 +194,8 @@ export const signalOnboardingAdapter: ChannelOnboardingAdapter = {
     if (options?.allowSignalInstall) {
       const wantsInstall = await prompter.confirm({
         message: cliDetected
-          ? "signal-cli detected. Reinstall/update now?"
-          : "signal-cli not found. Install now?",
+          ? "signal-cli détecté. Réinstaller/Mettre à jour maintenant ?"
+          : "signal-cli n'est pas trouvé. L'installer maintenant ?",
         initialValue: !cliDetected,
       });
       if (wantsInstall) {
@@ -208,19 +204,19 @@ export const signalOnboardingAdapter: ChannelOnboardingAdapter = {
           if (result.ok && result.cliPath) {
             cliDetected = true;
             resolvedCliPath = result.cliPath;
-            await prompter.note(`Installed signal-cli at ${result.cliPath}`, "Signal");
+            await prompter.note(`signal-cli installé dans ${result.cliPath}`, "Signal");
           } else if (!result.ok) {
-            await prompter.note(result.error ?? "signal-cli install failed.", "Signal");
+            await prompter.note(result.error ?? "L'installation de signal-cli a échoué.", "Signal");
           }
         } catch (err) {
-          await prompter.note(`signal-cli install failed: ${String(err)}`, "Signal");
+          await prompter.note(`L'installation de signal-cli a échoué : ${String(err)}`, "Signal");
         }
       }
     }
 
     if (!cliDetected) {
       await prompter.note(
-        "signal-cli not found. Install it, then rerun this step or set channels.signal.cliPath.",
+        "signal-cli n'est pas trouvé. Installez-le, puis relancez cette étape ou réglez channels.signal.cliPath.",
         "Signal",
       );
     }
@@ -228,7 +224,7 @@ export const signalOnboardingAdapter: ChannelOnboardingAdapter = {
     let account = accountConfig.account ?? "";
     if (account) {
       const keep = await prompter.confirm({
-        message: `Signal account set (${account}). Keep it?`,
+        message: `Compte Signal configuré (${account}). Le conserver ?`,
         initialValue: true,
       });
       if (!keep) account = "";
@@ -237,8 +233,8 @@ export const signalOnboardingAdapter: ChannelOnboardingAdapter = {
     if (!account) {
       account = String(
         await prompter.text({
-          message: "Signal bot number (E.164)",
-          validate: (value) => (value?.trim() ? undefined : "Required"),
+          message: "Numéro du bot Signal (format E.164)",
+          validate: (value) => (value?.trim() ? undefined : "Requis"),
         }),
       ).trim();
     }
@@ -282,12 +278,12 @@ export const signalOnboardingAdapter: ChannelOnboardingAdapter = {
 
     await prompter.note(
       [
-        'Link device with: signal-cli link -n "Alizé"',
-        "Scan QR in Signal → Linked Devices",
-        `Then run: ${formatCliCommand("alize gateway call channels.status --params '{\"probe\":true}'")}`,
-        `Docs: ${formatDocsLink("/signal", "signal")}`,
+        'Appairez l\'appareil avec : signal-cli link -n "Alizé"',
+        "Scannez le QR dans Signal → Appareils reliés",
+        `Puis lancez : ${formatCliCommand("alize gateway call channels.status --params '{\"probe\":true}'")}`,
+        `Docs : ${formatDocsLink("/signal", "signal")}`,
       ].join("\n"),
-      "Signal next steps",
+      "Prochaines étapes Signal",
     );
 
     return { cfg: next, accountId: signalAccountId };

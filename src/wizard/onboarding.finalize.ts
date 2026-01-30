@@ -65,7 +65,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     process.platform === "linux" ? await isSystemdUserServiceAvailable() : true;
   if (process.platform === "linux" && !systemdAvailable) {
     await prompter.note(
-      "Systemd user services are unavailable. Skipping lingering checks and service install.",
+      "Les services utilisateur Systemd ne sont pas disponibles. Passage des vérifications de persistance et de l'installation du service.",
       "Systemd",
     );
   }
@@ -95,15 +95,15 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     installDaemon = true;
   } else {
     installDaemon = await prompter.confirm({
-      message: "Install Gateway service (recommended)",
+      message: "Installer le service de la passerelle (recommandé)",
       initialValue: true,
     });
   }
 
   if (process.platform === "linux" && !systemdAvailable && installDaemon) {
     await prompter.note(
-      "Systemd user services are unavailable; skipping service install. Use your container supervisor or `docker compose up -d`.",
-      "Gateway service",
+      "Services Systemd indisponibles ; installation du service ignorée. Utilisez votre superviseur de conteneur ou `docker compose up -d`.",
+      "Service Gateway",
     );
     installDaemon = false;
   }
@@ -113,33 +113,33 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       flow === "quickstart"
         ? (DEFAULT_GATEWAY_DAEMON_RUNTIME as GatewayDaemonRuntime)
         : ((await prompter.select({
-            message: "Gateway service runtime",
+            message: "Environnement d'exécution (Runtime)",
             options: GATEWAY_DAEMON_RUNTIME_OPTIONS,
             initialValue: opts.daemonRuntime ?? DEFAULT_GATEWAY_DAEMON_RUNTIME,
           })) as GatewayDaemonRuntime);
     if (flow === "quickstart") {
       await prompter.note(
-        "QuickStart uses Node for the Gateway service (stable + supported).",
-        "Gateway service runtime",
+        "Le mode QuickStart utilise Node pour le service (stable + supporté).",
+        "Environnement d'exécution",
       );
     }
     const service = resolveGatewayService();
     const loaded = await service.isLoaded({ env: process.env });
     if (loaded) {
       const action = (await prompter.select({
-        message: "Gateway service already installed",
+        message: "Le service Gateway est déjà installé",
         options: [
-          { value: "restart", label: "Restart" },
-          { value: "reinstall", label: "Reinstall" },
-          { value: "skip", label: "Skip" },
+          { value: "restart", label: "Redémarrer" },
+          { value: "reinstall", label: "Réinstaller" },
+          { value: "skip", label: "Passer" },
         ],
       })) as "restart" | "reinstall" | "skip";
       if (action === "restart") {
         await withWizardProgress(
-          "Gateway service",
-          { doneMessage: "Gateway service restarted." },
+          "Service Gateway",
+          { doneMessage: "Service Gateway redémarré." },
           async (progress) => {
-            progress.update("Restarting Gateway service…");
+            progress.update("Redémarrage du service Gateway…");
             await service.restart({
               env: process.env,
               stdout: process.stdout,
@@ -148,10 +148,10 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
         );
       } else if (action === "reinstall") {
         await withWizardProgress(
-          "Gateway service",
-          { doneMessage: "Gateway service uninstalled." },
+          "Service Gateway",
+          { doneMessage: "Service Gateway désinstallé." },
           async (progress) => {
-            progress.update("Uninstalling Gateway service…");
+            progress.update("Désinstallation du service Gateway…");
             await service.uninstall({ env: process.env, stdout: process.stdout });
           },
         );
@@ -159,10 +159,10 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     }
 
     if (!loaded || (loaded && (await service.isLoaded({ env: process.env })) === false)) {
-      const progress = prompter.progress("Gateway service");
+      const progress = prompter.progress("Service Gateway");
       let installError: string | null = null;
       try {
-        progress.update("Preparing Gateway service…");
+        progress.update("Préparation du service Gateway…");
         const { programArguments, workingDirectory, environment } = await buildGatewayInstallPlan({
           env: process.env,
           port: settings.port,
@@ -172,7 +172,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
           config: nextConfig,
         });
 
-        progress.update("Installing Gateway service…");
+        progress.update("Installation du service Gateway…");
         await service.install({
           env: process.env,
           stdout: process.stdout,
@@ -184,7 +184,7 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
         installError = err instanceof Error ? err.message : String(err);
       } finally {
         progress.stop(
-          installError ? "Gateway service install failed." : "Gateway service installed.",
+          installError ? "Échec de l'installation du service." : "Service Gateway installé.",
         );
       }
       if (installError) {
@@ -213,11 +213,11 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       runtime.error(formatHealthCheckFailure(err));
       await prompter.note(
         [
-          "Docs:",
+          "Docs :",
           "https://docs.molt.bot/gateway/health",
           "https://docs.molt.bot/gateway/troubleshooting",
         ].join("\n"),
-        "Health check help",
+        "Aide au diagnostic",
       );
     }
   }
@@ -233,12 +233,12 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
 
   await prompter.note(
     [
-      "Add nodes for extra features:",
-      "- macOS app (system + notifications)",
-      "- iOS app (camera/canvas)",
-      "- Android app (camera/canvas)",
+      "Ajoutez des compagnons pour plus de fonctionnalités :",
+      "- App macOS (système + notifications)",
+      "- App iOS (caméra/dessin)",
+      "- App Android (caméra/dessin)",
     ].join("\n"),
-    "Optional apps",
+    "Applications optionnelles",
   );
 
   const controlUiBasePath =
@@ -293,31 +293,31 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
     if (hasBootstrap) {
       await prompter.note(
         [
-          "This is the defining action that makes your agent you.",
-          "Please take your time.",
-          "The more you tell it, the better the experience will be.",
-          'We will send: "Wake up, my friend!"',
+          "C'est ici que votre agent prend vie réellement.",
+          "Prenez votre temps pour lui parler de vous.",
+          "Plus il en saura, plus l'expérience sera riche.",
+          'Nous allons envoyer : "Réveille-toi, mon ami !"',
         ].join("\n"),
-        "Start TUI (best option!)",
+        "Démarrer le TUI (Meilleure option !)",
       );
     }
 
     await prompter.note(
       [
-        "Gateway token: shared auth for the Gateway + Control UI.",
-        "Stored in: ~/.alize/alize.json (gateway.auth.token) or ALIZE_GATEWAY_TOKEN.",
-        "Web UI stores a copy in this browser's localStorage (alize.control.settings.v1).",
-        `Get the tokenized link anytime: ${formatCliCommand("alize dashboard --no-open")}`,
+        "Jeton Gateway : sécurité partagée pour la passerelle et l'interface.",
+        "Stocké dans : ~/.alize/alize.json (gateway.auth.token) ou ALIZE_GATEWAY_TOKEN.",
+        "L'interface Web stocke une copie dans le localStorage (alize.control.settings.v1).",
+        `Retrouvez le lien avec jeton à tout moment : ${formatCliCommand("alize dashboard --no-open")}`,
       ].join("\n"),
-      "Token",
+      "Jeton de sécurité (Token)",
     );
 
     hatchChoice = (await prompter.select({
-      message: "How do you want to hatch your bot?",
+      message: "Comment souhaitez-vous réveiller votre agent ?",
       options: [
-        { value: "tui", label: "Hatch in TUI (recommended)" },
-        { value: "web", label: "Open the Web UI" },
-        { value: "later", label: "Do this later" },
+        { value: "tui", label: "Dans le Terminal (TUI - Recommandé)" },
+        { value: "web", label: "Dans le Tableau de Bord (Web)" },
+        { value: "later", label: "Plus tard" },
       ],
       initialValue: "tui",
     })) as "tui" | "web" | "later";
@@ -329,17 +329,17 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
         password: settings.authMode === "password" ? nextConfig.gateway?.auth?.password : "",
         // Safety: onboarding TUI should not auto-deliver to lastProvider/lastTo.
         deliver: false,
-        message: hasBootstrap ? "Wake up, my friend!" : undefined,
+        message: hasBootstrap ? "Réveille-toi, mon ami !" : undefined,
       });
       if (settings.authMode === "token" && settings.gatewayToken) {
         seededInBackground = await openUrlInBackground(authedUrl);
       }
       if (seededInBackground) {
         await prompter.note(
-          `Web UI seeded in the background. Open later with: ${formatCliCommand(
+          `Tableau de bord configuré en arrière-plan. Ouvrez-le plus tard avec : ${formatCliCommand(
             "alize dashboard --no-open",
           )}`,
-          "Web UI",
+          "Tableau de Bord",
         );
       }
     } else if (hatchChoice === "web") {
@@ -362,20 +362,20 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
       }
       await prompter.note(
         [
-          `Dashboard link (with token): ${authedUrl}`,
+          `Lien du Tableau de Bord (avec jeton) : ${authedUrl}`,
           controlUiOpened
-            ? "Opened in your browser. Keep that tab to control Alizé."
-            : "Copy/paste this URL in a browser on this machine to control Alizé.",
+            ? "Ouvert dans votre navigateur. Gardez cet onglet pour piloter Alizé."
+            : "Copiez/collez cette URL dans un navigateur sur cette machine pour piloter Alizé.",
           controlUiOpenHint,
         ]
           .filter(Boolean)
           .join("\n"),
-        "Dashboard ready",
+        "Tableau de Bord prêt",
       );
     } else {
       await prompter.note(
-        `When you're ready: ${formatCliCommand("alize dashboard --no-open")}`,
-        "Later",
+        `Quand vous serez prêt : ${formatCliCommand("alize dashboard --no-open")}`,
+        "Plus tard",
       );
     }
   } else if (opts.skipUi) {
@@ -390,8 +390,8 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
   );
 
   await prompter.note(
-    "Running agents on your computer is risky — harden your setup: https://docs.molt.bot/security",
-    "Security",
+    "Faire tourner des agents sur votre machine comporte des risques — sécurisez votre installation : https://docs.molt.bot/security",
+    "Sécurité",
   );
 
   const shouldOpenControlUi =
@@ -420,15 +420,15 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
 
     await prompter.note(
       [
-        `Dashboard link (with token): ${authedUrl}`,
+        `Lien du Tableau de Bord (avec jeton) : ${authedUrl}`,
         controlUiOpened
-          ? "Opened in your browser. Keep that tab to control Alizé."
-          : "Copy/paste this URL in a browser on this machine to control Alizé.",
+          ? "Ouvert dans votre navigateur. Gardez cet onglet pour piloter Alizé."
+          : "Copiez/collez cette URL dans un navigateur sur cette machine pour piloter Alizé.",
         controlUiOpenHint,
       ]
         .filter(Boolean)
         .join("\n"),
-      "Dashboard ready",
+      "Tableau de Bord prêt",
     );
   }
 
@@ -438,38 +438,38 @@ export async function finalizeOnboardingWizard(options: FinalizeOnboardingOption
   await prompter.note(
     hasWebSearchKey
       ? [
-          "Web search is enabled, so your agent can look things up online when needed.",
+          "La recherche Web est active, votre agent pourra consulter Internet si besoin.",
           "",
           webSearchKey
-            ? "API key: stored in config (tools.web.search.apiKey)."
-            : "API key: provided via BRAVE_API_KEY env var (Gateway environment).",
-          "Docs: https://docs.molt.bot/tools/web",
+            ? "Clé API : stockée dans la config (tools.web.search.apiKey)."
+            : "Clé API : fournie via la variable d'environnement BRAVE_API_KEY.",
+          "Docs : https://docs.molt.bot/tools/web",
         ].join("\n")
       : [
-          "If you want your agent to be able to search the web, you’ll need an API key.",
+          "Pour que votre agent puisse faire des recherches Web, vous aurez besoin d'une clé API.",
           "",
-          "Alizé uses Brave Search for the `web_search` tool. Without a Brave Search API key, web search won’t work.",
+          "Alizé utilise Brave Search pour l'outil `web_search`. Sans clé Brave, la recherche Web ne fonctionnera pas.",
           "",
-          "Set it up interactively:",
-          `- Run: ${formatCliCommand("alize configure --section web")}`,
-          "- Enable web_search and paste your Brave Search API key",
+          "Configurez-la maintenant :",
+          `- Run : ${formatCliCommand("alize configure --section web")}`,
+          "- Activez web_search et collez votre clé Brave Search API",
           "",
-          "Alternative: set BRAVE_API_KEY in the Gateway environment (no config changes).",
-          "Docs: https://docs.molt.bot/tools/web",
+          "Alternative : définissez BRAVE_API_KEY dans l'environnement (sans changer la config).",
+          "Docs : https://docs.molt.bot/tools/web",
         ].join("\n"),
-    "Web search (optional)",
+    "Recherche Web (optionnel)",
   );
 
   await prompter.note(
-    'What now: https://molt.bot/showcase ("What People Are Building").',
-    "What now",
+    'Et maintenant : https://molt.bot/showcase ("Ce que le monde construit").',
+    "Prochaines étapes",
   );
 
   await prompter.outro(
     controlUiOpened
-      ? "Onboarding complete. Dashboard opened with your token; keep that tab to control Alizé."
+      ? "Onboarding terminé. Le Tableau de Bord est ouvert avec votre jeton ; gardez cet onglet pour piloter Alizé."
       : seededInBackground
-        ? "Onboarding complete. Web UI seeded in the background; open it anytime with the tokenized link above."
-        : "Onboarding complete. Use the tokenized dashboard link above to control Alizé.",
+        ? "Onboarding terminé. L'interface Web est prête en arrière-plan ; ouvrez-la quand vous voulez avec le lien ci-dessus."
+        : "Onboarding terminé. Utilisez le lien avec jeton ci-dessus pour piloter Alizé.",
   );
 }

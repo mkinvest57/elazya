@@ -1,7 +1,7 @@
 {
     "$schema": "./dist/config-schema.json",
     "_comment": "Configuration Alizé - Le premier assistant IA français haute performance",
-    "_credits": "Basé sur Moltbot (https://github.com/moltbot/moltbot) par Peter Steinberger",
+    "_credits": "Propulsé par le moteur d'Excellence Alizé",
     "workspace": "~/.alize",
     "agent": {
         "name": "Alizé",

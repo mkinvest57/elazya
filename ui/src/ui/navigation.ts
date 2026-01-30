@@ -1,9 +1,9 @@
 import type { IconName } from "./icons.js";
 
 export const TAB_GROUPS = [
-  { label: "Chat", tabs: ["chat"] },
-  { label: "Control", tabs: ["overview"] },
-  { label: "Settings", tabs: ["config", "logs"] },
+  { label: "Discussion", tabs: ["chat"] },
+  { label: "Contrôle", tabs: ["overview"] },
+  { label: "Paramètres", tabs: ["config", "logs"] },
 ] as const;
 
 export type Tab =
@@ -128,56 +128,56 @@ export function iconForTab(tab: Tab): IconName {
 export function titleForTab(tab: Tab) {
   switch (tab) {
     case "overview":
-      return "Overview";
+      return "Vue d'ensemble";
     case "channels":
-      return "Channels";
+      return "Canaux";
     case "instances":
       return "Instances";
     case "sessions":
       return "Sessions";
     case "cron":
-      return "Cron Jobs";
+      return "Tâches Cron";
     case "skills":
-      return "Skills";
+      return "Compétences";
     case "nodes":
-      return "Nodes";
+      return "Nœuds";
     case "chat":
-      return "Chat";
+      return "Discussion";
     case "config":
-      return "Config";
+      return "Configuration";
     case "debug":
-      return "Debug";
+      return "Débogage";
     case "logs":
-      return "Logs";
+      return "Journaux";
     default:
-      return "Control";
+      return "Contrôle";
   }
 }
 
 export function subtitleForTab(tab: Tab) {
   switch (tab) {
     case "overview":
-      return "Gateway status, entry points, and a fast health read.";
+      return "État de la passerelle, points d'entrée et santé.";
     case "channels":
-      return "Manage channels and settings.";
+      return "Gérer les canaux et les paramètres.";
     case "instances":
-      return "Presence beacons from connected clients and nodes.";
+      return "Balises de présence des clients et nœuds connectés.";
     case "sessions":
-      return "Inspect active sessions and adjust per-session defaults.";
+      return "Inspecter les sessions actives et ajuster les défauts.";
     case "cron":
-      return "Schedule wakeups and recurring agent runs.";
+      return "Planifier les réveils et les tâches récurrentes.";
     case "skills":
-      return "Manage skill availability and API key injection.";
+      return "Gérer la disponibilité des compétences et les clés API.";
     case "nodes":
-      return "Paired devices, capabilities, and command exposure.";
+      return "Appareils jumelés, capacités et commandes.";
     case "chat":
-      return "Direct gateway chat session for quick interventions.";
+      return "Session de chat directe avec la passerelle pour interventions rapides.";
     case "config":
-      return "Edit ~/.alize/alize.json safely.";
+      return "Modifier ~/.alize/alize.json en toute sécurité.";
     case "debug":
-      return "Gateway snapshots, events, and manual RPC calls.";
+      return "Instantanés de la passerelle, événements et appels RPC manuels.";
     case "logs":
-      return "Live tail of the gateway file logs.";
+      return "Suivi en direct des logs fichiers de la passerelle.";
     default:
       return "";
   }
