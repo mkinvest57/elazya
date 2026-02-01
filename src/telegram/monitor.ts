@@ -13,6 +13,8 @@ import { isRecoverableTelegramNetworkError } from "./network-errors.js";
 import { makeProxyFetch } from "./proxy.js";
 import { readTelegramUpdateOffset, writeTelegramUpdateOffset } from "./update-offset-store.js";
 import { startTelegramWebhook } from "./webhook.js";
+import { registerTelegramWebhookBot } from "./webhook-registry.js";
+import { withTelegramApiErrorLogging } from "./api-logging.js";
 
 export type MonitorTelegramOpts = {
   token?: string;
@@ -139,18 +141,46 @@ export async function monitorTelegramProvider(opts: MonitorTelegramOpts = {}) {
   });
 
   if (opts.useWebhook) {
-    await startTelegramWebhook({
-      token,
-      accountId: account.accountId,
-      config: cfg,
-      path: opts.webhookPath,
-      port: opts.webhookPort,
-      secret: opts.webhookSecret,
-      runtime: opts.runtime as RuntimeEnv,
-      fetch: proxyFetch,
-      abortSignal: opts.abortSignal,
-      publicUrl: opts.webhookUrl,
+    const path = opts.webhookPath ?? "/telegram-webhook";
+
+    // Register the bot with the unified webhook registry
+    const unregister = registerTelegramWebhookBot({
+      bot,
+      path,
+      secretToken: opts.webhookSecret,
     });
+
+    // Setup the webhook with Telegram API
+    const publicUrl = opts.webhookUrl ?? `https://gateway.alize.ai${path}`; // Default fallback, likely overridden by config
+
+    await withTelegramApiErrorLogging({
+      operation: "setWebhook",
+      runtime: opts.runtime ?? ({ log: console.log, error: console.error } as RuntimeEnv),
+      fn: () =>
+        bot.api.setWebhook(publicUrl, {
+          secret_token: opts.webhookSecret,
+          allowed_updates: resolveTelegramAllowedUpdates(),
+        }),
+    });
+
+    (opts.runtime?.log ?? console.log)(
+      `telegram: webhook registered at ${publicUrl} (unified gateway)`,
+    );
+
+    // Keep the process alive and handle cleanup
+    const stopOnAbort = () => {
+      unregister();
+      void bot.stop();
+    };
+
+    if (opts.abortSignal) {
+      if (opts.abortSignal.aborted) {
+        stopOnAbort();
+        return;
+      }
+      opts.abortSignal.addEventListener("abort", stopOnAbort, { once: true });
+    }
+
     return;
   }
 

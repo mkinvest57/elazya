@@ -301,6 +301,7 @@ export type PluginRuntime = {
       resolveTelegramToken: ResolveTelegramToken;
       sendMessageTelegram: SendMessageTelegram;
       monitorTelegramProvider: MonitorTelegramProvider;
+      handleWebhookRequest: typeof import("../../telegram/webhook-registry.js").handleTelegramWebhookRequest;
       messageActions: TelegramMessageActions;
     };
     signal: {

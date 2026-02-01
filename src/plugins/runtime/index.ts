@@ -106,7 +106,7 @@ import {
   auditTelegramGroupMembership,
   collectTelegramUnmentionedGroupIds,
 } from "../../telegram/audit.js";
-import { monitorTelegramProvider } from "../../telegram/monitor.js";
+import { handleTelegramWebhookRequest, monitorTelegramProvider } from "../../telegram/index.js";
 import { probeTelegram } from "../../telegram/probe.js";
 import { sendMessageTelegram } from "../../telegram/send.js";
 import { resolveTelegramToken } from "../../telegram/token.js";
@@ -289,6 +289,7 @@ export function createPluginRuntime(): PluginRuntime {
         resolveTelegramToken,
         sendMessageTelegram,
         monitorTelegramProvider,
+        handleWebhookRequest: handleTelegramWebhookRequest,
         messageActions: telegramMessageActions,
       },
       signal: {

@@ -1,0 +1,38 @@
+npm warn Unknown project config "allow-build-scripts". This will stop working in the next major version of npm.
+-------------
+Version mismatch:
+Extra packages with wrong versions:
+  - zod: installed 4.3.6, required 3.22.3
+    See: https://www.remotion.dev/docs/schemas#prerequisites
+
+You may experience breakages such as:
+- React context and hooks not working
+- Type errors and feature incompatibilities
+- Failed renders and unclear errors
+
+To resolve:
+- Make sure your package.json has all Remotion packages pointing to the same version.
+- Remove the `^` character in front of a version to pin a package.
+- For zod, install exact version 3.22.3 (run: npx remotion add zod).
+- Run `npx remotion versions --log=verbose` to see the path of the modules resolved.
+-------------
+
+Remotion root directory: /Users/sashimi/Documents/moltbot-main
+No config file loaded.
+Checking if AlizeExplainerPortrait is the entry file
+Selected /Users/sashimi/Documents/moltbot-main/src/index.ts as the entry point because file exists and is a common entry point and no entry point was explicitly selected
+Entry point = /Users/sashimi/Documents/moltbot-main/src/index.ts (common paths)
+Ensuring browser executable
+Ensured browser is available.
+[openBrowser()] Opening browser: gl = null, executable = /Users/sashimi/Documents/moltbot-main/node_modules/.remotion/chrome-headless-shell/mac-arm64/chrome-headless-shell-mac-arm64/chrome-headless-shell, enableMultiProcessOnLinux = true
+
+Error: You passed /Users/sashimi/Documents/moltbot-main/src/index.ts as your entry point, but this file does not contain "registerRoot". You should use the file that calls registerRoot() as the entry point. To ignore this error, pass "ignoreRegisterRootWarning" to bundle(). This error cannot be ignored on the CLI.
+    at validateEntryPoint (/Users/sashimi/Documents/moltbot-main/node_modules/.pnpm/@remotion+bundler@4.0.410_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/@remotion/bundler/dist/bundle.js:132:15)
+    at async Object.internalBundle (/Users/sashimi/Documents/moltbot-main/node_modules/.pnpm/@remotion+bundler@4.0.410_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/@remotion/bundler/dist/bundle.js:145:9)
+    at async bundleOnCli (/Users/sashimi/Documents/moltbot-main/node_modules/.pnpm/@remotion+cli@4.0.410_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/@remotion/cli/dist/setup-cache.js:146:21)
+    at async bundleOnCliOrTakeServeUrl (/Users/sashimi/Documents/moltbot-main/node_modules/.pnpm/@remotion+cli@4.0.410_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/@remotion/cli/dist/setup-cache.js:35:21)
+    at async renderVideoFlow (/Users/sashimi/Documents/moltbot-main/node_modules/.pnpm/@remotion+cli@4.0.410_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/@remotion/cli/dist/render-flows/render.js:162:53)
+    at async render (/Users/sashimi/Documents/moltbot-main/node_modules/.pnpm/@remotion+cli@4.0.410_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/@remotion/cli/dist/render.js:126:5)
+    at async cli (/Users/sashimi/Documents/moltbot-main/node_modules/.pnpm/@remotion+cli@4.0.410_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/@remotion/cli/dist/index.js:92:13)
+Cleaning up...
+Cleanup done in 0ms

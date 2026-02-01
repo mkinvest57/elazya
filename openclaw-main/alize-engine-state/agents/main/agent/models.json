@@ -1,0 +1,10 @@
+{
+  "providers": {
+    "google": {
+      "baseUrl": "https://generativelanguage.googleapis.com",
+      "apiKey": "AIzaSyDHOLH2ZLaEMh7duk-06TCDG8M10j5HA98",
+      "api": "google-generative-ai",
+      "models": []
+    }
+  }
+}

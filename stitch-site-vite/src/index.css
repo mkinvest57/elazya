@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    color-scheme: dark;
+}
+
+body {
+    @apply bg-background text-white font-sans overflow-x-hidden;
+}
+
+/* Custom Utilities that might be complex to tokenise, but we can access theme() */
+.glass-card {
+    @apply bg-glass-bg border border-glass-border rounded-xl backdrop-blur-md shadow-glass;
+}
+
+.btn-primary {
+    @apply px-6 py-3 rounded-full font-semibold transition-all duration-300 text-white bg-gradient-primary shadow-glow-primary hover:-translate-y-0.5 hover:shadow-glow-primary-hover inline-block no-underline cursor-pointer border-none;
+}
+
+.btn-secondary {
+    @apply px-6 py-3 rounded-full font-semibold transition-all duration-300 text-white bg-white/10 border border-glass-border hover:bg-white/15 inline-block no-underline cursor-pointer;
+}
+
+.gradient-text {
+    @apply bg-gradient-primary bg-clip-text text-transparent;
+}
+
+.ambient-layer {
+    @apply fixed rounded-full blur-[100px] -z-10 opacity-40 animate-float;
+}

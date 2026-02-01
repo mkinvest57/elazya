@@ -1,0 +1,22 @@
+{
+  "gateway": {
+    "auth": {
+      "mode": "token",
+      "token": "elazya-v1000-internal-token"
+    },
+    "mode": "local"
+  },
+  "models": {
+    "primary": "google/gemini-3-pro-preview",
+    "providers": {
+      "google": {
+        "api": "google-generative-ai",
+        "apiKey": "",
+        "baseUrl": "https://generativelanguage.googleapis.com",
+        "models": [
+          "google/gemini-3-pro-preview"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Alizé</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Specific Docs Styles */
+        .docs-layout {
+            display: flex;
+            min-height: 100vh;
+            padding-top: 80px;
+            /* Space for fixed nav */
+        }
+
+        .sidebar {
+            width: 250px;
+            position: fixed;
+            top: 80px;
+            bottom: 0;
+            left: 0;
+            padding: 2rem;
+            border-right: 1px solid var(--glass-border);
+            background: rgba(10, 10, 10, 0.5);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .sidebar-group {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-indigo);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.5rem 0;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            opacity: 1;
+            color: white;
+            padding-left: 5px;
+        }
+
+        .content-area {
+            margin-left: 250px;
+            padding: 4rem;
+            max-width: 800px;
+            flex: 1;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: monospace;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .code-lang {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--glass-border);
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            border-bottom-left-radius: 12px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Ambient Layers -->
+    <div class="ambient-layer ambient-indigo" style="opacity: 0.2"></div>
+    <div class="ambient-layer ambient-pink" style="opacity: 0.2; right: 20%; animation-delay: -10s"></div>
+
+    <nav class="sticky-nav">
+        <div class="container nav-content">
+            <div class="logo">🌬️ Alizé <span style="font-size:0.8rem; opacity:0.5; margin-left: 10px">DOCS</span></div>
+            <div class="nav-links">
+                <a href="index.html">Accueil</a>
+                <a href="#" class="active">Documentation</a>
+                <a href="index.html#buy" class="btn btn-secondary">Acheter</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="docs-layout">
+        <aside class="sidebar">
+            <div class="sidebar-group">
+                <div class="sidebar-title">Introduction</div>
+                <a href="#" class="sidebar-link active">Commencer</a>
+                <a href="#" class="sidebar-link">Installation</a>
+                <a href="#" class="sidebar-link">Configuration</a>
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-title">Utilisation</div>
+                <a href="#" class="sidebar-link">Compétences (Skills)</a>
+                <a href="#" class="sidebar-link">Mode Agent</a>
+                <a href="#" class="sidebar-link">Commandes Vocales</a>
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-title">Avancé</div>
+                <a href="#" class="sidebar-link">Créer un Skill</a>
+                <a href="#" class="sidebar-link">Architecture</a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <h1>Bienvenue sur Alizé</h1>
+            <p>Alizé est votre assistant personnel local, conçu pour respecter votre vie privée tout en augmentant votre
+                productivité de manière exponentielle.</p>
+
+            <div class="glass-card"
+                style="padding: 2rem; margin-bottom: 3rem; background: rgba(79, 70, 229, 0.1); border-color: rgba(79, 70, 229, 0.3)">
+                <strong>🚀 En Bref :</strong> Alizé tourne 100% sur votre machine. Elle utilise Gemini 2.5 Flash pour
+                une rapidité extrême et peut interagir avec vos fichiers, votre terminal et vos applications.
+            </div>
+
+            <h2>Installation Rapide</h2>
+            <p>Copiez-collez cette commande dans votre terminal pour installer Alizé (Mac/Linux) :</p>
+
+            <div class="code-block">
+                <div class="code-lang">BASH</div>
+                <code>curl -sL https://get.alize.ai/install | bash</code>
+            </div>
+
+            <h2>Premier Lancement</h2>
+            <p>Une fois installé, lancez simplement :</p>
+            <div class="code-block">
+                <div class="code-lang">BASH</div>
+                <code>alize start</code>
+            </div>
+            <p>L'interface web s'ouvrira automatiquement à l'adresse <code>http://localhost:3000</code>.</p>
+        </main>
+    </div>
+</body>
+
+</html>

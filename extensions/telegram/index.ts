@@ -11,6 +11,8 @@ const plugin = {
   configSchema: emptyPluginConfigSchema(),
   register(api: MoltbotPluginApi) {
     setTelegramRuntime(api.runtime);
+    // Register global handler for unified webhook routing
+    api.registerHttpHandler(api.runtime.channel.telegram.handleWebhookRequest);
     api.registerChannel({ plugin: telegramPlugin });
   },
 };

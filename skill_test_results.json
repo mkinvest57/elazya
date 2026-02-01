@@ -1,0 +1,190 @@
+{
+  "timestamp": "2026-01-29T07:03:00Z",
+  "total_skills": 0,
+  "passed": 0,
+  "failed": 0,
+  "skills": [
+    {
+      "name": "apple-notes",
+      "status": "pass"
+    },
+    {
+      "name": "apple-reminders",
+      "status": "pass"
+    },
+    {
+      "name": "himalaya",
+      "status": "pass"
+    },
+    {
+      "name": "imsg",
+      "status": "pass"
+    },
+    {
+      "name": "github",
+      "status": "pass"
+    },
+    {
+      "name": "discord",
+      "status": "fail_list"
+    },
+    {
+      "name": "slack",
+      "status": "fail_reqs"
+    },
+    {
+      "name": "trello",
+      "status": "fail_reqs"
+    },
+    {
+      "name": "notion",
+      "status": "fail_reqs"
+    },
+    {
+      "name": "obsidian",
+      "status": "pass"
+    },
+    {
+      "name": "gemini",
+      "status": "pass"
+    },
+    {
+      "name": "weather",
+      "status": "pass"
+    },
+    {
+      "name": "spotify-player",
+      "status": "fail_reqs"
+    },
+    {
+      "name": "voice-call",
+      "status": "fail_reqs"
+    },
+    {
+      "name": "web-search",
+      "status": "pass"
+    },
+    {
+      "name": "goplaces",
+      "status": "fail_reqs"
+    },
+    {
+      "name": "bear-notes",
+      "status": "pass"
+    },
+    {
+      "name": "bird",
+      "status": "pass"
+    },
+    {
+      "name": "camsnap",
+      "status": "pass"
+    },
+    {
+      "name": "canvas",
+      "status": "fail_reqs"
+    },
+    {
+      "name": "coding-agent",
+      "status": "fail_reqs"
+    },
+    {
+      "name": "eightctl",
+      "status": "pass"
+    },
+    {
+      "name": "food-order",
+      "status": "fail_list"
+    },
+    {
+      "name": "gog",
+      "status": "pass"
+    },
+    {
+      "name": "local-places",
+      "status": "fail_reqs"
+    },
+    {
+      "name": "summarize",
+      "status": "pass"
+    },
+    {
+      "name": "tmux",
+      "status": "pass"
+    },
+    {
+      "name": "things-mac",
+      "status": "pass"
+    },
+    {
+      "name": "bitwarden",
+      "status": "pass"
+    },
+    {
+      "name": "1password",
+      "status": "pass"
+    },
+    {
+      "name": "blucli",
+      "status": "pass"
+    },
+    {
+      "name": "bluebubbles",
+      "status": "pass"
+    },
+    {
+      "name": "mcporter",
+      "status": "pass"
+    },
+    {
+      "name": "nano-pdf",
+      "status": "pass"
+    },
+    {
+      "name": "video-frames",
+      "status": "pass"
+    },
+    {
+      "name": "wacli",
+      "status": "pass"
+    },
+    {
+      "name": "blogwatcher",
+      "status": "pass"
+    },
+    {
+      "name": "openhue",
+      "status": "pass"
+    },
+    {
+      "name": "oracle",
+      "status": "pass"
+    },
+    {
+      "name": "remotion",
+      "status": "pass"
+    },
+    {
+      "name": "sherpa-onnx-tts",
+      "status": "fail_reqs"
+    },
+    {
+      "name": "skill-creator",
+      "status": "pass"
+    },
+    {
+      "name": "ordercli",
+      "status": "pass"
+    },
+    {
+      "name": "peekaboo",
+      "status": "pass"
+    }
+  ],
+  "summary": {
+    "total": 44,
+    "passed": 32,
+    "failed": 12,
+    "pass_rate": "72.7%"
+  }
+}

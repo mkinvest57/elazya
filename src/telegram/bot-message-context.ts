@@ -162,9 +162,26 @@ export const buildTelegramMessageContext = async ({
     messageThreadId,
   });
   const { groupConfig, topicConfig } = resolveTelegramGroupConfig(chatId, resolvedThreadId);
+
+  // Load persistent identity links
+  const persistentLinks = await import("../sessions/identity-store.js")
+    .then((mod) => mod.getAllIdentityLinks())
+    .catch(() => ({}));
+
+  const runtimeConfig: AlizeConfig = {
+    ...cfg,
+    session: {
+      ...cfg.session,
+      identityLinks: {
+        ...(cfg.session?.identityLinks ?? {}),
+        ...persistentLinks,
+      },
+    },
+  };
+
   const peerId = isGroup ? buildTelegramGroupPeerId(chatId, resolvedThreadId) : String(chatId);
   const route = resolveAgentRoute({
-    cfg,
+    cfg: runtimeConfig,
     channel: "telegram",
     accountId: account.accountId,
     peer: {
