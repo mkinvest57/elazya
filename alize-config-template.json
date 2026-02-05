@@ -1,10 +1,10 @@
 {
     "$schema": "./dist/config-schema.json",
-    "_comment": "Configuration Alizé - Le premier assistant IA français haute performance",
-    "_credits": "Propulsé par le moteur d'Excellence Alizé",
+    "_comment": "Configuration Elazya - Le premier assistant IA français haute performance",
+    "_credits": "Propulsé par le moteur d'Excellence Elazya",
     "workspace": "~/.alize",
     "agent": {
-        "name": "Alizé",
+        "name": "Elazya",
         "description": "Votre assistant IA personnel français haute performance",
         "language": "fr"
     },

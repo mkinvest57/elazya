@@ -1,6 +1,5 @@
-#!/bin/bash
-# 📧 Alizé Email Setup (Himalaya)
-# Simplifie la configuration des emails pour Alizé
+# 📧 Elazya Email Setup (Himalaya)
+# Simplifie la configuration des emails pour Elazya
 
 set -e
 
@@ -12,7 +11,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BLUE}📧 Configuration Email pour Alizé (via Himalaya)${NC}"
+echo -e "${BLUE}📧 Configuration Email pour Elazya (via Himalaya)${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
@@ -33,13 +32,11 @@ fi
 echo -e "Nous allons configurer votre compte Gmail."
 echo -e "${YELLOW}IMPORTANT : Vous devez utiliser un 'Mot de passe d'application' (pas votre mot de passe habituel).${NC}"
 echo ""
-echo -e "${YELLOW}IMPORTANT : Vous devez utiliser un 'Mot de passe d'application' (pas votre mot de passe habituel).${NC}"
-echo ""
 echo -e "${BLUE}--- Lien direct pour créer le mot de passe ---${NC}"
 echo -e "${BLUE}👉 https://myaccount.google.com/apppasswords${NC}"
 echo ""
 echo "Une fois sur la page :"
-echo "1. Donnez un nom (ex: Alizé) et cliquez sur 'Créer'"
+echo "1. Donnez un nom (ex: Elazya) et cliquez sur 'Créer'"
 echo "2. Copiez le code de 16 lettres généré (sans les espaces)"
 echo -e "${BLUE}---------------------------------------------${NC}"
 echo ""
@@ -103,7 +100,7 @@ echo ""
 echo -e "Test de connexion..."
 if himalaya account list &> /dev/null; then
     echo -e "${GREEN}✅ Connexion réussie ! Vos emails sont configurés.${NC}"
-    echo -e "Alizé peut maintenant envoyer et recevoir des emails."
+    echo -e "Elazya peut maintenant envoyer et recevoir des emails."
 else
     echo -e "${RED}❌ La connexion a échoué.${NC}"
     echo -e "Vérifiez votre mot de passe d'application ou votre connexion internet."

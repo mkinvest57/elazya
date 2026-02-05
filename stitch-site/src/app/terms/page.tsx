@@ -8,8 +8,8 @@ export default function TermsPage() {
                 <section>
                     <h2 className="text-2xl font-bold mb-4 text-primary">1. Objet</h2>
                     <p>
-                        Les présentes CGV régissent la vente de la licence perpétuelle du logiciel Alizé.
-                        En achetant Alizé, vous acceptez sans réserve ces conditions.
+                        Les présentes CGV régissent la vente de la licence perpétuelle du logiciel Elazya.
+                        En achetant Elazya, vous acceptez sans réserve ces conditions.
                     </p>
                 </section>
 
@@ -24,7 +24,7 @@ export default function TermsPage() {
                 <section>
                     <h2 className="text-2xl font-bold mb-4 text-primary">3. Remboursement</h2>
                     <p>
-                        Conformément à notre politique commerciale, vous disposez de **30 jours**
+                        Conformément à notre politique commerciale, vous disposez de <strong>30 jours</strong>
                         après l'achat pour demander un remboursement intégral si le logiciel ne
                         répond pas à vos attentes.
                     </p>

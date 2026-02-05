@@ -1,0 +1,23 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+send "lcd dist\r"
+expect "sftp>"
+send "cd elazya\r"
+expect "sftp>"
+send "put index.html\r"
+expect "sftp>"
+send "mkdir assets\r"
+expect "sftp>"
+send "cd assets\r"
+expect "sftp>"
+send "lcd assets\r"
+expect "sftp>"
+send "put *\r"
+expect "sftp>"
+send "bye\r"

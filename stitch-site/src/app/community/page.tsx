@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button"
 import { MessageCircle, Twitter, Globe } from "lucide-react"
+import Link from "next/link"
 
 export default function CommunityPage() {
     return (
@@ -18,7 +19,9 @@ export default function CommunityPage() {
                     <p className="text-foreground/60 text-sm mb-8">
                         Support prioritaire, bêtas exclusives et discussions techniques.
                     </p>
-                    <Button className="w-full">Rejoindre Discord</Button>
+                    <a href="https://discord.gg/elazya" target="_blank" rel="noopener noreferrer" className="w-full">
+                        <Button className="w-full">Rejoindre Discord</Button>
+                    </a>
                 </div>
 
                 <div className="p-8 bg-surface-2 rounded-2xl border border-surface-3 flex flex-col items-center">
@@ -29,13 +32,15 @@ export default function CommunityPage() {
                     <p className="text-foreground/60 text-sm mb-8">
                         Suivez nos annonces en temps réel et les nouveaux skills.
                     </p>
-                    <Button variant="secondary" className="w-full">Suivre @AlizeAI</Button>
+                    <a href="https://twitter.com/ElazyaAI" target="_blank" rel="noopener noreferrer" className="w-full">
+                        <Button variant="secondary" className="w-full">Suivre @ElazyaAI</Button>
+                    </a>
                 </div>
             </div>
 
             <div className="border-t border-surface-3 pt-12">
                 <p className="text-sm text-foreground/40 italic">
-                    "Alizé a changé ma façon de travailler. La communauté est incroyable." — Thomas, Developer
+                    "Elazya a changé ma façon de travailler. La communauté est incroyable." — Thomas, Developer
                 </p>
             </div>
         </div>

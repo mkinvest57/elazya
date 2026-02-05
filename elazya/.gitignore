@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+dist/
+
+# Rust/Tauri build artifacts
+src-tauri/target/
+*.dmg
+*.app
+
+# IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local

@@ -8,7 +8,7 @@ export default function PrivacyPage() {
                 <section>
                     <h2 className="text-2xl font-bold mb-4 text-primary">1. Principe Fondamental</h2>
                     <p>
-                        Alizé est un logiciel local. Cela signifie que par défaut, **aucune donnée personnelle**
+                        Elazya est un logiciel local. Cela signifie que par défaut, <strong>aucune donnée personnelle</strong>
                         n'est envoyée à nos serveurs. Vos emails, vos notes, et vos conversations sont traités
                         exclusivement sur votre ordinateur.
                     </p>
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
                 <section>
                     <h2 className="text-2xl font-bold mb-4 text-primary">3. Hébergement</h2>
                     <p>
-                        Alizé ne possède pas de stockage cloud pour vos données utilisateur. Si vous utilisez
+                        Elazya ne possède pas de stockage cloud pour vos données utilisateur. Si vous utilisez
                         une intégration web (ex: Search), les requêtes sont envoyées via HTTPS sécurisé
                         aux fournisseurs respectifs (Google Gemini, OpenAI, etc.), mais jamais stockées chez nous.
                     </p>

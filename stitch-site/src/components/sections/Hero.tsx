@@ -30,27 +30,27 @@ export function Hero() {
                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70">Intelligence Autonome · v4.0</span>
                         </div>
 
-                        <h1 className="text-7xl md:text-9xl font-black leading-[0.9] tracking-tighter mb-8 font-display italic">
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-9xl font-black leading-[0.9] tracking-tighter mb-6 md:mb-8 font-display italic">
                             VOTRE IA <br />
                             <span className="text-primary NOT-italic">PERSONNELLE.</span>
                         </h1>
 
-                        <p className="text-xl md:text-2xl text-foreground/60 leading-relaxed max-w-xl mb-12 font-light">
-                            L'IA qui vit **chez vous**, pas dans un serveur américain.
+                        <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/60 leading-relaxed max-w-xl mb-8 md:mb-12 font-light">
+                            L'IA qui vit <strong className="text-white">chez vous</strong>, pas dans un serveur américain.
                             Française. Locale. 44 super-pouvoirs pour agir sur votre machine.
                             <span className="block mt-4 text-white/80 font-medium italic">Zéro cloud, zéro abonnement, zéro donnée envoyée ailleurs.</span>
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-6">
+                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                             <Link href="/checkout">
-                                <Button size="lg" className="bg-white text-black hover:bg-white/90 rounded-none px-12 h-16 text-lg font-black italic group tracking-tight">
+                                <Button size="lg" className="w-full sm:w-auto bg-white text-black hover:bg-white/90 rounded-none px-6 sm:px-12 h-14 sm:h-16 text-base sm:text-lg font-black italic group tracking-tight">
                                     POSSÉDER ELAZYA — 200€
-                                    <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    <ArrowRight className="ml-2 sm:ml-3 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                                 </Button>
                             </Link>
                             <Link href="#philosophy">
-                                <Button variant="outline" className="border-white/10 hover:bg-white/5 rounded-none px-12 h-16 text-lg font-bold italic tracking-tight backdrop-blur-md text-white">
-                                    L'ÉTHIQUE LOCALE
+                                <Button variant="outline" className="w-full sm:w-auto border-white/10 hover:bg-white/5 rounded-none px-6 sm:px-12 h-14 sm:h-16 text-base sm:text-lg font-bold italic tracking-tight backdrop-blur-md text-white">
+                                    L’ÉTHIQUE LOCALE
                                 </Button>
                             </Link>
                         </div>
@@ -85,7 +85,7 @@ export function Hero() {
                                     playsInline
                                     className="w-full h-full object-cover opacity-90 scale-[1.01] grayscale-[0.2] hue-rotate-[-45deg]"
                                 >
-                                    <source src="/animations/alize-explainer-portrait.mp4" type="video/mp4" />
+                                    <source src="/animations/elazya-explainer-portrait.mp4" type="video/mp4" />
                                 </video>
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60 pointer-events-none" />
                                 <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-black to-transparent opacity-40 pointer-events-none" />

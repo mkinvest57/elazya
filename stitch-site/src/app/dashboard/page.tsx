@@ -21,7 +21,7 @@ export default function DashboardPage() {
                         <h1 className="text-4xl font-extrabold tracking-tight mb-2">Bienvenue, Sashimi !</h1>
                         <div className="flex items-center gap-2 text-sm text-foreground/40 font-medium">
                             <span className="w-2 h-2 rounded-full bg-status-success animate-pulse"></span>
-                            Licence Alizé Pro — Valide à vie
+                            Licence Elazya Pro — Valide à vie
                         </div>
                     </div>
                     <Button variant="outline" className="border-white/5 bg-white/5 backdrop-blur hover:bg-white/10 group">
@@ -49,8 +49,15 @@ export default function DashboardPage() {
 
                                 <div className="space-y-6">
                                     <div className="bg-black/60 border border-white/5 rounded-2xl p-6 font-mono text-xl md:text-2xl flex flex-col md:flex-row justify-between items-center gap-4 group/key">
-                                        <span className="tracking-tighter text-white">ALIZ-8374-KSDJ-9238-LZPF</span>
-                                        <Button variant="ghost" className="h-12 w-full md:w-auto px-6 border border-white/5 hover:border-primary/50 text-xs uppercase font-black tracking-widest">
+                                        <span className="tracking-tighter text-white">ELZY-8374-KSDJ-9238-LZPF</span>
+                                        <Button
+                                            variant="ghost"
+                                            className="h-12 w-full md:w-auto px-6 border border-white/5 hover:border-primary/50 text-xs uppercase font-black tracking-widest"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText("ELZY-8374-KSDJ-9238-LZPF")
+                                                alert("Clé copiée !")
+                                            }}
+                                        >
                                             <Copy className="w-3 h-3 mr-2" /> Copier
                                         </Button>
                                     </div>
@@ -84,7 +91,7 @@ export default function DashboardPage() {
                         <Card className="glass-card p-8 h-full flex flex-col justify-between border-primary/20">
                             <div>
                                 <h4 className="text-sm font-black uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
-                                    <Download className="w-4 h-4 text-secondary" /> Setup Alizé
+                                    <Download className="w-4 h-4 text-secondary" /> Setup Elazya
                                 </h4>
                                 <div className="mb-10">
                                     <div className="text-4xl font-black mb-2 italic">v2.1.4</div>

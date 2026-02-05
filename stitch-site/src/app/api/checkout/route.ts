@@ -14,9 +14,9 @@ export async function POST(req: Request) {
                     price_data: {
                         currency: "eur",
                         product_data: {
-                            name: "Alizé - Licence Perpétuelle",
+                            name: "Elazya - Licence Perpétuelle",
                             description: "Assistant IA Personnel (Version Commerciale)",
-                            images: ["https://alize.ai/opengraph-image.png"], // Placeholder
+                            images: ["https://elazya.com/opengraph-image.png"],
                         },
                         unit_amount: 20000, // 200.00 EUR
                     },
@@ -35,6 +35,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ url: session.url })
     } catch (err: any) {
+        console.error("Stripe Checkout Error:", err)
         return NextResponse.json({ error: err.message }, { status: 500 })
     }
 }

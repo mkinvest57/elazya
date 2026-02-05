@@ -56,7 +56,7 @@ export default function LandingPage() {
                 <div>
                   <h3 className="text-2xl font-black mb-4 font-display italic text-white">La réalité d'Elazya</h3>
                   <p className="text-white/50 leading-relaxed font-light">
-                    Elazya est l'assistant exécutif définitif. Il n'est pas sur un serveur en Californie, il est **déjà chez vous**. Il possède les clés de votre système pour agir là où ça compte : vos mails, vos documents, votre temps.
+                    Elazya est l'assistant exécutif définitif. Il n'est pas sur un serveur en Californie, il est <strong className="text-white">déjà chez vous</strong>. Il possède les clés de votre système pour agir là où ça compte : vos mails, vos documents, votre temps.
                   </p>
                 </div>
               </motion.div>
@@ -375,7 +375,7 @@ export default function LandingPage() {
               { name: "Notion", icon: FileText, desc: "Knowledge Base", longDesc: "Il injecte de l'intelligence dans vos bases de données. Elazya automatise la mise à jour de vos pages Notion.", example: "Un nouveau client signe -> Création automatique de son espace projet Notion." },
               { name: "Python Runner", icon: Cpu, desc: "Calculs & Data", longDesc: "Besoin d'un script complexe ? Elazya écrit, teste et exécute du code Python directement sur votre machine.", example: "Analyse d'un Excel géant -> Création d'un graphique de tendances automatique." },
               { name: "SNCF Connect", icon: Train, desc: "Billets & Voyages", longDesc: "Votre agent de voyage personnel. Il compare, réserve et vous alerte sur les retards en temps réel.", example: "Besoin de Paris-Lyon vendredi -> Trouver le meilleur prix et l'ajouter à l'agenda." },
-              { name: "Amazon Track", icon: ShoppingCart, desc: "Suivi colis", longDesc: "Ne cherchez plus vos numéros de suivi. Alizé centralise l'état de toutes vos livraisons.", example: "Scan des mails de confirmation -> Affichage du jour précis de livraison." },
+              { name: "Amazon Track", icon: ShoppingCart, desc: "Suivi colis", longDesc: "Ne cherchez plus vos numéros de suivi. Elazya centralise l'état de toutes vos livraisons.", example: "Scan des mails de confirmation -> Affichage du jour précis de livraison." },
               { name: "Spotify / Music", icon: Music, desc: "Ambiance locale", longDesc: "La bande son de votre focus. Il adapte la musique à votre rythme cardiaque ou à la complexité de votre tâche.", example: "Tâche de code intense -> Lancer une playlist Lofi sans intervention." },
               { name: "Focus Mode", icon: Moon, desc: "Concentration", longDesc: "Le gardien de votre attention. Il bloque les distractions au niveau du système quand vous êtes en flux.", example: "Détection de travail profond -> Coupure des notifications sociales." },
               { name: "Password Guard", icon: Lock, desc: "Coffre-fort local", longDesc: "Sécurité maximale. Il vous aide à gérer vos accès sans jamais les stocker sur un cloud tiers.", example: "Génération de mot de passe fort -> Stockage sécurisé local." },
@@ -436,17 +436,17 @@ export default function LandingPage() {
               </thead>
               <tbody className="text-sm font-medium">
                 {[
-                  { feature: "Confidentialité", alize: "Absolue (Air-gapped possible)", cloud: "Exploitation des données" },
-                  { feature: "Exécution", alize: "Locale (Zéro latence)", cloud: "Serveurs distants" },
-                  { feature: "Accès Système", alize: "Total (Finder, Mails, Applis)", cloud: "Navigateur uniquement" },
-                  { feature: "Mode Hors-Ligne", alize: "100% Fonctionnel", cloud: "Inexploitable" },
-                  { feature: "Usage Illimité", alize: "Pas de quota, pas de bride", cloud: "Limité par l'abonnement" },
-                  { feature: "Coût", alize: "200€ (Une seule fois)", cloud: "216€ / MOIS (Claude Max)" }
+                  { feature: "Confidentialité", elazya: "Absolue (Air-gapped possible)", cloud: "Exploitation des données" },
+                  { feature: "Exécution", elazya: "Locale (Zéro latence)", cloud: "Serveurs distants" },
+                  { feature: "Accès Système", elazya: "Total (Finder, Mails, Applis)", cloud: "Navigateur uniquement" },
+                  { feature: "Mode Hors-Ligne", elazya: "100% Fonctionnel", cloud: "Inexploitable" },
+                  { feature: "Usage Illimité", elazya: "Pas de quota, pas de bride", cloud: "Limité par l'abonnement" },
+                  { feature: "Coût", elazya: "200€ (Une seule fois)", cloud: "216€ / MOIS (Claude Max)" }
                 ].map((row, i) => (
                   <tr key={i} className="border-t border-white/5 hover:bg-white/[0.01] transition-colors">
                     <td className="p-8 text-white/75">{row.feature}</td>
                     <td className="p-8 text-primary font-bold italic flex items-center gap-2">
-                      <Check className="w-4 h-4" /> {row.alize}
+                      <Check className="w-4 h-4" /> {row.elazya}
                     </td>
                     <td className="p-8 text-white/50 flex items-center gap-2">
                       <X className="w-4 h-4" /> {row.cloud}
@@ -545,7 +545,7 @@ export default function LandingPage() {
               className="text-center mb-24"
             >
               <h2 className="text-5xl font-black italic mb-6">ENGAGEMENT <span className="text-primary NOT-italic">SÉRÉNITÉ.</span></h2>
-              <p className="text-white/50 text-xl font-light italic">Pas besoin d'être un ingénieur pour dompter Alizé.</p>
+              <p className="text-white/50 text-xl font-light italic">Pas besoin d'être un ingénieur pour dompter Elazya.</p>
             </motion.div>
 
             <div className="space-y-6">
@@ -563,7 +563,7 @@ export default function LandingPage() {
                   a: "Zéro. Elazya est un investissement unique (200€). Il utilise des modèles gratuits ou des clés API que l'on vous aide à obtenir facilement. Vous reprenez le contrôle de votre budget."
                 },
                 {
-                  q: "En quoi Alizé est différent de ChatGPT ou Siri ?",
+                  q: "En quoi Elazya est différent de ChatGPT ou Siri ?",
                   a: "ChatGPT est dans le cloud et ne peut pas toucher à vos fichiers. Siri est limité par Apple. Elazya est un agent local autonome qui possède les clés de votre système pour AGIR réellement, pas juste parler."
                 }
               ].map((faq, i) => (

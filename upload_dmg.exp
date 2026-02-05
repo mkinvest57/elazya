@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect "password:"
+send "Yassine.2011\r"
+expect "sftp>"
+send "put /Users/sashimi/Documents/Elazya_Projects/elazya/src-tauri/target/release/bundle/dmg/Elazya_1.0.0_aarch64.dmg elazya/downloads/Elazya_1.0.0_aarch64.dmg\r"
+expect "sftp>"
+send "exit\r"

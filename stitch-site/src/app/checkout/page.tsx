@@ -14,39 +14,18 @@ export default function CheckoutPage() {
         email: ""
     })
 
-    const handlePayment = async () => {
+    const handlePayment = () => {
+        // Lien de Paiement Stripe (Elazya Licence Perpétuelle - 200€)
+        const PAYMENT_LINK = "https://buy.stripe.com/bJe14pc0r7oN1xe6UDds400"
+
         if (!formData.email || !formData.firstName || !formData.lastName) {
             alert("Veuillez remplir tous les champs.")
             return
         }
 
         setIsLoading(true)
-        try {
-            console.log("Sending checkout request:", formData)
-            const res = await fetch("/api/checkout", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            })
-
-            if (!res.ok) {
-                const errData = await res.json()
-                throw new Error(errData.error || "Erreur serveur")
-            }
-
-            const data = await res.json()
-            if (data.url) {
-                console.log("Redirecting to:", data.url)
-                window.location.href = data.url
-            } else {
-                throw new Error("Pas d'URL de redirection reçue.")
-            }
-        } catch (e: any) {
-            console.error("Payment Error:", e)
-            alert(`Erreur: ${e.message}`)
-        } finally {
-            setIsLoading(false)
-        }
+        // Redirection simple avec emails pré-remplis si possible via URL params
+        window.location.href = `${PAYMENT_LINK}?prefilled_email=${encodeURIComponent(formData.email)}`
     }
 
     return (
@@ -55,7 +34,7 @@ export default function CheckoutPage() {
                 <div className="space-y-8">
                     <div>
                         <h1 className="text-3xl font-bold mb-2">Finaliser votre commande</h1>
-                        <p className="text-foreground/60">Licence perpétuelle Alizé (200€)</p>
+                        <p className="text-foreground/60">Licence perpétuelle Elazya (200€)</p>
                     </div>
 
                     <Card className="p-8">
@@ -134,7 +113,7 @@ export default function CheckoutPage() {
                         <h3 className="font-bold mb-6 text-xl">Résumé</h3>
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <div className="font-bold text-lg">Alizé Licence Perpétuelle</div>
+                                <div className="font-bold text-lg">Elazya Licence Perpétuelle</div>
                                 <div className="text-sm text-foreground/60">Version Commerciale 2026</div>
                             </div>
                             <div className="font-mono text-lg">200€</div>
@@ -152,7 +131,7 @@ export default function CheckoutPage() {
                         <div className="mt-8 pt-6 border-t border-surface-3">
                             <h4 className="font-bold text-sm mb-4">Inclus après achat :</h4>
                             <ul className="space-y-2 text-sm text-foreground/70">
-                                <li className="flex gap-2"><span>✅</span> Lien téléchargement Alizé v2</li>
+                                <li className="flex gap-2"><span>✅</span> Lien téléchargement Elazya v1.0</li>
                                 <li className="flex gap-2"><span>✅</span> Clé de licence unique</li>
                                 <li className="flex gap-2"><span>✅</span> Accès Discord VIP</li>
                                 <li className="flex gap-2"><span>✅</span> Facture pour notes de frais</li>

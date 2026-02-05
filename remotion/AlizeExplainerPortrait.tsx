@@ -72,7 +72,7 @@ export const AlizeExplainerPortrait: React.FC = () => {
                             color: 'rgba(255,255,255,0.4)',
                             textAlign: 'center',
                             maxWidth: 600
-                        }}>Mails, Impôts, Doctolib... <br /> Alizé agit sur votre monde.</div>
+                        }}>Mails, Impôts, Doctolib... <br /> Elazya agit sur votre monde.</div>
                     </AbsoluteFill>
                 </Series.Sequence>
 
@@ -93,7 +93,7 @@ export const AlizeExplainerPortrait: React.FC = () => {
                 {/* Scene 4: Final */}
                 <Series.Sequence durationInFrames={60}>
                     <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
-                        <HypeText text="ALIZÉ." />
+                        <HypeText text="ELAZYA." />
                         <div style={{
                             marginTop: 20,
                             width: 160,

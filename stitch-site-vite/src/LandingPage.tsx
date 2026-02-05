@@ -1,5 +1,5 @@
 import React from 'react';
-import './style.css'; // Assuming styles are imported globally or converted to modules
+// import './style.css' // Removed incorrectly referenced file; // Assuming styles are imported globally or converted to modules
 
 export const LandingPage: React.FC = () => {
     return (
@@ -12,26 +12,26 @@ export const LandingPage: React.FC = () => {
             {/* Nav */}
             <nav className="sticky-nav">
                 <div className="container nav-content">
-                    <div className="logo">🌬️ Alizé</div>
+                    <div className="logo">Elazya</div>
                     <div className="nav-links">
                         <a href="#features">Fonctionnalités</a>
                         <a href="#demo">Démo</a>
                         <a href="#pricing">Tarifs</a>
-                        <a href="#buy" className="btn btn-secondary">Acheter</a>
+                        <a href="#pricing" className="btn btn-secondary">Acheter</a>
                     </div>
                 </div>
             </nav>
 
             {/* Hero */}
-            <header className="hero-section">
+            <header id="demo" className="hero-section">
                 <div className="container hero-grid">
                     <div className="hero-text">
                         <h1>Libérez votre <br /><span className="gradient-text">Potentiel</span></h1>
                         <p className="hero-sub">
-                            Alizé est votre second cerveau. Une IA locale, privée et autonome qui gère votre vie numérique sans jamais envoyer vos données dans le cloud.
+                            Elazya est votre second cerveau. Une IA locale, privée et autonome qui gère votre vie numérique sans jamais envoyer vos données dans le cloud.
                         </p>
                         <div className="cta-group">
-                            <a href="#buy" className="btn btn-primary">Obtenir Alizé v1.0</a>
+                            <a href="#pricing" className="btn btn-primary">Obtenir Elazya v1.0</a>
                             <a href="#demo" className="btn btn-glass">Voir la Démo</a>
                         </div>
                     </div>
@@ -46,7 +46,7 @@ export const LandingPage: React.FC = () => {
                                     </div>
                                     <div className="mockup-body">
                                         <div className="message system">Bonjour Sashimi, j'ai optimisé votre agenda.</div>
-                                        <div className="message user">Merci Alizé. Lance le rendu vidéo.</div>
+                                        <div className="message user">Merci Elazya. Lance le rendu vidéo.</div>
                                         <div className="message system">Rendu lancé. 14 min restantes.</div>
                                     </div>
                                 </div>
@@ -59,12 +59,12 @@ export const LandingPage: React.FC = () => {
             {/* Features */}
             <section id="features" className="features-section">
                 <div className="container">
-                    <h2 className="section-title">Pourquoi <span className="gradient-text">Alizé</span> ?</h2>
+                    <h2 className="section-title">Pourquoi <span className="gradient-text">Elazya</span> ?</h2>
                     <div className="features-grid">
                         {[
                             { icon: "🔒", title: "100% Privé", text: "Vos données restent sur votre machine. Aucune télémétrie." },
                             { icon: "⚡", title: "Ultra Rapide", text: "Réponses instantanées grâce à Gemini 2.5 Flash." },
-                            { icon: "🤖", title: "Autonomie", text: "Alizé agit pour vous : emails, calendrier, code." },
+                            { icon: "🤖", title: "Autonomie", text: "Elazya agit pour vous : emails, calendrier, code." },
                             { icon: "🔌", title: "Multi-Canaux", text: "WhatsApp, Telegram, Discord, Slack, iMessage." }
                         ].map((f, i) => (
                             <div key={i} className="glass-card feature-card">
@@ -97,7 +97,7 @@ export const LandingPage: React.FC = () => {
             </section>
 
             <footer className="site-footer">
-                <p>© 2026 Alizé AI. Conçu à Paris.</p>
+                <p>© 2026 Elazya AI. Conçu à Paris.</p>
             </footer>
         </div>
     );

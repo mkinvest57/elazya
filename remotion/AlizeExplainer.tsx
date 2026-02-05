@@ -13,14 +13,14 @@ export const AlizeExplainer: React.FC = () => {
         {
             type: 'intro',
             durationInFrames: 90,
-            title: 'ALIZÉ',
+            title: 'ELAZYA',
             subtitle: 'L\'IA qui travaille pour vous.',
             backgroundColor: '#0a0a0b',
         },
         {
             type: 'text',
             durationInFrames: 120,
-            text: 'Trier vos emails ? Alizé s\'en occupe.',
+            text: 'Trier vos emails ? Elazya s\'en occupe.',
             backgroundColor: '#002244',
             textColor: '#00d4ff',
         },

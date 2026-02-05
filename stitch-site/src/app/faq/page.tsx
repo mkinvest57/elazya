@@ -3,12 +3,12 @@ import { Card } from "@/components/ui/Card"
 export default function FAQPage() {
     const faqs = [
         {
-            q: "C'est quoi exactement Alizé?",
-            a: "Alizé est un assistant IA personnel qui tourne sur VOTRE ordinateur. Il n'est pas dans le cloud, il n'envoie rien à Internet sans votre permission. Il parle avec vous via WhatsApp, Telegram, iMessage, Email, ou Slack."
+            q: "C'est quoi exactement Elazya?",
+            a: "Elazya est un assistant IA personnel qui tourne sur VOTRE ordinateur. Il n'est pas dans le cloud, il n'envoie rien à Internet sans votre permission. Il parle avec vous via WhatsApp, Telegram, iMessage, Email, ou Slack."
         },
         {
             q: "J'ai zéro compétences techniques. C'est faisable?",
-            a: "Oui, 100%. Installation = 1 clic. Aucune config requise. Si vous pouvez ouvrir WhatsApp, vous pouvez utiliser Alizé."
+            a: "Oui, 100%. Installation = 1 clic. Aucune config requise. Si vous pouvez ouvrir WhatsApp, vous pouvez utiliser Elazya."
         },
         {
             q: "Ça utilise quelle IA?",
@@ -16,7 +16,7 @@ export default function FAQPage() {
         },
         {
             q: "Mes données, elles vont où?",
-            a: "Nulle part. Alizé tourne SUR VOTRE ORDINATEUR. Aucune donnée n'est envoyée à nos serveurs. Vos données = 100% privées."
+            a: "Nulle part. Elazya tourne SUR VOTRE ORDINATEUR. Aucune donnée n'est envoyée à nos serveurs. Vos données = 100% privées."
         },
         {
             q: "Que se passe si vous fermez le projet?",

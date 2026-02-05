@@ -26,7 +26,7 @@ export default function PricingPage() {
                         <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">pour la vie.</span>
                     </h1>
                     <p className="text-xl text-foreground/60 max-w-2xl mx-auto">
-                        Alizé n'est pas un service. C'est un actif numérique qui vous appartient pour toujours.
+                        Elazya n'est pas un service. C'est un actif numérique qui vous appartient pour toujours.
                     </p>
                 </motion.div>
 
@@ -78,7 +78,7 @@ export default function PricingPage() {
                                     Meilleure Valeur • Licence Pro
                                 </div>
 
-                                <h3 className="text-3xl font-bold mb-4">Alizé Perpetual</h3>
+                                <h3 className="text-3xl font-bold mb-4">Elazya Perpetual</h3>
                                 <div className="flex items-baseline gap-1 mb-8">
                                     <span className="text-7xl font-black italic tracking-tighter text-white">200€</span>
                                     <span className="text-sm text-foreground/40 font-bold uppercase tracking-widest">HT</span>

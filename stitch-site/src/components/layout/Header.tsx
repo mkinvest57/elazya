@@ -37,10 +37,12 @@ export function Header() {
         >
             <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="text-2xl font-bold flex items-center gap-2 group">
-                    <span className="text-3xl group-hover:scale-110 transition-transform">🌬️</span>
-                    <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                        Elazya
+                <Link href="/" className="text-2xl font-black flex items-center gap-2 group">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-primary/30">
+                        <span className="text-black font-black text-lg">E</span>
+                    </div>
+                    <span className="bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent font-display italic tracking-tight">
+                        ELAZYA
                     </span>
                 </Link>
 
