@@ -187,8 +187,8 @@ export async function startGatewayServer(
     const issues =
       configSnapshot.issues.length > 0
         ? configSnapshot.issues
-            .map((issue) => `${issue.path || "<root>"}: ${issue.message}`)
-            .join("\n")
+          .map((issue) => `${issue.path || "<root>"}: ${issue.message}`)
+          .join("\n")
         : "Unknown validation issue.";
     throw new Error(
       `Invalid config at ${configSnapshot.path}.\n${issues}\nRun "${formatCliCommand("openclaw doctor")}" to repair, then retry.`,
@@ -570,8 +570,14 @@ export async function startGatewayServer(
     httpServers,
   });
 
+  // Heartbeat to keep the event loop alive, as httpServer sometimes fails to do so.
+  const heartbeatParams = {
+    timer: setInterval(() => { }, 60000), // 1 minute
+  };
+
   return {
     close: async (opts) => {
+      clearInterval(heartbeatParams.timer);
       if (diagnosticsEnabled) {
         stopDiagnosticHeartbeat();
       }
