@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 222.2 84% 4.9%;
+        --foreground: 210 40% 98%;
+
+        --card: 222.2 84% 4.9%;
+        --card-foreground: 210 40% 98%;
+
+        --popover: 222.2 84% 4.9%;
+        --popover-foreground: 210 40% 98%;
+
+        /* Primary: Indigo #6366f1 */
+        --primary: 243 75% 59%;
+        --primary-foreground: 210 40% 98%;
+
+        /* Secondary: Violet #8b5cf6 */
+        --secondary: 262 83% 58%;
+        --secondary-foreground: 210 40% 98%;
+
+        /* Muted: Slate/Zinc */
+        --muted: 222.2 47.4% 11.2%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+
+        /* Accent: Indigo/Violet Mix */
+        --accent: 262 83% 65%;
+        --accent-foreground: 210 40% 98%;
+
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 210 40% 98%;
+
+        --border: 217.2 32.6% 17.5%;
+        --input: 217.2 32.6% 17.5%;
+        /* Ring: Indigo Glow */
+        --ring: 243 75% 59%;
+
+        --radius: 0.5rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-black text-foreground overflow-hidden font-sans antialiased;
+        background-image:
+            radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 0% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 100% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+        background-attachment: fixed;
+    }
+}
+
+@layer utilities {
+    .bg-aurora {
+        background:
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+            /* Indigo-500 */
+            radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+            /* Violet-500 */
+            radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+            /* Indigo-500 */
+            radial-gradient(at 0% 100%, rgba(167, 139, 250, 0.15) 0px, transparent 50%);
+        /* Violet-400 */
+        background-size: 200% 200%;
+        animation: aurora 20s ease infinite;
+    }
+
+    .glass-panel {
+        @apply bg-zinc-900/40 backdrop-blur-2xl border border-white/10 shadow-2xl;
+        position: relative;
+    }
+
+    .glass-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .glass-card {
+        @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .glass-card:hover {
+        @apply bg-white/10 border-white/20;
+        transform: translateY(-2px);
+        box-shadow: 0 0 30px -5px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply bg-white/10 rounded-full;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-white/20;
+    }
+
+    /* V2 Animations */
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes shine {
+        from {
+            transform: translateX(-100%);
+        }
+
+        to {
+            transform: translateX(100%);
+        }
+    }
+
+    .animate-shine {
+        animation: shine 2s infinite;
+    }
+
+    @keyframes pulse-glow {
+
+        0%,
+        100% {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        50% {
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.6);
+        }
+    }
+
+    .animate-pulse-glow {
+        animation: pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+}

@@ -1,0 +1,94 @@
+    Checking elazya-v1000 v0.0.0 (/Users/sashimi/Documents/Elazya_Projects/elazya/src-tauri)
+warning: unused import: `get_token_usage`
+  --> src/main.rs:12:24
+   |
+12 | use openclaw_monitor::{get_token_usage, get_connected_channels, get_installed_skills, watch_token...
+   |                        ^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0277]: the trait bound `tokio::process::ChildStdout: std::io::Read` is not satisfied
+   --> src/openclaw.rs:436:41
+    |
+436 |             let reader = BufReader::new(stdout);
+    |                          -------------- ^^^^^^ the trait `std::io::Read` is not implemented for `tokio::process::ChildStdout`
+    |                          |
+    |                          required by a bound introduced by this call
+    |
+note: required by a bound in `std::io::BufReader::<R>::new`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/std/src/io/buffered/bufreader.rs:73:5
+
+error[E0599]: the method `lines` exists for struct `std::io::BufReader<tokio::process::ChildStdout>`, but its trait bounds were not satisfied
+    --> src/openclaw.rs:437:32
+     |
+ 437 |             for line in reader.lines() {
+     |                                ^^^^^ method cannot be called on `std::io::BufReader<tokio::process::ChildStdout>` due to unsatisfied trait bounds
+     |
+    ::: /Users/sashimi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.49.0/src/process/mod.rs:1491:1
+     |
+1491 | pub struct ChildStdout {
+     | ---------------------- doesn't satisfy `tokio::process::ChildStdout: std::io::Read`
+     |
+     = note: the following trait bounds were not satisfied:
+             `tokio::process::ChildStdout: std::io::Read`
+             which is required by `std::io::BufReader<tokio::process::ChildStdout>: BufRead`
+             `std::io::BufReader<tokio::process::ChildStdout>: BufRead`
+             which is required by `&mut std::io::BufReader<tokio::process::ChildStdout>: BufRead`
+
+error[E0277]: the trait bound `tokio::process::ChildStderr: std::io::Read` is not satisfied
+   --> src/openclaw.rs:447:41
+    |
+447 |             let reader = BufReader::new(stderr);
+    |                          -------------- ^^^^^^ the trait `std::io::Read` is not implemented for `tokio::process::ChildStderr`
+    |                          |
+    |                          required by a bound introduced by this call
+    |
+note: required by a bound in `std::io::BufReader::<R>::new`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/std/src/io/buffered/bufreader.rs:73:5
+
+error[E0599]: the method `lines` exists for struct `std::io::BufReader<tokio::process::ChildStderr>`, but its trait bounds were not satisfied
+    --> src/openclaw.rs:448:32
+     |
+ 448 |             for line in reader.lines() {
+     |                                ^^^^^ method cannot be called on `std::io::BufReader<tokio::process::ChildStderr>` due to unsatisfied trait bounds
+     |
+    ::: /Users/sashimi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.49.0/src/process/mod.rs:1500:1
+     |
+1500 | pub struct ChildStderr {
+     | ---------------------- doesn't satisfy `tokio::process::ChildStderr: std::io::Read`
+     |
+     = note: the following trait bounds were not satisfied:
+             `tokio::process::ChildStderr: std::io::Read`
+             which is required by `std::io::BufReader<tokio::process::ChildStderr>: BufRead`
+             `std::io::BufReader<tokio::process::ChildStderr>: BufRead`
+             which is required by `&mut std::io::BufReader<tokio::process::ChildStderr>: BufRead`
+
+warning: unreachable expression
+   --> src/openclaw.rs:858:5
+    |
+856 |     app_handle.restart();
+    |     -------------------- any code following this expression is unreachable
+857 |     
+858 |     Ok(())
+    |     ^^^^^^ unreachable expression
+    |
+    = note: `#[warn(unreachable_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `openclaw_dir`
+   --> src/openclaw.rs:617:25
+    |
+617 | pub fn ensure_workspace(openclaw_dir: &str) -> Result<serde_json::Value, String> {
+    |                         ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_openclaw_dir`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `node_path`
+   --> src/openclaw.rs:755:9
+    |
+755 |     let node_path = find_node_executable();
+    |         ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_node_path`
+
+Some errors have detailed explanations: E0277, E0599.
+For more information about an error, try `rustc --explain E0277`.
+warning: `elazya-v1000` (bin "elazya-v1000") generated 4 warnings
+error: could not compile `elazya-v1000` (bin "elazya-v1000") due to 4 previous errors; 4 warnings emitted
