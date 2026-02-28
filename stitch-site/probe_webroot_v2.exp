@@ -1,0 +1,26 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Create more candidates
+send "mkdir -p public www\r"
+expect -re {[$#] ?$}
+
+# Copy hello.html
+send "cp hello.html public/\r"
+expect -re {[$#] ?$}
+send "cp hello.html www/\r"
+expect -re {[$#] ?$}
+
+# Check permissions
+send "chmod 755 public www\r"
+expect -re {[$#] ?$}
+send "chmod 644 public/hello.html www/hello.html\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

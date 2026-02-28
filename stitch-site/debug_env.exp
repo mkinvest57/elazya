@@ -1,0 +1,28 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "ls -la elazya-server/.env\r"
+expect -re {[$#] ?$}
+
+send "cat elazya-server/watchdog.log\r"
+expect -re {[$#] ?$}
+send "cat elazya-server/watchdog_err.log\r"
+expect -re {[$#] ?$}
+
+# Check if app logs exist
+send "cat elazya-server/stdout.log\r"
+expect -re {[$#] ?$}
+send "cat elazya-server/stderr.log\r"
+expect -re {[$#] ?$}
+
+# Try to get response body
+send "wget -O - http://localhost:3000 | head -n 20\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

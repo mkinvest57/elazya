@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+set timeout 1800
+# Long timeout for large file upload
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+# Create downloads directory if needed
+send "mkdir elazya/downloads\r"
+expect "sftp>"
+
+# Upload DMG
+# Assuming the DMG is at this path (Verify before running!)
+send "put ../elazya/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/Elazya_2.0.0_aarch64.dmg elazya/downloads/\r"
+expect "sftp>"
+
+send "bye\r"

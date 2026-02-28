@@ -1,0 +1,46 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Ensure target exists
+send "mkdir -p elazya\r"
+expect -re {[$#] ?$}
+
+# Extract static.tar.gz INTO elazya
+# static.tar.gz contains ./index.html etc.
+send "tar -xzf static.tar.gz -C elazya/\r"
+expect -re {[$#] ?$}
+
+# Remove the tarball
+send "rm static.tar.gz\r"
+expect -re {[$#] ?$}
+
+# Fix permissions
+send "chmod -R 755 elazya\r"
+expect -re {[$#] ?$}
+send "find elazya -type f -exec chmod 644 {} \\;\r"
+expect -re {[$#] ?$}
+
+# Create .htaccess in elazya/
+# We can't scp it easily without another script, so just echo it
+send "echo 'Options +FollowSymLinks' > elazya/.htaccess\r"
+expect -re {[$#] ?$}
+send "echo 'RewriteEngine On' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+send "echo 'RewriteBase /' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+send "echo 'RewriteCond %{REQUEST_FILENAME} !-d' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+send "echo 'RewriteCond %{REQUEST_FILENAME}\\.html -f' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+send "echo 'RewriteRule ^(.*)$ $1.html [L]' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+send "echo 'ErrorDocument 404 /404.html' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

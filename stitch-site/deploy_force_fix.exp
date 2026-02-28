@@ -1,0 +1,12 @@
+#!/usr/bin/expect
+set timeout 300
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect "password:"
+send "Yassine.2011\r"
+expect "sftp>"
+
+# Upload NEW file with different name
+send "put public/downloads/Elazya_1.1.6_FIX_aarch64.dmg elazya/downloads/Elazya_1.1.6_FIX_aarch64.dmg\r"
+expect "sftp>"
+
+send "bye\r"

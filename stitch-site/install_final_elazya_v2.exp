@@ -1,0 +1,27 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Re-create .htaccess with correct escaping
+send "echo 'Options +FollowSymLinks' > elazya/.htaccess\r"
+expect -re {[$#] ?$}
+send "echo 'RewriteEngine On' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+send "echo 'RewriteBase /' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+send "echo 'RewriteCond %{REQUEST_FILENAME} !-d' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+send "echo 'RewriteCond %{REQUEST_FILENAME}\\.html -f' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+# Escape $1 as \$1
+send "echo 'RewriteRule ^(.*)\$ \$1.html [L]' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+send "echo 'ErrorDocument 404 /404.html' >> elazya/.htaccess\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

@@ -1,0 +1,24 @@
+#!/usr/bin/expect -f
+set timeout 300
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+
+# Go to app dir
+send "cd elazya-server\r"
+expect "$ "
+
+# Install dependencies to fix binaries (quick if files exist)
+# Using --production to save time/space if possible, but we need Prisma CLI?
+# Prisma CLI is often in devDependencies, but listed in dependencies in package.json?
+# Let's just run npm install.
+send "npm install\r"
+expect "$ "
+
+# Run Prisma Push
+send "npx prisma db push\r"
+expect "$ "
+
+send "exit\r"

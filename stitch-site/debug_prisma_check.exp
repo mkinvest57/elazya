@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Check listing
+send "ls -l node_modules/.prisma/client/\r"
+expect -re {[$#] ?$}
+
+# Check error head
+send "node check_prisma.js 2>&1 | head -n 20\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

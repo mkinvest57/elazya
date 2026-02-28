@@ -222,4 +222,12 @@ export class OpenClawClient {
     static async restartEngine(): Promise<void> {
         return invoke('restart_openclaw');
     }
+
+    static async uninstallSkill(skill: string): Promise<void> {
+        return invoke('uninstall_skill_cmd', { skill });
+    }
+
+    static async resetApp(): Promise<void> {
+        return invoke('reset_app_cmd');
+    }
 }

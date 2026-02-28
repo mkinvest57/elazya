@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+send "perl start_daemon.pl\r"
+expect -re {[$#] ?$}
+
+# Check immediately
+send "ps aux | grep node\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

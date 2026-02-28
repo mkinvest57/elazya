@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya\r"
+expect -re {[$#] ?$}
+
+# Write a combined .htaccess that handles both static Next.js routing AND the API proxy
+send "cat << 'INNER_EOF' > .htaccess\nRewriteEngine On\nRewriteBase /\n\n<IfModule mod_rewrite.c>\n# Proxy the Stripe API requests back to our Node daemon on port 3002\nRewriteRule ^api/(.*)$ api_proxy.php \[QSA,L\]\n</IfModule>\n\n# Standard Next.js Static Export Rules (resolves the 404 errors on pages like /pricing)\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteCond %{REQUEST_FILENAME}\\.html -f\nRewriteRule ^(.*)$ \$1.html \[L\]\n\nErrorDocument 404 /404.html\nINNER_EOF\n"
+expect -re {[$#] ?$}
+
+send "exit\r"

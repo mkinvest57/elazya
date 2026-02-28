@@ -1,0 +1,28 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[0] ?$}
+
+# The Home Directory seems to be the web root.
+# Proceed with caution.
+
+# 1. Move contents of 'elazya' to home '.'
+# excluding elazya itself to avoid recursion if possible, but 'cp -r elazya/* .' is fine.
+
+send "cp -r elazya/* .\r"
+expect -re {[0] ?$}
+send "cp elazya/.htaccess .\r"
+expect -re {[0] ?$}
+
+# 2. Set permissions on HOME files
+# We can't chmod 755 . (HOME) usually, but we can chmod files.
+send "chmod 644 index.html\r"
+expect -re {[0] ?$}
+send "chmod 644 .htaccess\r"
+expect -re {[0] ?$}
+
+send "exit\r"

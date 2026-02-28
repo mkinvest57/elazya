@@ -1,0 +1,32 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[0] ?$}
+
+# Create test files in all potential roots
+send "echo '<h1>Served from htdocs</h1>' > htdocs/test_htdocs.html\r"
+expect -re {[0] ?$}
+send "echo '<h1>Served from public_html</h1>' > public_html/test_public.html\r"
+expect -re {[0] ?$}
+send "echo '<h1>Served from web</h1>' > web/test_web.html\r"
+expect -re {[0] ?$}
+
+# Also copy standard test.html to all
+send "cp www/test.html htdocs/test.html\r"
+expect -re {[0] ?$}
+send "cp www/test.html public_html/test.html\r"
+expect -re {[0] ?$}
+send "cp www/test.html web/test.html\r"
+expect -re {[0] ?$}
+
+# Fix permissions for all
+send "chmod 755 htdocs public_html web\r"
+expect -re {[0] ?$}
+send "chmod 644 htdocs/*.html public_html/*.html web/*.html\r"
+expect -re {[0] ?$}
+
+send "exit\r"

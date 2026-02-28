@@ -1,0 +1,32 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# The site is hosted in the "elazya" folder
+send "rm -rf elazya/*\r"
+expect -re {[$#] ?$}
+
+# We move the fresh extracted files from ~ (which extracts to current dir) to elazya/
+send "mv index.html index.txt install.sh logo.png next.svg pricing.html pricing.txt privacy.html privacy.txt success.html success.txt terms.html terms.txt vercel.svg window.svg agents.html agents.txt docs.html docs.txt faq.html faq.txt checkout.html checkout.txt dashboard.html dashboard.txt download.html download.txt changelog.html changelog.txt community.html community.txt elazya/\r"
+expect -re {[$#] ?$}
+
+send "mv 404.html header.html elazya/ 2>/dev/null\r"
+expect -re {[$#] ?$}
+
+send "mv _next assets chunks css docs faq fonts img js media woff2 elazya/ 2>/dev/null\r"
+expect -re {[$#] ?$}
+
+# Permissions
+send "chmod 755 elazya\r"
+expect -re {[$#] ?$}
+send "find elazya -type d -exec chmod 755 {} \\;\r"
+expect -re {[$#] ?$}
+send "find elazya -type f -exec chmod 644 {} \\;\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

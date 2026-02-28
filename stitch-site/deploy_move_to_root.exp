@@ -1,0 +1,28 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Move confirm we are in ~
+send "pwd\r"
+expect -re {[$#] ?$}
+
+# Copy contents of elazya/ to current dir (.)
+# -r checks for directories
+# -a might be better to preserve permissions
+send "cp -a elazya/. .\r"
+expect -re {[$#] ?$}
+
+# Verify it worked
+send "ls -la\r"
+expect -re {[$#] ?$}
+
+# Clean up elazya folder? No, keep it as backup for now.
+# But we might double storage usage. 150MB DMG in there.
+# It's fine for now.
+
+send "exit\r"

@@ -73,8 +73,7 @@ if [[ -d "$DEV_SOURCE" ]]; then
     REPO_URL="file://$DEV_SOURCE"
     # info "Mode développement détecté : source locale $REPO_URL"
 else
-    # Fallback sur le dépôt public (qui sera openclaw/moltbot pour l'instant)
-    REPO_URL="https://github.com/moltbot/moltbot.git" 
+    REPO_URL="https://github.com/mkinvest57/elazya.git" 
 fi
 
 if $IS_REMOTE; then

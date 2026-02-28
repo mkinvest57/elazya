@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, HardDrive, Radio, MessageCircle, Settings, Zap, Terminal, Server, Database, HelpCircle } from "lucide-react";
+import { Activity, HardDrive, Radio, Settings, Terminal, Server, Database, HelpCircle, Bot } from "lucide-react";
 import Sidebar from '@/components/Sidebar';
 import { useEffect } from "react";
 import { listen } from '@tauri-apps/api/event';
@@ -9,19 +9,17 @@ import { motion } from "framer-motion";
 // Import panels
 import SkillsPanel from '@/components/panels/SkillsPanel';
 import ChannelsPanel from '@/components/panels/ChannelsPanel';
-import ChatPanel from '@/components/panels/ChatPanel';
 import ConfigPanel from '@/components/panels/ConfigPanel';
-import TokensPanel from '@/components/panels/TokensPanel';
 import HelpPanel from '@/components/panels/HelpPanel';
+import ChainsPanel from '@/components/panels/ChainsPanel';
 
-type PanelType = 'overview' | 'skills' | 'channels' | 'chat' | 'config' | 'tokens' | 'help';
+type PanelType = 'overview' | 'agents' | 'skills' | 'channels' | 'config' | 'help';
 
 const TABS: { id: PanelType; label: string; icon: React.ElementType }[] = [
     { id: 'overview', label: 'Aperçu', icon: Activity },
-    { id: 'skills', label: 'Skills', icon: HardDrive },
+    { id: 'agents', label: 'Agents', icon: Bot },
+    { id: 'skills', label: 'Compétences', icon: HardDrive },
     { id: 'channels', label: 'Canaux', icon: Radio },
-    { id: 'chat', label: 'Chat', icon: MessageCircle },
-    { id: 'tokens', label: 'Tokens', icon: Zap },
     { id: 'help', label: 'Aide', icon: HelpCircle },
     { id: 'config', label: 'Config', icon: Settings },
 ];
@@ -38,6 +36,7 @@ function GlassCard({ children, className = "" }: { children: React.ReactNode, cl
 function OverviewPanel() {
     const [logs, setLogs] = useState<string[]>([]);
     const [uptime, setUptime] = useState<number>(0);
+    const [chainStats, setChainStats] = useState({ activeChains: 0, totalActionsToday: 0, totalTimeSavedMinutes: 0 });
 
     useEffect(() => {
         setLogs([
@@ -51,9 +50,21 @@ function OverviewPanel() {
 
         const interval = setInterval(() => setUptime(u => u + 1), 1000);
 
+        // Load chain stats
+        const loadStats = async () => {
+            try {
+                const { OpenClawClient } = await import('@/lib/openclaw-client');
+                const stats = await OpenClawClient.getChainStats();
+                setChainStats(stats);
+            } catch { /* ignore on first load */ }
+        };
+        loadStats();
+        const statsInterval = setInterval(loadStats, 10000);
+
         return () => {
             unlisten.then(f => f());
             clearInterval(interval);
+            clearInterval(statsInterval);
         }
     }, []);
 
@@ -64,10 +75,17 @@ function OverviewPanel() {
         return `${h}:${m}:${s}`;
     };
 
+    const formatTimeSaved = (minutes: number) => {
+        if (minutes < 60) return `${minutes}m`;
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return m > 0 ? `${h}h${m}m` : `${h}h`;
+    };
+
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* KPI Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <GlassCard>
                     <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-indigo-500/10 rounded-xl text-indigo-400 ring-1 ring-indigo-500/20">
@@ -96,13 +114,25 @@ function OverviewPanel() {
 
                 <GlassCard>
                     <div className="flex justify-between items-start mb-4">
+                        <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-400 ring-1 ring-emerald-500/20">
+                            <Bot className="w-6 h-6" />
+                        </div>
+                    </div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-1">Agents Actifs</p>
+                    <div className="text-3xl font-bold text-white tracking-tight">
+                        <AnimatedCounter value={chainStats.activeChains} suffix={` / 3`} />
+                    </div>
+                </GlassCard>
+
+                <GlassCard>
+                    <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-fuchsia-500/10 rounded-xl text-fuchsia-400 ring-1 ring-fuchsia-500/20">
                             <Database className="w-6 h-6" />
                         </div>
                     </div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-1">Utilisation Mémoire</p>
+                    <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-1">Temps Économisé</p>
                     <div className="text-3xl font-bold text-white tracking-tight">
-                        <AnimatedCounter value={72} suffix=" MB" />
+                        {formatTimeSaved(chainStats.totalTimeSavedMinutes)}
                     </div>
                 </GlassCard>
             </div>
@@ -140,6 +170,7 @@ function OverviewPanel() {
     );
 }
 
+
 export default function Dashboard() {
     const [activePanel, setActivePanel] = useState<PanelType>('overview');
 
@@ -149,17 +180,16 @@ export default function Dashboard() {
 
     // Filter tabs for beginners
     const visibleTabs = isBeginner
-        ? TABS.filter(t => ['overview', 'chat', 'help'].includes(t.id))
+        ? TABS.filter(t => ['overview', 'agents', 'help'].includes(t.id))
         : TABS;
 
     const renderPanel = () => {
         switch (activePanel) {
             case 'overview': return <OverviewPanel />;
+            case 'agents': return <ChainsPanel />;
             case 'skills': return <SkillsPanel />;
             case 'channels': return <ChannelsPanel />;
-            case 'chat': return <ChatPanel />;
             case 'config': return <ConfigPanel />;
-            case 'tokens': return <TokensPanel />;
             case 'help': return <HelpPanel />;
             default: return <OverviewPanel />;
         }

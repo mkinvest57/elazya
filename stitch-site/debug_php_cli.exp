@@ -1,0 +1,22 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Check PHP CLI
+send "php -v\r"
+expect -re {[$#] ?$}
+
+# Check all processes (ps -ef might show more than aux depending on OS)
+send "ps -ef | grep su594661\r"
+expect -re {[$#] ?$}
+
+# Check network connections (netstat)
+send "netstat -an | grep :80\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

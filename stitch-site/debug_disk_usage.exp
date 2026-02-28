@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Find big folders
+send "du -h --max-depth=1 .\r"
+expect -re {[$#] ?$}
+
+# Check if logs dir exists
+send "ls -ld logs\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

@@ -1,0 +1,29 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Write the daemon safely without escaping $ inside 'EOF'
+send "cat << 'ENDPL' > start_daemon_v2.pl\n#!/usr/bin/perl\nuse strict;\nuse warnings;\nuse POSIX qw(setsid);\n\nchdir '/home/www/elazya-server' or die \"Can't chdir: \$!\";\numask 0;\n\nopen STDIN, '/dev/null' or die \"Can't read /dev/null: \$!\";\nopen STDOUT, '>>stdout.log' or die \"Can't write to stdout.log: \$!\";\nopen STDERR, '>>stderr.log' or die \"Can't write to stderr.log: \$!\";\n\ndefined(my \$pid = fork) or die \"Can't fork: \$!\";\nexit if \$pid;\n\nsetsid or die \"Can't start a new session: \$!\";\n\n\$ENV{'PORT'} = '3002';\nexec 'node', '--max-old-space-size=256', 'server.js' or die \"Can't exec: \$!\";\nENDPL\n"
+expect -re {[$#] ?$}
+
+send "killall -u su594661 perl node\r"
+expect -re {[$#] ?$}
+
+send "perl start_daemon_v2.pl\r"
+expect -re {[$#] ?$}
+
+send "sleep 3\r"
+expect -re {[$#] ?$}
+
+send "curl -s http://localhost:3002 | head -n 5\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

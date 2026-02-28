@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Check PM2 Status
+send "./node_modules/.bin/pm2 list\r"
+expect -re {[$#] ?$}
+
+# Get last 100 lines of logs
+send "./node_modules/.bin/pm2 logs --lines 100 --nostream\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

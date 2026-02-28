@@ -1,0 +1,34 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Verify .env exists from previous step
+send "ls -l .env\r"
+expect -re {[$#] ?$}
+
+# Kill anything
+send "killall -u su594661 node\r"
+# Ignore if fails
+send "killall -u su594661 perl\r"
+
+# Run Daemon V2
+send "perl start_daemon_v2.pl\r"
+expect -re {[$#] ?$}
+
+sleep 2
+send "ps aux | grep node\r"
+expect -re {[$#] ?$}
+
+# Check output HEAD
+send "head -n 20 stdout.log\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

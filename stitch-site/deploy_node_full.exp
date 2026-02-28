@@ -1,0 +1,89 @@
+#!/usr/bin/expect -f
+set timeout 600
+
+# ─── 1. STOP SERVER (SSH) ─────────────────────────────────────────────
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Kill any existing node process
+send "pkill -u su594661 node\r"
+expect -re {[$#] ?$}
+# Also ensure php processes are gone just in case
+send "pkill -u su594661 php\r" 
+expect -re {[$#] ?$}
+
+# Clean previous deployment if needed (optional, safer to overwrite)
+# send "rm -rf elazya-server\r" 
+# expect -re {[$#] ?$}
+
+send "exit\r"
+expect eof
+
+
+# ─── 2. UPLOAD FILES (SFTP) ───────────────────────────────────────────
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+}
+expect "sftp>"
+
+# Create server directory
+send "mkdir elazya-server\r"
+expect "sftp>"
+
+# Upload standalone build (server.js, node_modules, etc.)
+send "put -r .next/standalone/* elazya-server/\r"
+expect "sftp>"
+# Explicitly upload the hidden .next folder (skipped by *)
+send "put -r .next/standalone/.next elazya-server/\r"
+expect "sftp>"
+
+# Upload static assets (Required for standalone)
+send "mkdir elazya-server/.next\r"
+expect "sftp>"
+send "mkdir elazya-server/.next/static\r"
+expect "sftp>"
+send "put -r .next/static/* elazya-server/.next/static/\r"
+expect "sftp>"
+
+# Upload public assets
+send "mkdir elazya-server/public\r"
+expect "sftp>"
+send "put -r public/* elazya-server/public/\r"
+expect "sftp>"
+
+# Upload ecosystem/start scripts
+send "put ecosystem.config.js elazya-server/\r"
+expect "sftp>"
+send "put start_node.php .\r"
+expect "sftp>"
+
+# Upload .htaccess (the PHP proxy one) as .htaccess in root
+send "put .htaccess_php .htaccess\r"
+expect "sftp>"
+
+send "bye\r"
+expect eof
+
+
+# ─── 3. START SERVER (SSH) ────────────────────────────────────────────
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+}
+expect -re {[$#] ?$}
+
+# Trigger the PHP direct start script
+# This runs 'nohup node server.js' in background
+send "php start_node.php\r"
+expect -re {[$#] ?$}
+
+# Check if node is running
+send "ps aux | grep node\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

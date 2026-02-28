@@ -1,0 +1,49 @@
+#!/usr/bin/expect -f
+set timeout 300
+
+# 1. Start Tunnel
+send_user "Starting Tunnel...\n"
+spawn ssh -L 3307:db5019545004.hosting-data.io:3306 su594661@access-5019523613.webspace-host.com -N
+set tunnel_id $spawn_id
+
+expect {
+    -i $tunnel_id "password:" { send "Yassine.2011\r" }
+    -i $tunnel_id "(yes/no)?" { send "yes\r"; exp_continue }
+}
+
+# Wait for connection
+sleep 5
+
+# 2. Run Prisma
+send_user "Starting Prisma Push...\n"
+# Set ENV for the next spawned process
+set env(DATABASE_URL) "mysql://dbu4443655:%24Etudes.psych%40.2025%24@127.0.0.1:3307/dbs15269470"
+
+spawn npx prisma db push --accept-data-loss
+set prisma_id $spawn_id
+
+expect {
+    -i $prisma_id "Your database is now in sync" {
+        send_user "\nSUCCESS: Database synced!\n"
+    }
+    -i $prisma_id "have been applied" {
+        send_user "\nSUCCESS: Database synced!\n"
+    }
+    -i $prisma_id "Already in sync" {
+        send_user "\nSUCCESS: Already in sync!\n"
+    }
+    -i $prisma_id "P1001" {
+        send_user "\nERROR: Connection failed even with tunnel.\n"
+        exit 1
+    }
+    -i $prisma_id timeout {
+        send_user "\nTIMEOUT waiting for Prisma.\n"
+        exit 1
+    }
+}
+
+# Cleanup
+# trap { exec kill [exp_pid -i $tunnel_id] } SIGINT
+exec kill [exp_pid -i $tunnel_id]
+send_user "Tunnel closed.\n"
+exit 0

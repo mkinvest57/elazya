@@ -1,0 +1,24 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Now schema exists, run push
+send "node node_modules/prisma/build/index.js db push\r"
+expect {
+    "Your database is now in sync" {
+        send_user "\nDB Sync Successful!\n"
+    }
+    timeout {
+        send_user "\nDB Sync Timeout/Fail\n"
+    }
+}
+
+send "exit\r"

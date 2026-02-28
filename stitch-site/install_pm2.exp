@@ -1,0 +1,25 @@
+#!/usr/bin/expect -f
+set timeout 300
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Install PM2 locally
+send "npm install pm2\r"
+expect -re {[$#] ?$}
+
+# Start Server
+send "./node_modules/.bin/pm2 start ecosystem.config.js\r"
+expect -re {[$#] ?$}
+
+# List processes
+send "./node_modules/.bin/pm2 list\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

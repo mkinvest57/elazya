@@ -1,0 +1,38 @@
+#!/usr/bin/expect -f
+set timeout 300
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# 1. Clear staging directory (elazya/)
+# Create it if it doesn't exist
+send "mkdir -p elazya\r"
+expect -re {[$#] ?$}
+
+# Clear contents
+send "rm -rf elazya/*\r"
+expect -re {[$#] ?$}
+
+# 2. Extract tarball into elazya/
+send "tar -xzvf static.tar.gz -C elazya/\r"
+expect -re {[$#] ?$}
+
+# 3. Deploy to elazya/ (Done)
+# We do NOT move to root because web root seems to be ~/elazya 
+# or root is messed up. We assume elazya.com points here.
+
+# 4. Cleanup
+
+send "rm static.tar.gz\r"
+expect -re {[$#] ?$}
+
+# 5. Fix permissions
+send "chmod -R 755 elazya\r"
+expect -re {[$#] ?$}
+send "find elazya -type f -exec chmod 644 {} \\;\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

@@ -1,7 +1,7 @@
 use sqlx::sqlite::SqlitePool;
 use sqlx::sqlite::SqlitePoolOptions;
 use std::fs;
-use tauri::{Manager, State};
+use tauri::{Emitter, Listener, Manager, State};
 use std::sync::Arc;
 use serde_json::Value;
 
@@ -9,7 +9,7 @@ mod openclaw;
 mod openclaw_monitor;
 
 use openclaw::ManagedOpenClaw;
-use openclaw_monitor::{get_token_usage, get_connected_channels, get_installed_skills, watch_token_usage, TokenUsage, ChannelInfo};
+use openclaw_monitor::{get_connected_channels, get_installed_skills, watch_token_usage, TokenUsage, ChannelInfo};
 
 // Application State
 struct AppState {
@@ -116,10 +116,17 @@ async fn install_openclaw() -> Result<(), String> {
 
 #[tauri::command]
 async fn get_usage_stats(state: State<'_, AppState>) -> Result<TokenUsage, String> {
+    println!("[Elazya] get_usage_stats called");
     // Call usage.cost via bridge
     let params = serde_json::json!({ "days": 30 });
-    let res = state.openclaw.bridge.request("usage.cost", params).await
-        .map_err(|e| format!("Bridge error: {}", e))?;
+    let res_result = state.openclaw.bridge.request("usage.cost", params).await;
+    
+    match &res_result {
+        Ok(r) => println!("[Elazya] get_usage_stats bridge response: {:?}", r),
+        Err(e) => println!("[Elazya] get_usage_stats bridge error: {:?}", e),
+    }
+
+    let res = res_result.map_err(|e| format!("Bridge error: {}", e))?;
 
     // Parse response
     let totals = res.get("totals").ok_or("No totals in response")?;
@@ -146,6 +153,8 @@ async fn get_usage_stats(state: State<'_, AppState>) -> Result<TokenUsage, Strin
     } else {
         openclaw_monitor::UsageStats::default()
     };
+    
+
 
     Ok(TokenUsage {
         session,
@@ -234,8 +243,160 @@ async fn restart_openclaw(state: State<'_, AppState>) -> Result<(), String> {
 }
 
 #[tauri::command]
+async fn uninstall_skill_cmd(state: State<'_, AppState>, skill: String) -> Result<(), String> {
+    openclaw::uninstall_skill(&state.openclaw_dir, &skill)
+}
+
+#[tauri::command]
+async fn reset_app_cmd(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<(), String> {
+    // Stop engine first
+    state.openclaw.stop();
+    openclaw::reset_application(&state.openclaw_dir, app)
+}
+
+/// Handle deep link URL from Stripe upgrade flow.
+/// URL format: elazya://upgrade-success?plan=pro&session=cs_xxx
+#[tauri::command]
+async fn handle_deep_link(app: tauri::AppHandle, url: String) -> Result<(), String> {
+    println!("[DeepLink] Received: {}", url);
+
+    if url.contains("upgrade-success") {
+        let parsed = url::Url::parse(&url)
+            .map_err(|e| format!("Failed to parse deep link URL: {}", e))?;
+
+        let plan = parsed.query_pairs()
+            .find(|(k, _)| k == "plan")
+            .map(|(_, v)| v.to_string())
+            .unwrap_or_else(|| "solo".to_string());
+
+        let session = parsed.query_pairs()
+            .find(|(k, _)| k == "session")
+            .map(|(_, v)| v.to_string())
+            .unwrap_or_default();
+
+        handle_upgrade_success(app, plan, session).await?;
+    } else if url.contains("upgrade-cancelled") {
+        println!("[DeepLink] Upgrade cancelled by user");
+    }
+
+    Ok(())
+}
+
+/// Update the license after a successful Stripe upgrade.
+/// Writes to ~/.elazya/license.json and emits event to reload UI.
+#[tauri::command]
+async fn handle_upgrade_success(app: tauri::AppHandle, plan: String, session_id: String) -> Result<(), String> {
+    println!("[Upgrade] Processing upgrade to plan: {} (session: {})", plan, session_id);
+
+    // 1. Ensure ~/.elazya directory exists
+    let home = dirs::home_dir()
+        .ok_or_else(|| "Could not determine home directory".to_string())?;
+    let elazya_dir = home.join(".elazya");
+    if !elazya_dir.exists() {
+        fs::create_dir_all(&elazya_dir)
+            .map_err(|e| format!("Failed to create ~/.elazya: {}", e))?;
+    }
+
+    // 2. Build plan code for license key
+    let plan_code = match plan.to_lowercase().as_str() {
+        "pro" => "PRO",
+        "business" => "BIZ",
+        _ => "SOLO",
+    };
+
+    // 3. Generate a new license key for the upgraded plan
+    let key = format!("ELAZYA-{}-{}-{}",
+        plan_code,
+        generate_key_segment(),
+        generate_key_segment(),
+    );
+
+    // 4. Write license.json
+    let license = serde_json::json!({
+        "key": key,
+        "plan": plan.to_lowercase(),
+        "activatedAt": chrono::Utc::now().to_rfc3339(),
+        "upgradedAt": chrono::Utc::now().to_rfc3339(),
+        "stripeSession": session_id,
+    });
+
+    let license_path = elazya_dir.join("license.json");
+    fs::write(&license_path, serde_json::to_string_pretty(&license).unwrap())
+        .map_err(|e| format!("Failed to write license.json: {}", e))?;
+
+    println!("[Upgrade] License upgraded to {} — key: {}", plan, key);
+
+    // 5. Emit event to frontend so it reloads the license
+    let _ = app.emit("license-updated", serde_json::json!({
+        "plan": plan.to_lowercase(),
+        "key": key,
+    }));
+
+    Ok(())
+}
+
+/// Generate a 4-character alphanumeric key segment.
+fn generate_key_segment() -> String {
+    use uuid::Uuid;
+    let id = Uuid::new_v4().to_string();
+    id.chars()
+        .filter(|c| c.is_alphanumeric())
+        .take(4)
+        .collect::<String>()
+        .to_uppercase()
+}
+
+#[tauri::command]
 async fn is_bridge_connected(state: State<'_, AppState>) -> Result<bool, String> {
     Ok(state.openclaw.bridge.is_connected())
+}
+
+/// Process a deep link URL (standalone function, callable from event listener).
+fn process_deep_link_url(app: &tauri::AppHandle, url: &str) {
+    if url.contains("upgrade-success") {
+        if let Ok(parsed) = url::Url::parse(url) {
+            let plan = parsed.query_pairs()
+                .find(|(k, _)| k == "plan")
+                .map(|(_, v)| v.to_string())
+                .unwrap_or_else(|| "solo".to_string());
+            let session = parsed.query_pairs()
+                .find(|(k, _)| k == "session")
+                .map(|(_, v)| v.to_string())
+                .unwrap_or_default();
+
+            let home = match dirs::home_dir() {
+                Some(h) => h,
+                None => { println!("[DeepLink] Could not determine home directory"); return; }
+            };
+            let elazya_dir = home.join(".elazya");
+            let _ = fs::create_dir_all(&elazya_dir);
+
+            let plan_code = match plan.to_lowercase().as_str() {
+                "pro" => "PRO",
+                "business" => "BIZ",
+                _ => "SOLO",
+            };
+            let key = format!("ELAZYA-{}-{}-{}", plan_code, generate_key_segment(), generate_key_segment());
+
+            let license = serde_json::json!({
+                "key": key,
+                "plan": plan.to_lowercase(),
+                "activatedAt": chrono::Utc::now().to_rfc3339(),
+                "upgradedAt": chrono::Utc::now().to_rfc3339(),
+                "stripeSession": session,
+            });
+            let license_path = elazya_dir.join("license.json");
+            let _ = fs::write(&license_path, serde_json::to_string_pretty(&license).unwrap());
+
+            println!("[DeepLink] License upgraded to {} — key: {}", plan, key);
+            let _ = app.emit("license-updated", serde_json::json!({
+                "plan": plan.to_lowercase(),
+                "key": key,
+            }));
+        }
+    } else if url.contains("upgrade-cancelled") {
+        println!("[DeepLink] Upgrade cancelled by user");
+    }
 }
 
 fn main() {
@@ -245,10 +406,11 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_deep_link::init())
         .setup(|app| {
             let app_handle = app.handle();
             
-            // 1. Database Setup
+            // 0. Execute any pending factory reset BEFORE opening the DB
             let app_dir = app_handle.path().app_data_dir()
                 .map_err(|e| format!("Failed to get app data dir: {}", e))?;
             
@@ -256,7 +418,11 @@ fn main() {
                 fs::create_dir_all(&app_dir)
                     .map_err(|e| format!("Failed to create app data dir: {}", e))?;
             }
+
+            // This will delete DB, state, ~/.openclaw if a reset was requested
+            openclaw::execute_pending_reset(&app_dir);
             
+            // 1. Database Setup
             let db_path = app_dir.join("elazya.db");
             let db_url = format!("sqlite://{}", db_path.to_string_lossy());
             
@@ -311,7 +477,33 @@ fn main() {
                 openclaw: Arc::new(openclaw),
                 openclaw_dir
             });
-            
+
+            // Deep link handler: listen for elazya:// URLs
+            let app_handle_for_deep_link = app_handle.clone();
+            app.listen("deep-link://new-url", move |event: tauri::Event| {
+                let payload = event.payload().to_string();
+                println!("[DeepLink] Raw payload: {}", payload);
+
+                // tauri-plugin-deep-link v2 sends payload as JSON array of URL strings
+                let urls: Vec<String> = serde_json::from_str(&payload).unwrap_or_else(|_| {
+                    // Fallback: try as a single quoted string
+                    let trimmed = payload.trim_matches('"').to_string();
+                    if trimmed.starts_with("elazya://") {
+                        vec![trimmed]
+                    } else {
+                        vec![]
+                    }
+                });
+
+                for url in urls {
+                    println!("[DeepLink] Processing URL: {}", url);
+                    let handle = app_handle_for_deep_link.clone();
+                    tauri::async_runtime::spawn(async move {
+                        process_deep_link_url(&handle, &url);
+                    });
+                }
+            });
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -338,7 +530,11 @@ fn main() {
             health_check_cmd,
             ensure_workspace_cmd,
             install_daemon_service_cmd,
-            restart_openclaw
+            restart_openclaw,
+            uninstall_skill_cmd,
+            reset_app_cmd,
+            handle_deep_link,
+            handle_upgrade_success
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

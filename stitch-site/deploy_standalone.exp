@@ -1,0 +1,39 @@
+#!/usr/bin/expect -f
+set timeout 120
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+send "put standalone.tar.gz elazya-server/\r"
+expect "sftp>"
+
+send "bye\r"
+
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Gracefully stop Node to replace files
+send "killall -u su594661 node\r"
+expect -re {[$#] ?$}
+
+# Extract over existing files, taking care not to overwrite our custom start scripts
+send "tar -xzf standalone.tar.gz\r"
+expect -re {[$#] ?$}
+
+send "rm standalone.tar.gz\r"
+expect -re {[$#] ?$}
+
+# Trigger restart using the web hook
+send "curl -s http://localhost/start_node2.php\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

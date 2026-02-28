@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# 🌬️ Installateur Elazya
+# 🌬️ Installateur Alizé
 # Le premier agent IA français haute performance
-# Basé sur la technologie Elazya (https://elazya.com)
+# Basé sur la technologie Alizé (https://alize.ai)
 #
 
 set -e
@@ -45,11 +45,11 @@ step() {
 # Bannière
 say ""
 say "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-say "${BOLD}🌬️  Bienvenue dans l'installation d'Elazya!${NC}"
+say "${BOLD}🌬️  Bienvenue dans l'installation d'Alizé!${NC}"
 say "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 say ""
 say "    ${BOLD}Le premier assistant IA français haute performance${NC}"
-say "    Propulsé par le moteur d'autonomie Elazya"
+say "    Propulsé par le moteur d'autonomie Alizé"
 say ""
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -65,15 +65,14 @@ if [[ -z "${BASH_SOURCE[0]}" ]] || [[ "${BASH_SOURCE[0]}" == "/dev/stdin" ]]; th
 fi
 
 # Répertoire cible par défaut pour l'installation
-TARGET_DIR="$HOME/elazya"
+TARGET_DIR="$HOME/alize"
 
 # Pour le développement local, on privilégie le code source modifié
-DEV_SOURCE="/Users/sashimi/Documents/Elazya_Projects/elazya"
+DEV_SOURCE="/Users/sashimi/Documents/moltbot-main"
 if [[ -d "$DEV_SOURCE" ]]; then
     REPO_URL="file://$DEV_SOURCE"
     # info "Mode développement détecté : source locale $REPO_URL"
 else
-    # Dépôt public Elazya
     REPO_URL="https://github.com/mkinvest57/elazya.git" 
 fi
 
@@ -99,7 +98,7 @@ elif [[ "$OS_TYPE" == "Linux" ]]; then
     OS_NAME="linux"
 else
     error "Système non supporté: $OS_TYPE"
-    say "Elazya supporte macOS et Linux."
+    say "Alizé supporte macOS et Linux."
     exit 1
 fi
 
@@ -266,7 +265,7 @@ ALIZE_ALIAS="alias alize='node $SCRIPT_DIR/alize.mjs'"
 
 if ! grep -q "alias alize=" "$RC_FILE" 2>/dev/null; then
     echo "" >> "$RC_FILE"
-    echo "# Elazya - Assistant IA français" >> "$RC_FILE"
+    echo "# Alizé - Assistant IA français" >> "$RC_FILE"
     echo "$ALIZE_ALIAS" >> "$RC_FILE"
     success "Alias ajouté à $RC_FILE"
 else
@@ -395,7 +394,7 @@ say "   ouvrez une nouvelle fenêtre ou tapez : ${CYAN}source $RC_FILE${NC}"
 say ""
 say "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 say ""
-say "${GREEN}Elazya vous remercie de votre confiance. 🌬️🇫🇷✨⚖️${NC}"
+say "${GREEN}Alizé vous remercie de votre confiance. 🌬️🇫🇷✨⚖️${NC}"
 say ""
 
 exit 0

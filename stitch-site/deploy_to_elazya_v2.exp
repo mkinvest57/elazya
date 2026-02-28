@@ -1,0 +1,29 @@
+#!/usr/bin/expect -f
+set timeout 120
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Clear previous contents EXCEPT .htaccess
+# Clear previous contents EXCEPT .htaccess
+send "find elazya -mindepth 1 -not -name '.htaccess' -delete\r"
+expect -re {[$#] ?$}
+
+# Extract
+send "tar -xzvf static.tar.gz -C elazya/\r"
+expect -re {[$#] ?$}
+
+# Fix perms
+send "chmod -R 755 elazya\r"
+expect -re {[$#] ?$}
+send "find elazya -type f -exec chmod 644 {} \\;\r"
+expect -re {[$#] ?$}
+
+# Clean tar
+send "rm static.tar.gz\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

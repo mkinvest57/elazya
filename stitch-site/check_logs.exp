@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[0] ?$}
+
+send "ls -l index.html\r"
+expect -re {[0] ?$}
+
+send "ls -la logs\r"
+expect -re {[0] ?$}
+
+# Try to tail error log if it exists
+send "tail -n 20 logs/error_log 2>/dev/null || echo 'No error_log found'\r"
+expect -re {[0] ?$}
+
+send "exit\r"

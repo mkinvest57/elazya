@@ -1,0 +1,35 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+send "put start_node_local.php elazya-server/start_node2.php\r"
+expect "sftp>"
+send "bye\r"
+
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+}
+expect -re {[$#] ?$}
+
+# We need the PHP webroot to have a webhook that points to elazya-server.
+# Let's write a simple PHP webhook directly into the `elazya` (webroot) folder to trigger the node server in `elazya-server`
+send "cat << 'INNER_EOF' > elazya/start_node.php\n<?php\nshell_exec('cd /home/www/elazya-server && ./start.sh');\n?>\nINNER_EOF\n"
+expect -re {[$#] ?$}
+
+# Trigger it
+send "curl -s http://localhost/start_node.php\r"
+expect -re {[$#] ?$}
+
+send "sleep 2\r"
+expect -re {[$#] ?$}
+
+send "ps ux | grep node\r"
+expect -re {[$#] ?$}
+
+send "exit\r"
+

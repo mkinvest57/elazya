@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+# Upload .htaccess to web root (elazya/)
+# Note: The domain points to elazya/ folder
+# We need to make sure we don't break existing static files if we revert.
+# But since we are moving to Node, we want ALL traffic to go to localhost:3000
+
+send "put .htaccess elazya/.htaccess\r"
+expect "sftp>"
+
+send "bye\r"

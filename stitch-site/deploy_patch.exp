@@ -1,0 +1,28 @@
+#!/usr/bin/expect -f
+set timeout 120
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+# Upload root .next files (manifests, build_id)
+# These are required by server.js to know the build
+send "put .next/BUILD_ID elazya-server/.next/\r"
+expect "sftp>"
+send "put .next/package.json elazya-server/.next/\r"
+expect "sftp>"
+send "put .next/prerender-manifest.json elazya-server/.next/\r"
+expect "sftp>"
+send "put .next/routes-manifest.json elazya-server/.next/\r"
+expect "sftp>"
+send "put .next/required-server-files.json elazya-server/.next/\r"
+expect "sftp>"
+send "put .next/images-manifest.json elazya-server/.next/\r"
+expect "sftp>"
+
+# Uploading these might be redundant if standalone handles it, 
+# but "Could not find production build" usually means BUILD_ID is missing.
+
+send "bye\r"

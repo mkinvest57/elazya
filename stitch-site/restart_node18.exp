@@ -1,0 +1,31 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# 1. Kill potential zombie processes
+send "killall -u su594661 node\r"
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# 2. No Install - Just Start
+# Using localized pm2 from deployed node_modules
+
+send "./node_modules/.bin/pm2 start ecosystem.config.js\r"
+expect {
+    "No process found" {
+        send "./node_modules/.bin/pm2 start ecosystem.config.js -f\r"
+    }
+    -re {[$#] ?$}
+}
+
+send "./node_modules/.bin/pm2 save\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

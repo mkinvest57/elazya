@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Create symlinks for all potential roots pointing to current dir (.)
+foreach dir {Elazya stitch-site public site html build dist web www public_html htdocs} {
+    send "ln -s . $dir\r"
+    expect -re {[$#] ?$}
+}
+
+send "ls -la\r"
+expect -re {[$#] ?$}
+
+send "exit\r"
+expect eof

@@ -2,23 +2,23 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-    variant?: 'default' | 'interactive' | 'pricing';
+    variant?: 'default' | 'interactive' | 'highlight';
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
     ({ className, variant = "default", ...props }, ref) => {
 
         const variants = {
-            default: "bg-surface-1 border border-surface-3",
-            interactive: "bg-surface-1 border border-surface-3 hover:border-primary/50 hover:shadow-glow-card transition-all duration-300 hover:-translate-y-1 cursor-pointer",
-            pricing: "bg-gradient-to-b from-surface-1 to-surface-2 border-2 border-primary shadow-glow-cyan relative overflow-hidden",
+            default: "bg-white/[0.03] border border-white/[0.06]",
+            interactive: "bg-white/[0.03] border border-white/[0.06] hover:border-primary/20 hover:bg-white/[0.05] hover:shadow-glow-sm transition-all duration-300 cursor-pointer",
+            highlight: "bg-gradient-to-b from-primary/[0.08] to-transparent border border-primary/20 shadow-glow-sm",
         };
 
         return (
             <div
                 ref={ref}
                 className={cn(
-                    "rounded-xl p-6 text-foreground shadow-sm",
+                    "rounded-2xl p-6 text-foreground backdrop-blur-sm",
                     variants[variant],
                     className
                 )}

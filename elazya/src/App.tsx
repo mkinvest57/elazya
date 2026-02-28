@@ -1,42 +1,53 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Setup from "./pages/Setup";
 import Dashboard from "./pages/Dashboard";
 import { OpenClawClient } from "./lib/openclaw-client";
-import { TitleBar } from "./components/TitleBar";
+import { hasLicense } from "./lib/license";
 
 import PrerequisitesCheck from "./components/PrerequisitesCheck";
+import OnboardingWizardV3 from "./components/OnboardingWizardV3";
 
 import { ToastProvider } from "./components/ToastProvider";
+import { useLicenseListener } from "./hooks/useLicenseListener";
 
 function App() {
-    const [appState, setAppState] = useState<'checking' | 'setup' | 'dashboard'>('checking');
+    const [appState, setAppState] = useState<'checking' | 'onboarding' | 'dashboard'>('checking');
+
+    // Listen for license upgrade events from deep links (elazya://upgrade-success)
+    const handleLicenseUpdate = useCallback((plan: string, key: string) => {
+        console.log(`[App] License upgraded to ${plan}, reloading UI...`);
+        // Reset to 'checking' to re-evaluate license and route to dashboard
+        setAppState('checking');
+    }, []);
+
+    useLicenseListener(handleLicenseUpdate);
 
     return (
         <ToastProvider>
             <div className="w-screen h-screen bg-[#09090b] overflow-hidden flex flex-col font-sans">
-                {/* TitleBar with space for native traffic lights */}
-                <TitleBar />
 
                 {/* Main Content */}
                 <div className="flex-1 overflow-hidden relative">
                     {appState === 'checking' && (
-                        <PrerequisitesCheck onReady={() => {
-                            // Versioned config flag to force new wizard for v2 upgrade
-                            const configured = localStorage.getItem('elazya_v2_configured') === 'true';
+                        <PrerequisitesCheck onReady={async () => {
+                            // Check if user has license + completed onboarding
+                            const licensed = await hasLicense();
+                            const onboarded = localStorage.getItem('elazya_v2_configured') === 'true';
 
-                            if (configured) {
-                                OpenClawClient.isSetupComplete().then(isConfigured => {
-                                    setAppState(isConfigured ? 'dashboard' : 'setup');
-                                });
+                            if (licensed && onboarded) {
+                                // Check if engine is configured too
+                                const engineOk = await OpenClawClient.isSetupComplete();
+                                setAppState(engineOk ? 'dashboard' : 'onboarding');
                             } else {
-                                // Force setup if v2 flag is missing, even if engine is configured
-                                setAppState('setup');
+                                setAppState('onboarding');
                             }
                         }} />
                     )}
 
                     {appState === 'dashboard' && <Dashboard />}
-                    {appState === 'setup' && <Setup onComplete={() => setAppState('dashboard')} />}
+                    {appState === 'onboarding' && (
+                        <OnboardingWizardV3 onComplete={() => setAppState('dashboard')} />
+                    )}
                 </div>
             </div>
         </ToastProvider>

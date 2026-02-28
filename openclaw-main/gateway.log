@@ -1,0 +1,18 @@
+[DEBUG] OpenClaw Launcher Starting...
+(node:41543) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[90m2026-02-16T19:43:18.256Z[39m [35m[canvas][39m [36mhost mounted at http://127.0.0.1:18789/__openclaw__/canvas/ (root /Users/sashimi/.openclaw/canvas)[39m
+2026-02-16T19:43:18.259Z [DEBUG] HTTP: server listening on {"address":"127.0.0.1","family":"IPv4","port":18789}
+2026-02-16T19:43:18.260Z [DEBUG] HTTP: server listening on {"address":"::1","family":"IPv6","port":18789}
+[90m2026-02-16T19:43:18.295Z[39m [36m[heartbeat][39m [36mstarted[39m
+[90m2026-02-16T19:43:18.297Z[39m [36m[gateway][39m [36magent model: anthropic/claude-opus-4-5[39m
+[90m2026-02-16T19:43:18.297Z[39m [36m[gateway][39m [36mlistening on ws://127.0.0.1:18789 (PID 41543)[39m
+[90m2026-02-16T19:43:18.297Z[39m [36m[gateway][39m [36mlistening on ws://[::1]:18789[39m
+[90m2026-02-16T19:43:18.298Z[39m [36m[gateway][39m [36mlog file: /tmp/openclaw/openclaw-2026-02-16.log[39m
+[90m2026-02-16T19:43:18.309Z[39m [35m[browser/service][39m [36mBrowser control service ready (profiles=2)[39m
+[90m2026-02-16T19:43:19.512Z[39m [34m[telegram][39m [36m[default] starting provider (@alizenotbot)[39m
+[90m2026-02-16T19:43:19.515Z[39m [34m[telegram][39m [36mautoSelectFamily=false (default-node22)[39m
+[90m2026-02-16T19:43:20.171Z[39m [36m[gateway][39m [36msignal SIGTERM received[39m
+[90m2026-02-16T19:43:20.172Z[39m [36m[gateway][39m [36mreceived SIGTERM; shutting down[39m
+[90m2026-02-16T19:43:20.172Z[39m [36m[gateway][39m [36mshutting down...[39m
+[90m2026-02-16T19:43:20.179Z[39m [34m[gmail-watcher][39m [36mgmail watcher stopped[39m

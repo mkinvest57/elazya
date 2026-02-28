@@ -7,6 +7,7 @@ use serde_json::Value;
 
 mod openclaw;
 mod openclaw_monitor;
+mod chains;
 
 use openclaw::ManagedOpenClaw;
 use openclaw_monitor::{get_connected_channels, get_installed_skills, watch_token_usage, TokenUsage, ChannelInfo};
@@ -259,6 +260,87 @@ async fn is_bridge_connected(state: State<'_, AppState>) -> Result<bool, String>
     Ok(state.openclaw.bridge.is_connected())
 }
 
+#[tauri::command]
+async fn send_test_message(state: State<'_, AppState>) -> Result<serde_json::Value, String> {
+    let result = state.openclaw.bridge.send_test_message().await;
+    if let Err(ref e) = result {
+        // Log the error to SQLite
+        let _ = sqlx::query("INSERT INTO error_log (source, message) VALUES (?, ?)")
+            .bind("send_test_message")
+            .bind(e.to_string())
+            .execute(&state.db)
+            .await;
+    }
+    result
+}
+
+#[tauri::command]
+async fn log_error_cmd(state: State<'_, AppState>, source: String, message: String, details: Option<String>) -> Result<(), String> {
+    sqlx::query("INSERT INTO error_log (source, message, details) VALUES (?, ?, ?)")
+        .bind(&source)
+        .bind(&message)
+        .bind(details.as_deref())
+        .execute(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn get_error_logs(state: State<'_, AppState>, limit: Option<i32>) -> Result<serde_json::Value, String> {
+    let limit = limit.unwrap_or(50);
+    let rows = sqlx::query_as::<_, (i64, String, String, String, Option<String>)>(
+        "SELECT id, timestamp, source, message, details FROM error_log ORDER BY id DESC LIMIT ?"
+    )
+        .bind(limit)
+        .fetch_all(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+    
+    let logs: Vec<serde_json::Value> = rows.iter().map(|r| serde_json::json!({
+        "id": r.0,
+        "timestamp": r.1,
+        "source": r.2,
+        "message": r.3,
+        "details": r.4
+    })).collect();
+    
+    Ok(serde_json::json!(logs))
+}
+
+// ─────────────────────────────────────────────
+//  Chain Management Commands
+// ─────────────────────────────────────────────
+
+#[tauri::command]
+async fn get_chains_cmd(state: State<'_, AppState>) -> Result<serde_json::Value, String> {
+    let chains = chains::get_all_chains(&state.db).await?;
+    Ok(serde_json::json!(chains))
+}
+
+#[tauri::command]
+async fn toggle_chain_cmd(state: State<'_, AppState>, chain_id: String) -> Result<bool, String> {
+    chains::toggle_chain_db(&state.db, &chain_id).await
+}
+
+#[tauri::command]
+async fn get_chain_logs_cmd(state: State<'_, AppState>, chain_id: Option<String>, limit: Option<i32>) -> Result<serde_json::Value, String> {
+    let logs = chains::get_chain_logs_db(&state.db, chain_id.as_deref(), limit.unwrap_or(30)).await?;
+    Ok(serde_json::json!(logs))
+}
+
+#[tauri::command]
+async fn get_chain_stats_cmd(state: State<'_, AppState>) -> Result<serde_json::Value, String> {
+    let stats = chains::get_chain_stats_db(&state.db).await?;
+    Ok(serde_json::json!(stats))
+}
+
+#[tauri::command]
+async fn auto_install_deps_cmd(state: State<'_, AppState>) -> Result<serde_json::Value, String> {
+    let results = chains::auto_install_chain_deps(&state.db).await?;
+    Ok(serde_json::json!(results))
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -306,6 +388,16 @@ fn main() {
                     .execute(&pool)
                     .await
                     .map_err(|e| format!("Failed to run migration 2: {}", e))?;
+
+                sqlx::query(include_str!("../migrations/202602180001_error_log.sql"))
+                    .execute(&pool)
+                    .await
+                    .map_err(|e| format!("Failed to run migration 3 (error_log): {}", e))?;
+
+                sqlx::query(include_str!("../migrations/202602180002_chains.sql"))
+                    .execute(&pool)
+                    .await
+                    .map_err(|e| format!("Failed to run migration 4 (chains): {}", e))?;
                 
                 Ok::<SqlitePool, String>(pool)
             }) {
@@ -313,9 +405,8 @@ fn main() {
                 Err(e) => return Err(e.into()),
             };
 
-            // 2. OpenClaw Setup
             let openclaw_dir = std::env::var("OPENCLAW_DIR")
-                .unwrap_or_else(|_| "/Users/sashimi/Documents/Elazya_Projects/openclaw-main".to_string());
+                .unwrap_or_else(|_| app_dir.to_string_lossy().into_owned());
             
             if !std::path::Path::new(&openclaw_dir).exists() {
                 return Err(format!("OpenClaw directory not found at: {}. Please set OPENCLAW_DIR environment variable.", openclaw_dir).into());
@@ -330,7 +421,18 @@ fn main() {
              let openclaw_dir_clone = openclaw_dir.clone();
              watch_token_usage(app_handle_clone_for_watch, openclaw_dir_clone);
 
-            // 3. Manage State
+            // 3. Start Chain Engine
+            let chain_engine = chains::ChainEngine::new(
+                pool.clone(),
+                openclaw.bridge.clone(),
+                app_handle.clone(),
+            );
+            tauri::async_runtime::spawn(async move {
+                chain_engine.start().await;
+            });
+            println!("[Elazya] Chain engine started");
+
+            // 4. Manage State
             app.manage(AppState { 
                 db: pool, 
                 openclaw: Arc::new(openclaw),
@@ -363,10 +465,17 @@ fn main() {
             health_check_cmd,
             ensure_workspace_cmd,
             install_daemon_service_cmd,
-            install_daemon_service_cmd,
             restart_openclaw,
             uninstall_skill_cmd,
-            reset_app_cmd
+            reset_app_cmd,
+            send_test_message,
+            log_error_cmd,
+            get_error_logs,
+            get_chains_cmd,
+            toggle_chain_cmd,
+            get_chain_logs_cmd,
+            get_chain_stats_cmd,
+            auto_install_deps_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

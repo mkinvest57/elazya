@@ -1,0 +1,58 @@
+#!/usr/bin/expect -f
+set timeout 600
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+# Upload server.js directly (from nested path)
+# The standalone build often nests inside .next/standalone/YourProject/
+# We need to find where server.js is.
+# Based on previous ls, it was deep inside Documents/Elazya_Projects...
+
+# Let's try to upload the CONTENTS of the standalone folder to the root of elazya-server
+# But sftp put -r is dumb.
+
+# Strategy: Upload correctly.
+# First, upload the package.json and ecosystem
+send "put package.json elazya-server/\r"
+expect "sftp>"
+send "put ecosystem.config.js elazya-server/\r"
+expect "sftp>"
+send "put .env elazya-server/\r"
+expect "sftp>"
+
+# Put public
+send "mkdir elazya-server/public\r"
+expect "sftp>"
+send "put -r public/* elazya-server/public/\r"
+expect "sftp>"
+
+# Put .next/static
+send "mkdir elazya-server/.next\r"
+expect "sftp>"
+send "mkdir elazya-server/.next/static\r"
+expect "sftp>"
+send "put -r .next/static/* elazya-server/.next/static/\r"
+expect "sftp>"
+
+# Put Standalone Contents (The tricky part)
+# We need to upload .next/standalone/server.js to elazya-server/server.js
+# And .next/standalone/node_modules to elazya-server/node_modules
+# And .next/standalone/.next/server to elazya-server/.next/server
+
+send "put .next/standalone/server.js elazya-server/\r"
+expect "sftp>"
+
+send "put -r .next/standalone/node_modules elazya-server/\r"
+expect "sftp>"
+
+# We need to create .next/server remotely first
+send "mkdir elazya-server/.next/server\r"
+expect "sftp>"
+send "put -r .next/standalone/.next/server/* elazya-server/.next/server/\r"
+expect "sftp>"
+
+send "bye\r"

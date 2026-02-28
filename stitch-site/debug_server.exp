@@ -1,0 +1,26 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[0] ?$}
+
+send "echo '--- HOME LISTING ---'\r"
+send "ls -la\r"
+expect -re {[0] ?$}
+
+send "echo '--- LOGS CHECK ---'\r"
+send "ls -F logs/ 2>/dev/null\r"
+expect -re {[0] ?$}
+
+send "echo '--- CURL TEST ---'\r"
+send "curl -I http://localhost/ 2>/dev/null || curl -I http://127.0.0.1/ 2>/dev/null\r"
+expect -re {[0] ?$}
+
+send "echo '--- PERMISSIONS ---'\r"
+send "ls -ld www\r"
+expect -re {[0] ?$}
+
+send "exit\r"

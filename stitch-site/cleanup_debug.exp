@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Remove debug dirs and files created during brute force
+send "rm -rf Elazya stitch-site public site html build dist web www public_html htdocs root.txt *.exp\r"
+expect -re {[$#] ?$}
+
+send "ls -la\r"
+expect -re {[$#] ?$}
+
+send "exit\r"
+expect eof

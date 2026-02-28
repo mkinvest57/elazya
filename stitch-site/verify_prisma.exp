@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Check binary again
+send "ls -la node_modules/.bin/prisma\r"
+expect -re {[$#] ?$}
+
+# Try push
+send "./node_modules/.bin/prisma db push\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

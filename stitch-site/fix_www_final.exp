@@ -1,0 +1,37 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[0] ?$}
+
+# 1. Clean www
+send "rm -rf www/*\r"
+expect -re {[0] ?$}
+
+# 2. Move files from HOME to www (excluding www itself and other system dirs)
+# We can use rsync or just specific moves.
+# Let's move specific known files/dirs to avoid moving '.bashrc' etc.
+send "mv index.html index.txt install.sh logo.png next.svg pricing.html pricing.txt privacy.html privacy.txt success.html success.txt terms.html terms.txt vercel.svg window.svg style.css www/\r"
+expect -re {[0] ?$}
+send "mv 404.html header.html www/ 2>/dev/null\r"
+expect -re {[0] ?$}
+# Move directories
+send "mv _next assets chunks css docs faq fonts img js media woff2 www/ 2>/dev/null\r"
+expect -re {[0] ?$}
+
+# 3. Create test.html
+send "echo '<html><body><h1>It Works!</h1></body></html>' > www/test.html\r"
+expect -re {[0] ?$}
+
+# 4. Fix permissions
+send "chmod 755 www\r"
+expect -re {[0] ?$}
+send "find www -type d -exec chmod 755 {} \;\r"
+expect -re {[0] ?$}
+send "find www -type f -exec chmod 644 {} \;\r"
+expect -re {[0] ?$}
+
+send "exit\r"

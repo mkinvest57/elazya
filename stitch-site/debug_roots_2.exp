@@ -1,0 +1,26 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "mkdir -p site\r"
+send "echo 'SITE' > site/site.txt\r"
+expect -re {[$#] ?$}
+
+send "mkdir -p web\r"
+send "echo 'WEB' > web/web.txt\r"
+expect -re {[$#] ?$}
+
+send "mkdir -p public\r"
+send "echo 'PUBLIC_DIR' > public/public_dir.txt\r"
+expect -re {[$#] ?$}
+
+send "ls -la\r"
+expect -re {[$#] ?$}
+
+send "exit\r"
+expect eof

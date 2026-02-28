@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Kill existing node instances if any
+send "killall -u su594661 perl node\r"
+expect -re {[$#] ?$}
+
+# Write a clean PHP launcher in the webroot (elazya dir)
+send "cat << 'ENDPHP' > elazya/start_node2.php\n<?php\n\\\$cmd = 'cd ' . dirname(__DIR__) . '/elazya-server && export PORT=3002 && export NODE_ENV=production && nohup node --max-old-space-size=256 server.js </dev/null > stdout.log 2> stderr.log & echo \\\$!';\n\\\$pid = shell_exec(\\\$cmd);\necho \"Attempted to start Node.js server. PID: \" . \\\$pid;\n?>\nENDPHP\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

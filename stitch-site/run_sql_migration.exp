@@ -1,0 +1,29 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Password: $Etudes.psych@.2025$
+# In Tcl, single quote doesn't protect $. Use backslash.
+# We need to send: mysql ... -p'$Etudes.psych@.2025$' ...
+# To get a literal $ in send, we use \$
+
+send "mysql -h db5019545004.hosting-data.io -u dbu4443655 '-p\$Etudes.psych@.2025\$' dbs15269470 < customer.sql\r"
+
+expect {
+    "ERROR" {
+        send_user "\nMySQL Error: Migration Failed\n"
+    }
+    -re {[$#] ?$} {
+        send_user "\nMySQL Command Executed (Check if table exists)\n"
+    }
+}
+
+send "exit\r"

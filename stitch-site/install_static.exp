@@ -1,0 +1,23 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Clean old static files if needed? 
+# To be safe, just extract over.
+# But keep elazya-server just in case.
+
+# Extract to current dir (root)
+send "tar -xzf static.tar.gz\r"
+expect -re {[$#] ?$}
+
+# Kill node process just to stop resource usage
+send "killall -u su594661 node\r"
+# Ignore failure
+send "killall -u su594661 perl\r"
+
+send "exit\r"

@@ -50,15 +50,15 @@ export function loadSettings(): UiSettings {
           : defaults.sessionKey,
       lastActiveSessionKey:
         typeof parsed.lastActiveSessionKey === "string" &&
-        parsed.lastActiveSessionKey.trim()
+          parsed.lastActiveSessionKey.trim()
           ? parsed.lastActiveSessionKey.trim()
           : (typeof parsed.sessionKey === "string" &&
-              parsed.sessionKey.trim()) ||
-            defaults.lastActiveSessionKey,
+            parsed.sessionKey.trim()) ||
+          defaults.lastActiveSessionKey,
       theme:
         parsed.theme === "light" ||
-        parsed.theme === "dark" ||
-        parsed.theme === "system"
+          parsed.theme === "dark" ||
+          parsed.theme === "system"
           ? parsed.theme
           : defaults.theme,
       chatFocusMode:
@@ -71,8 +71,8 @@ export function loadSettings(): UiSettings {
           : defaults.chatShowThinking,
       splitRatio:
         typeof parsed.splitRatio === "number" &&
-        parsed.splitRatio >= 0.4 &&
-        parsed.splitRatio <= 0.7
+          parsed.splitRatio >= 0.4 &&
+          parsed.splitRatio <= 0.7
           ? parsed.splitRatio
           : defaults.splitRatio,
       navCollapsed:
@@ -81,7 +81,7 @@ export function loadSettings(): UiSettings {
           : defaults.navCollapsed,
       navGroupsCollapsed:
         typeof parsed.navGroupsCollapsed === "object" &&
-        parsed.navGroupsCollapsed !== null
+          parsed.navGroupsCollapsed !== null
           ? parsed.navGroupsCollapsed
           : defaults.navGroupsCollapsed,
     };

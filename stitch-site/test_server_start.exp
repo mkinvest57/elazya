@@ -1,0 +1,25 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server && node server.js\r"
+# Wait to see output
+expect {
+    "Ready on" {
+        send_user "\nServer started successfully!\n"
+    }
+    "Error" {
+        send_user "\nServer crashed.\n"
+    }
+    timeout {
+        send_user "\nTimeout waiting for server start.\n"
+    }
+}
+
+send "\x03" ;# Ctrl+C
+send "exit\r"

@@ -1,0 +1,35 @@
+#!/usr/bin/expect -f
+set timeout 300
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+send "put static.tar.gz\r"
+expect "sftp>"
+
+send "bye\r"
+
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+}
+expect -re {[$#] ?$}
+
+# Safely delete static artifacts but keep our proxy scripts intact!
+send "rm -rf elazya/_next elazya/*.html elazya/*.txt elazya/*.xml current_static_deploy\r"
+expect -re {[$#] ?$}
+
+send "tar -xzvf static.tar.gz -C elazya/\r"
+expect -re {[$#] ?$}
+
+send "rm static.tar.gz\r"
+expect -re {[$#] ?$}
+
+# Restore our carefully crafted proxy rules into .htaccess
+send "cat << 'INNER_EOF' > elazya/.htaccess\nRewriteEngine On\nRewriteBase /\n\n<IfModule mod_rewrite.c>\nRewriteRule ^api/(.*)$ api_proxy.php \[QSA,L\]\n</IfModule>\n\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteCond %{REQUEST_FILENAME}\\.html -f\nRewriteRule ^(.*)$ \$1.html \[L\]\n\nErrorDocument 404 /404.html\nINNER_EOF\n"
+expect -re {[$#] ?$}
+
+send "exit\r"

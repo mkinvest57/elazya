@@ -1,0 +1,24 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[0] ?$}
+
+# Clean up suspicious files
+send "rm start_node.php package.json package-lock.json prisma.log\r"
+expect -re {[0] ?$}
+send "rm -rf node_modules\r"
+expect -re {[0] ?$}
+
+# Check disk usage
+send "du -sh .\r"
+expect -re {[0] ?$}
+
+# Test PHP CLI
+send "php www/test.php\r"
+expect -re {[0] ?$}
+
+send "exit\r"

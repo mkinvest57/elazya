@@ -1,0 +1,35 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Remove symlinks
+send "rm htdocs www\r"
+expect -re {[$#] ?$}
+
+# Move files back from public_html to .
+# We use a glob pattern. 
+send "mv public_html/* .\r"
+expect -re {[$#] ?$}
+
+# Move hidden files if any (specifically .next which is important for Next.js)
+# The previous move might have missed hidden files if not careful, but my ls -la showed _next inside public_html, so it's good.
+# mv public_html/* does not move hidden files by default in bash, but _next starts with underscore, not dot.
+# However, .htaccess or similar might be there.
+send "mv public_html/.* .\r"
+# This might error on . and .. but that's fine.
+expect -re {[$#] ?$}
+
+# Remove empty public_html
+send "rmdir public_html\r"
+expect -re {[$#] ?$}
+
+send "ls -la\r"
+expect -re {[$#] ?$}
+
+send "exit\r"
+expect eof

@@ -1,0 +1,30 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Kill any existing node processes
+send "killall -u su594661 node\r"
+expect -re {[$#] ?$}
+
+# Kill any existing perl processes (careful here, but needed)
+send "killall -u su594661 perl\r"
+expect -re {[$#] ?$}
+
+send "perl watchdog.pl\r"
+expect -re {[$#] ?$}
+
+# Verify
+send "ps aux | grep perl\r"
+expect -re {[$#] ?$}
+send "ps aux | grep node\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

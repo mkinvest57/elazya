@@ -1,0 +1,38 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Remove existing symlinks (careful not to delete directories if they exist, but I know they are symlinks from previous step)
+send "rm Elazya stitch-site public site html build dist web www public_html htdocs\r"
+expect -re {[$#] ?$}
+
+# Create test files
+send "echo 'ROOT' > root.txt\r"
+expect -re {[$#] ?$}
+
+send "mkdir -p public_html\r"
+send "echo 'PUBLIC' > public_html/public.txt\r"
+expect -re {[$#] ?$}
+
+send "mkdir -p www\r"
+send "echo 'WWW' > www/www_test.txt\r"
+expect -re {[$#] ?$}
+
+send "mkdir -p htdocs\r"
+send "echo 'HTDOCS' > htdocs/htdocs.txt\r"
+expect -re {[$#] ?$}
+
+send "mkdir -p Elazya\r"
+send "echo 'ELAZYA' > Elazya/elazya.txt\r"
+expect -re {[$#] ?$}
+
+send "ls -la\r"
+expect -re {[$#] ?$}
+
+send "exit\r"
+expect eof

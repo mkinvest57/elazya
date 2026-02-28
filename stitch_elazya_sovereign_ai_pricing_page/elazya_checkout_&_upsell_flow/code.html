@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Elazya - Checkout &amp; Upsell Flow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#6366f1", // Indigo accent from the screenshot
+              gold: "#d4af37",    // Premium gold accent
+              "background-light": "#f8fafc",
+              "background-dark": "#0a0a0c", // Deep black from the screenshot
+              "surface-dark": "#16161a",
+              "border-dark": "#2a2a2e",
+            },
+            fontFamily: {
+              display: ["Outfit", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "12px",
+            },
+          },
+        },
+      };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .display-font {
+            font-family: 'Outfit', sans-serif;
+        }
+        .step-active {
+            @apply border-primary text-primary;
+        }
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(to bottom, #16161a, #0a0a0c);
+        }
+        .gradient-border::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(to bottom right, #4f46e5, #d4af37, transparent);
+            border-radius: 13px;
+            z-index: -1;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<header class="sticky top-0 z-50 backdrop-blur-md border-b border-slate-200/10 dark:border-border-dark">
+<div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons-outlined text-white text-xl">psychology</span>
+</div>
+<span class="display-font font-bold text-xl tracking-tight">Elazya</span>
+</div>
+<div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
+<div class="flex items-center gap-2 text-primary">
+<span class="w-6 h-6 rounded-full border border-primary flex items-center justify-center text-xs">1</span>
+                    Installation
+                </div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full border border-slate-600 flex items-center justify-center text-xs">2</span>
+                    Abonnement
+                </div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full border border-slate-600 flex items-center justify-center text-xs">3</span>
+                    Paiement
+                </div>
+</div>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Besoin d'aide ?</a>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 py-12">
+<section class="text-center mb-16">
+<h1 class="display-font text-4xl md:text-5xl font-bold mb-4">Choisissez votre <span class="text-primary">Pack d'Installation</span></h1>
+<p class="text-slate-400 max-w-2xl mx-auto">Configuration unique et souveraine de votre agent IA local. Installation garantie en moins de 24h.</p>
+</section>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+<div class="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark p-8 rounded-2xl flex flex-col hover:border-primary/50 transition-all group">
+<div class="mb-8">
+<span class="text-slate-400 text-sm font-semibold tracking-wider uppercase">Installation Unique</span>
+<h3 class="display-font text-2xl font-bold mt-2">Pack Starter</h3>
+<div class="mt-4 flex items-baseline">
+<span class="text-4xl font-bold">197€</span>
+<span class="text-slate-500 ml-2">HT</span>
+</div>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3 text-slate-400">
+<span class="material-icons-outlined text-primary text-sm">check_circle</span>
+<span>Configuration standard Mac</span>
+</li>
+<li class="flex items-center gap-3 text-slate-400">
+<span class="material-icons-outlined text-primary text-sm">check_circle</span>
+<span>Indexation de 1,000 documents</span>
+</li>
+<li class="flex items-center gap-3 text-slate-400">
+<span class="material-icons-outlined text-primary text-sm">check_circle</span>
+<span>Support email (24h)</span>
+</li>
+</ul>
+<button class="w-full py-4 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-primary hover:text-white transition-all">Choisir Starter</button>
+</div>
+<div class="gradient-border bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark p-8 rounded-2xl flex flex-col relative transform scale-105 shadow-2xl shadow-primary/10">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gold text-black text-[10px] font-bold uppercase tracking-widest px-4 py-1 rounded-full">Plus Populaire</div>
+<div class="mb-8">
+<span class="text-primary text-sm font-semibold tracking-wider uppercase">Installation Complète</span>
+<h3 class="display-font text-2xl font-bold mt-2">Pack Pro Agent</h3>
+<div class="mt-4 flex items-baseline">
+<span class="text-4xl font-bold">497€</span>
+<span class="text-slate-500 ml-2">HT</span>
+</div>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3">
+<span class="material-icons-outlined text-gold text-sm">stars</span>
+<span>Optimisation M2/M3 Max</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-icons-outlined text-gold text-sm">stars</span>
+<span>Multi-agents spécialisés</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-icons-outlined text-gold text-sm">stars</span>
+<span>Accès API Local illimité</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-icons-outlined text-gold text-sm">stars</span>
+<span>Formation privée 1h</span>
+</li>
+</ul>
+<button class="w-full py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all">S'équiper en Pro</button>
+</div>
+<div class="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark p-8 rounded-2xl flex flex-col hover:border-primary/50 transition-all group">
+<div class="mb-8">
+<span class="text-slate-400 text-sm font-semibold tracking-wider uppercase">Infrastructure Dédiée</span>
+<h3 class="display-font text-2xl font-bold mt-2">Pack Business</h3>
+<div class="mt-4 flex items-baseline">
+<span class="text-4xl font-bold">997€</span>
+<span class="text-slate-500 ml-2">HT</span>
+</div>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3 text-slate-400">
+<span class="material-icons-outlined text-primary text-sm">check_circle</span>
+<span>Installation Serveur Local</span>
+</li>
+<li class="flex items-center gap-3 text-slate-400">
+<span class="material-icons-outlined text-primary text-sm">check_circle</span>
+<span>Intégration CRM / ERP custom</span>
+</li>
+<li class="flex items-center gap-3 text-slate-400">
+<span class="material-icons-outlined text-primary text-sm">check_circle</span>
+<span>SLA garanti 99.9%</span>
+</li>
+</ul>
+<button class="w-full py-4 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-primary hover:text-white transition-all">Choisir Business</button>
+</div>
+</div>
+<div class="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-background-dark/80 backdrop-blur-sm">
+<div class="bg-white dark:bg-surface-dark w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-border-dark relative">
+<div class="flex flex-col md:flex-row">
+<div class="md:w-1/3 bg-slate-50 dark:bg-slate-900/50 p-8 border-r border-slate-200 dark:border-border-dark">
+<div class="inline-flex items-center px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full mb-6">OFFRE LIMITÉE</div>
+<h2 class="display-font text-2xl font-bold mb-4">Optimisez votre IA avec un abonnement</h2>
+<p class="text-sm text-slate-400 mb-8 leading-relaxed">Libérez la pleine puissance d'Elazya avec les mises à jour de modèles et les fonctions cloud hybrides optionnelles.</p>
+<div class="space-y-4">
+<div class="flex gap-3">
+<span class="material-icons-outlined text-primary">auto_awesome</span>
+<div>
+<p class="text-sm font-semibold">Modèles illimités</p>
+<p class="text-xs text-slate-500">Accès à GPT-4, Claude 3 &amp; Mistral</p>
+</div>
+</div>
+<div class="flex gap-3">
+<span class="material-icons-outlined text-primary">sync</span>
+<div>
+<p class="text-sm font-semibold">Mises à jour à vie</p>
+<p class="text-xs text-slate-500">Versions mensuelles incluses</p>
+</div>
+</div>
+</div>
+</div>
+<div class="md:w-2/3 p-8">
+<div class="flex justify-between items-center mb-10">
+<div>
+<h3 class="text-lg font-bold">Choisissez votre forfait mensuel</h3>
+<p class="text-sm text-slate-500">Peut être annulé à tout moment.</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Essai Gratuit 14j</span>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-primary" role="switch">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="border-2 border-primary bg-primary/5 p-6 rounded-2xl cursor-pointer relative">
+<span class="material-icons-outlined absolute top-4 right-4 text-primary">check_circle</span>
+<p class="text-xs font-bold text-primary uppercase">Essentiel</p>
+<div class="mt-2 flex items-baseline">
+<span class="text-3xl font-bold">79€</span>
+<span class="text-slate-500 text-sm ml-1">/mois</span>
+</div>
+<p class="text-xs text-slate-500 mt-2">Pour les particuliers et freelances.</p>
+</div>
+<div class="border border-slate-200 dark:border-border-dark p-6 rounded-2xl cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 transition-all">
+<p class="text-xs font-bold text-slate-400 uppercase">Pro</p>
+<div class="mt-2 flex items-baseline">
+<span class="text-3xl font-bold">199€</span>
+<span class="text-slate-500 text-sm ml-1">/mois</span>
+</div>
+<p class="text-xs text-slate-500 mt-2">Pour les équipes et startups.</p>
+</div>
+</div>
+<div class="mt-10 flex gap-4">
+<button class="flex-1 py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-indigo-500 transition-all">
+                                Activer l'essai gratuit
+                            </button>
+<button class="flex-1 py-4 border border-slate-200 dark:border-border-dark text-slate-500 font-medium rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                                Ignorer l'étape
+                            </button>
+</div>
+<p class="text-center text-[10px] text-slate-500 mt-6 italic">En activant l'essai, vous ne serez pas débité avant 14 jours. Annulation facile en un clic.</p>
+</div>
+</div>
+<button class="absolute top-4 right-4 text-slate-400 hover:text-white">
+<span class="material-icons-outlined">close</span>
+</button>
+</div>
+</div>
+<section class="max-w-2xl mx-auto mt-24 opacity-20 pointer-events-none">
+<h2 class="display-font text-3xl font-bold mb-8 text-center">Détails de Paiement</h2>
+<div class="bg-surface-dark border border-border-dark p-8 rounded-2xl space-y-6">
+<div class="grid grid-cols-2 gap-4">
+<div class="col-span-2">
+<label class="block text-xs font-bold text-slate-500 uppercase mb-2">Nom sur la carte</label>
+<input class="w-full bg-slate-900 border-border-dark rounded-lg py-3 focus:ring-primary focus:border-primary" placeholder="Jean Dupont" type="text"/>
+</div>
+<div class="col-span-2">
+<label class="block text-xs font-bold text-slate-500 uppercase mb-2">Numéro de carte</label>
+<input class="w-full bg-slate-900 border-border-dark rounded-lg py-3 focus:ring-primary focus:border-primary" placeholder="0000 0000 0000 0000" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-500 uppercase mb-2">Expiration</label>
+<input class="w-full bg-slate-900 border-border-dark rounded-lg py-3 focus:ring-primary focus:border-primary" placeholder="MM / YY" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-500 uppercase mb-2">CVC</label>
+<input class="w-full bg-slate-900 border-border-dark rounded-lg py-3 focus:ring-primary focus:border-primary" placeholder="123" type="text"/>
+</div>
+</div>
+<button class="w-full py-4 bg-primary text-white font-bold rounded-xl">Confirmer le paiement</button>
+</div>
+</section>
+</main>
+<footer class="border-t border-slate-200/10 dark:border-border-dark py-12 mt-20">
+<div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 bg-slate-400 rounded-md flex items-center justify-center">
+<span class="material-icons-outlined text-background-dark text-sm font-bold">P</span>
+</div>
+<span class="text-sm text-slate-400">Paiement 100% sécurisé via Stripe</span>
+</div>
+<div class="flex gap-8 text-xs text-slate-500 uppercase font-semibold tracking-widest">
+<a class="hover:text-white transition-colors" href="#">Politique de Confidentialité</a>
+<a class="hover:text-white transition-colors" href="#">CGV</a>
+<a class="hover:text-white transition-colors" href="#">Support</a>
+</div>
+<div class="text-slate-500 text-sm">
+                © 2024 Elazya AI. Tous droits réservés.
+            </div>
+</div>
+</footer>
+<div class="fixed bottom-8 right-8 z-[100]">
+<div class="bg-gold text-black p-4 rounded-2xl shadow-2xl flex items-center gap-4 max-w-sm border border-white/20 animate-bounce">
+<div class="bg-black/10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-icons-outlined">calendar_today</span>
+</div>
+<div>
+<p class="font-bold text-sm">Besoin d'un accompagnement ?</p>
+<button class="text-[10px] font-black uppercase underline tracking-tighter hover:opacity-70">Réserver une démo live</button>
+</div>
+</div>
+</div>
+
+</body></html>

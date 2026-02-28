@@ -1,0 +1,44 @@
+#!/usr/bin/expect
+set timeout 120
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect "password:"
+send "Yassine.2011\r"
+expect "sftp>"
+
+# Upload main site files FIRST
+send "put -r out/_next elazya/\r"
+expect "sftp>"
+send "put out/*.html elazya/\r"
+expect "sftp>"
+send "put out/*.txt elazya/\r"
+expect "sftp>"
+send "put out/*.xml elazya/\r"
+expect "sftp>"
+send "put out/favicon.ico elazya/\r"
+expect "sftp>"
+send "put out/icon.png elazya/\r"
+expect "sftp>"
+send "put out/logo.png elazya/\r"
+expect "sftp>"
+
+# Upload ancillary folders
+send "put -r out/changelog elazya/\r"
+expect "sftp>"
+send "put -r out/community elazya/\r"
+expect "sftp>"
+send "put -r out/dashboard elazya/\r"
+expect "sftp>"
+send "put -r out/docs elazya/\r"
+expect "sftp>"
+send "put -r out/faq elazya/\r"
+expect "sftp>"
+send "put -r out/pricing elazya/\r"
+expect "sftp>"
+send "put -r out/privacy elazya/\r"
+expect "sftp>"
+send "put -r out/success elazya/\r"
+expect "sftp>"
+send "put -r out/terms elazya/\r"
+expect "sftp>"
+
+send "bye\r"

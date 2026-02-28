@@ -1,0 +1,30 @@
+#!/usr/bin/expect -f
+set timeout 120
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+
+# Go to app dir
+send "cd elazya-server\r"
+expect "$ "
+
+# Install PM2 locally (since global install might fail/not be in path)
+send "npm install pm2\r"
+expect "$ "
+
+# Start app with PM2
+# Note: ./node_modules/.bin/pm2
+send "./node_modules/.bin/pm2 start ecosystem.config.js --env production\r"
+expect "$ "
+
+# Save PM2 list (dumps process list, good for verifying)
+send "./node_modules/.bin/pm2 save\r"
+expect "$ "
+
+# Check if it's running
+send "curl http://localhost:3000\r"
+expect "$ "
+
+send "exit\r"

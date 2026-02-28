@@ -13,16 +13,20 @@
         --popover: 222.2 84% 4.9%;
         --popover-foreground: 210 40% 98%;
 
-        --primary: 210 40% 98%;
-        --primary-foreground: 222.2 47.4% 11.2%;
+        /* Primary: Indigo #6366f1 */
+        --primary: 243 75% 59%;
+        --primary-foreground: 210 40% 98%;
 
-        --secondary: 217.2 32.6% 17.5%;
+        /* Secondary: Violet #8b5cf6 */
+        --secondary: 262 83% 58%;
         --secondary-foreground: 210 40% 98%;
 
-        --muted: 217.2 32.6% 17.5%;
-        --muted-foreground: 215 20.2% 65.1%;
+        /* Muted: Slate/Zinc */
+        --muted: 222.2 47.4% 11.2%;
+        --muted-foreground: 215.4 16.3% 46.9%;
 
-        --accent: 217.2 32.6% 17.5%;
+        /* Accent: Indigo/Violet Mix */
+        --accent: 262 83% 65%;
         --accent-foreground: 210 40% 98%;
 
         --destructive: 0 62.8% 30.6%;
@@ -30,7 +34,8 @@
 
         --border: 217.2 32.6% 17.5%;
         --input: 217.2 32.6% 17.5%;
-        --ring: 212.7 26.8% 83.9%;
+        /* Ring: Indigo Glow */
+        --ring: 243 75% 59%;
 
         --radius: 0.5rem;
     }
@@ -44,9 +49,9 @@
     body {
         @apply bg-black text-foreground overflow-hidden font-sans antialiased;
         background-image:
-            radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
-            radial-gradient(circle at 0% 50%, rgba(20, 184, 166, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 100% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+            radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 0% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 100% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
         background-attachment: fixed;
     }
 }
@@ -54,10 +59,14 @@
 @layer utilities {
     .bg-aurora {
         background:
-            radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
-            radial-gradient(at 100% 0%, rgba(20, 184, 166, 0.15) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
-            radial-gradient(at 0% 100%, rgba(20, 184, 166, 0.15) 0px, transparent 50%);
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+            /* Indigo-500 */
+            radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+            /* Violet-500 */
+            radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+            /* Indigo-500 */
+            radial-gradient(at 0% 100%, rgba(167, 139, 250, 0.15) 0px, transparent 50%);
+        /* Violet-400 */
         background-size: 200% 200%;
         animation: aurora 20s ease infinite;
     }
@@ -84,7 +93,7 @@
     .glass-card:hover {
         @apply bg-white/10 border-white/20;
         transform: translateY(-2px);
-        box-shadow: 0 0 30px -5px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 0 30px -5px rgba(99, 102, 241, 0.3);
     }
 
     /* Scrollbar */
@@ -102,5 +111,52 @@
 
     ::-webkit-scrollbar-thumb:hover {
         @apply bg-white/20;
+    }
+
+    /* V2 Animations */
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes shine {
+        from {
+            transform: translateX(-100%);
+        }
+
+        to {
+            transform: translateX(100%);
+        }
+    }
+
+    .animate-shine {
+        animation: shine 2s infinite;
+    }
+
+    @keyframes pulse-glow {
+
+        0%,
+        100% {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        50% {
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.6);
+        }
+    }
+
+    .animate-pulse-glow {
+        animation: pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
 }

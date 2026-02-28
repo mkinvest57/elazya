@@ -1,0 +1,40 @@
+#!/usr/bin/expect -f
+set timeout 120
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# 1. Kill stray processes
+send "killall -u su594661 node\r"
+expect -re {[$#] ?$}
+send "killall -u su594661 perl\r"
+expect -re {[$#] ?$}
+send "killall -9 node\r"
+expect -re {[$#] ?$}
+
+# 2. Aggressive Cleanup of massive directories
+# This usually frees up Inodes/Quotas causing 500s
+send "rm -rf node_modules\r"
+expect -re {[$#] ?$}
+
+send "rm -rf elazya-server\r"
+expect -re {[$#] ?$}
+
+send "rm -rf .prisma\r"
+expect -re {[$#] ?$}
+
+send "rm *.tar.gz\r"
+expect -re {[$#] ?$}
+
+# 3. Clean root files but KEEP static html for now
+send "rm -f .env .env.production info.php check_prisma.js\r"
+expect -re {[$#] ?$}
+
+# 4. Check disk usage again
+send "du -sh .\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

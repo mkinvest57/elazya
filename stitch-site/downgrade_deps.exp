@@ -1,0 +1,34 @@
+#!/usr/bin/expect -f
+set timeout 600
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Remove incompatible packages
+send "rm -rf node_modules package-lock.json\r"
+expect -re {[$#] ?$}
+
+# Install specific versions compatible with Node 18
+# Next.js 14.2.0 supports Node 18
+# Resend 3.2.0 supports Node 18
+send "npm install next@14.2.0 react@18 react-dom@18 resend@3.2.0 \r"
+expect -re {[$#] ?$}
+
+# Install others
+send "npm install --omit=dev\r"
+expect -re {[$#] ?$}
+
+send "npm install pm2\r"
+expect -re {[$#] ?$}
+
+# Try starting
+send "./node_modules/.bin/pm2 start ecosystem.config.js\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

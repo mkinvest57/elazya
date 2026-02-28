@@ -1,0 +1,24 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya\r"
+expect -re {[$#] ?$}
+
+# The first two lines of .htaccess are breaking everything for static mode. We rewrite it completely.
+send "cat << 'INNER_EOF' > .htaccess\n<IfModule mod_rewrite.c>\nRewriteEngine On\nRewriteRule ^api/(.*)$ api_proxy.php [QSA,L]\n</IfModule>\nINNER_EOF\n"
+expect -re {[$#] ?$}
+
+# Update api_proxy.php to use port 3002 (current Node instance)
+send "sed -i 's/127.0.0.1:3001/127.0.0.1:3002/g' api_proxy.php\r"
+expect -re {[$#] ?$}
+
+send "cat .htaccess\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# List prisma dir to find entry point
+send "ls -la node_modules/prisma\r"
+expect -re {[$#] ?$}
+
+# Try running build/index.js
+send "node node_modules/prisma/build/index.js db push\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

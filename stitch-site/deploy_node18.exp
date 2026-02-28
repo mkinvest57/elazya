@@ -1,0 +1,43 @@
+#!/usr/bin/expect -f
+set timeout 1200
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+# Cleanup old artifacts (optional, careful not to delete .env or ecosystem)
+# We will just overwrite.
+
+# 1. Base Files
+send "put .next/standalone/server.js elazya-server/\r"
+expect "sftp>"
+send "put .next/standalone/package.json elazya-server/\r"
+expect "sftp>"
+
+# 2. Public Folder
+send "mkdir elazya-server/public\r"
+expect "sftp>"
+send "put -r public/* elazya-server/public/\r"
+expect "sftp>"
+
+# 3. Static Assets (Must be in .next/static)
+send "mkdir elazya-server/.next\r"
+expect "sftp>"
+send "mkdir elazya-server/.next/static\r"
+expect "sftp>"
+send "put -r .next/static/* elazya-server/.next/static/\r"
+expect "sftp>"
+
+# 4. Server Logic (From Standalone)
+# Note: standalone includes a minimal .next folder with required chunks
+send "put -r .next/standalone/.next/* elazya-server/.next/\r"
+expect "sftp>"
+
+# 5. Node Modules (Crucial for bypassing install)
+# This will take time but guarantees consistency
+send "put -r .next/standalone/node_modules elazya-server/\r"
+expect "sftp>"
+
+send "bye\r"

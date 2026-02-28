@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Remove potential conflict files
+send "rm .user.ini .php.ini .htaccess .htaccess_disabled .htaccess_php\r"
+expect -re {[$#] ?$}
+
+# Ensure hello.html exists
+send "ls -l hello.html\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

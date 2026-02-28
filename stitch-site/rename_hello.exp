@@ -1,0 +1,38 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Rename in potential roots
+send "mv public_html/hello.html public_html/hello_public_html.html\r"
+expect -re {[$#] ?$}
+send "mv htdocs/hello.html htdocs/hello_htdocs.html\r"
+expect -re {[$#] ?$}
+send "mv public/hello.html public/hello_public.html\r"
+expect -re {[$#] ?$}
+send "mv www/hello.html www/hello_www.html\r"
+expect -re {[$#] ?$}
+send "mv Elazya/hello.html Elazya/hello_Elazya.html\r"
+expect -re {[$#] ?$}
+send "mv elazya/hello.html elazya/hello_elazya.html\r"
+expect -re {[$#] ?$}
+send "mv stitch/hello.html stitch/hello_stitch.html\r"
+expect -re {[$#] ?$}
+send "mv stitch-site/hello.html stitch-site/hello_stitch_site.html\r"
+expect -re {[$#] ?$}
+send "mv web/hello.html web/hello_web.html\r"
+expect -re {[$#] ?$}
+send "mv site/hello.html site/hello_site.html\r"
+expect -re {[$#] ?$}
+send "mv html/hello.html html/hello_html.html\r"
+expect -re {[$#] ?$}
+send "mv dist/hello.html dist/hello_dist.html\r"
+expect -re {[$#] ?$}
+send "mv build/hello.html build/hello_build.html\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

@@ -1,0 +1,31 @@
+#!/usr/bin/expect -f
+set timeout 600
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Explicitly CD and verify
+send "cd elazya-server && pwd\r"
+expect {
+    "elazya-server" {
+        send_user "\nDirectory confirmed.\n"
+    }
+    timeout {
+        send_user "\nFailed to CD.\n"
+        exit 1
+    }
+}
+expect -re {[$#] ?$}
+
+# Now install
+send "npm install\r"
+expect -re {[$#] ?$}
+
+# Now push DB
+send "npx prisma db push\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

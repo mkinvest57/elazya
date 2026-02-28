@@ -1,0 +1,33 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+send "put api_proxy.php elazya/\r"
+expect "sftp>"
+
+send "put .htaccess_static elazya/.htaccess\r"
+expect "sftp>"
+
+send "bye\r"
+
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya\r"
+expect -re {[$#] ?$}
+
+# The previous .htaccess static overwrite might not have contained the RewriteRule for the proxy, 
+# since we used the default `deploy_static_files.exp` which sets a purely static .htaccess.
+# We need to manually append the /api rewrite rule if it's missing.
+send "cat << 'INNER_EOF' >> .htaccess\n\n<IfModule mod_rewrite.c>\nRewriteEngine On\nRewriteRule ^api/(.*)$ api_proxy.php [QSA,L]\n</IfModule>\nINNER_EOF\n"
+expect -re {[$#] ?$}
+
+send "exit\r"

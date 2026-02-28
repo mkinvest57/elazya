@@ -230,4 +230,34 @@ export class OpenClawClient {
     static async resetApp(): Promise<void> {
         return invoke('reset_app_cmd');
     }
+
+    static async sendTestMessage(): Promise<any> {
+        return invoke('send_test_message');
+    }
+
+    static async logError(source: string, message: string, details?: string): Promise<void> {
+        return invoke('log_error_cmd', { source, message, details: details || null });
+    }
+
+    static async getErrorLogs(limit?: number): Promise<any[]> {
+        return invoke('get_error_logs', { limit: limit || 50 });
+    }
+
+    // ─── Chain Management ─────────────────────────
+
+    static async getChains(): Promise<any[]> {
+        return invoke('get_chains_cmd');
+    }
+
+    static async toggleChain(chainId: string): Promise<boolean> {
+        return invoke('toggle_chain_cmd', { chainId });
+    }
+
+    static async getChainLogs(chainId?: string, limit?: number): Promise<any[]> {
+        return invoke('get_chain_logs_cmd', { chainId: chainId || null, limit: limit || 30 });
+    }
+
+    static async getChainStats(): Promise<{ activeChains: number; totalActionsToday: number; totalTimeSavedMinutes: number }> {
+        return invoke('get_chain_stats_cmd');
+    }
 }

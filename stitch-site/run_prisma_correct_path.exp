@@ -1,0 +1,30 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "pwd\r"
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Re-run check with dynamic path
+send "export PRISMA_QUERY_ENGINE_BINARY=$(pwd)/node_modules/.prisma/client/query-engine-linux-musl-openssl-3.0.x\r"
+expect -re {[$#] ?$}
+
+send "echo \$PRISMA_QUERY_ENGINE_BINARY\r"
+expect -re {[$#] ?$}
+
+# Re-upload chmod just in case
+send "chmod +x node_modules/.prisma/client/query-engine-linux-musl-openssl-3.0.x\r"
+expect -re {[$#] ?$}
+
+send "node check_prisma.js\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

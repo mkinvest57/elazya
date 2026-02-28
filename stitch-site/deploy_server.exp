@@ -1,0 +1,32 @@
+#!/usr/bin/expect -f
+set timeout 600
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+# Create server directory if not exists
+send "mkdir elazya-server\r"
+expect "sftp>"
+
+# Upload standalone build
+send "put -r .next/standalone/* elazya-server/\r"
+expect "sftp>"
+
+# Upload static assets (Required for standalone)
+send "mkdir elazya-server/.next/static\r"
+expect "sftp>"
+send "put -r .next/static/* elazya-server/.next/static/\r"
+expect "sftp>"
+
+# Upload public assets
+send "put -r public/* elazya-server/public/\r"
+expect "sftp>"
+
+# Upload ecosystem file
+send "put ecosystem.config.js elazya-server/\r"
+expect "sftp>"
+
+send "bye\r"

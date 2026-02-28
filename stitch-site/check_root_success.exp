@@ -1,0 +1,15 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+send "ls -l success.html\r"
+expect -re {[$#] ?$}
+send "grep 'v1.2.3' success.html\r"
+expect -re {[$#] ?$}
+send "grep 'v1.2.5' success.html\r"
+expect -re {[$#] ?$}
+send "exit\r"

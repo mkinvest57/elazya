@@ -1,0 +1,41 @@
+#!/usr/bin/expect -f
+set timeout 120
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+send "put static_assets.tar.gz elazya/\r"
+expect "sftp>"
+
+send "bye\r"
+
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya\r"
+expect -re {[$#] ?$}
+
+send "mkdir -p _next\r"
+expect -re {[$#] ?$}
+
+send "tar -xzf static_assets.tar.gz\r"
+expect -re {[$#] ?$}
+
+# The tar extracts a 'static' folder. We need to move it into _next.
+# Wait, actually let's remove the old _next/static first.
+send "rm -rf _next/static\r"
+expect -re {[$#] ?$}
+
+send "mv static _next/\r"
+expect -re {[$#] ?$}
+
+send "rm static_assets.tar.gz\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

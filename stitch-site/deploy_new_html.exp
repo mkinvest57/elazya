@@ -1,0 +1,33 @@
+#!/usr/bin/expect -f
+set timeout 120
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+send "put app_html.tar.gz elazya/\r"
+expect "sftp>"
+
+send "bye\r"
+
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya\r"
+expect -re {[$#] ?$}
+
+send "tar -xzf app_html.tar.gz\r"
+expect -re {[$#] ?$}
+
+send "rm app_html.tar.gz\r"
+expect -re {[$#] ?$}
+
+send "rm -f dashboard.html dashboard.txt\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

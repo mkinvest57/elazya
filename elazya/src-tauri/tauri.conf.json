@@ -1,6 +1,6 @@
 {
     "productName": "Elazya",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "identifier": "fr.elazya.assistant",
     "build": {
         "beforeDevCommand": "npm run dev",
@@ -29,7 +29,14 @@
             }
         ],
         "security": {
-            "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' asset: https://asset.localhost blob: data:;"
+            "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' asset: https://asset.localhost blob: data:; connect-src 'self' https://api.stripe.com https://*.stripe.com;"
+        }
+    },
+    "plugins": {
+        "deep-link": {
+            "desktop": {
+                "schemes": ["elazya"]
+            }
         }
     },
     "bundle": {
@@ -41,11 +48,12 @@
             "icons/icon.icns",
             "icons/icon.ico"
         ],
-        "targets": "all",
+        "targets": ["dmg"],
         "macOS": {
-            "entitlements": null,
-            "exceptionDomain": "",
+            "entitlements": "entitlements.plist",
+            "exceptionDomain": "stripe.com",
             "frameworks": [],
+            "minimumSystemVersion": "13.0",
             "providerShortName": null,
             "signingIdentity": null
         }

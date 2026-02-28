@@ -1,0 +1,59 @@
+#!/usr/bin/expect -f
+set timeout 1200
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+# Ensure clean directory (optional but good)
+# send "rm -rf elazya-server\r" # Too risky/slow via sftp
+# send "mkdir elazya-server\r"
+
+# 1. Base files
+send "put package.json elazya-server/\r"
+expect "sftp>"
+send "put ecosystem.config.js elazya-server/\r"
+expect "sftp>"
+send "put .env elazya-server/\r"
+expect "sftp>"
+
+# 2. Public Assets (Images, fonts)
+# Assumes 'elazya-server/public' exists or created
+send "mkdir elazya-server/public\r"
+expect "sftp>"
+send "put -r public/* elazya-server/public/\r"
+expect "sftp>"
+
+# 3. .next Structure
+send "mkdir elazya-server/.next\r"
+expect "sftp>"
+
+# 4. Upload STATIC assets (Critical for CSS/JS) - FROM LOCAL PROJECT ROOT
+send "mkdir elazya-server/.next/static\r"
+expect "sftp>"
+send "put -r .next/static/* elazya-server/.next/static/\r"
+expect "sftp>"
+
+# 5. Upload SERVER assets (Standalone build)
+# Path: .next/standalone/Documents/Elazya_Projects/stitch-site/
+# We need: server.js, node_modules, .next/server
+
+# 5a. server.js
+send "put .next/standalone/Documents/Elazya_Projects/stitch-site/server.js elazya-server/\r"
+expect "sftp>"
+
+# 5b. node_modules (this is huge, might timeout)
+# If this fails, we might need to 'npm install' on server instead.
+send "put -r .next/standalone/Documents/Elazya_Projects/stitch-site/node_modules elazya-server/\r"
+expect "sftp>"
+
+# 5c. .next/server (The actual app logic)
+# Merge into existing .next
+send "mkdir elazya-server/.next/server\r"
+expect "sftp>"
+send "put -r .next/standalone/Documents/Elazya_Projects/stitch-site/.next/server/* elazya-server/.next/server/\r"
+expect "sftp>"
+
+send "bye\r"

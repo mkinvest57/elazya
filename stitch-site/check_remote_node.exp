@@ -1,0 +1,8 @@
+#!/usr/bin/expect -f
+set timeout 20
+spawn ssh su594661@access-5019523613.webspace-host.com "node -v && npm -v"
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect eof

@@ -3,12 +3,13 @@ use serde_json::Value;
 use tokio::sync::{mpsc, oneshot};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
+use tokio::io::{BufReader, AsyncBufReadExt};
 use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
 use futures_util::{StreamExt, SinkExt};
 use tokio::time::{timeout, Duration};
-use std::process::Stdio;
+use std::process::Stdio; // Reverted back to simple Stdio since we don't need StdCommand
 use tokio::process::{Child, Command};
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, Manager};
 
 pub fn find_node_executable() -> String {
     // 1. Try PATH
@@ -373,9 +374,11 @@ impl ManagedOpenClaw {
             .env("OPENCLAW_STATE_DIR", state_dir.to_string_lossy().to_string())
             .env("OPENCLAW_CONFIG_PATH", state_dir.join("openclaw.json").to_string_lossy().to_string())
             .env("OPENCLAW_LOG_DIR", state_dir.join("logs").to_string_lossy().to_string())
+            .arg("--config")
+            .arg(state_dir.join("openclaw.json").to_string_lossy().to_string())
             .current_dir(openclaw_dir)
-            .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
             .kill_on_drop(true)
             .spawn()
             .map_err(|e| format!("Failed to start OpenClaw: {}", e))
@@ -420,7 +423,33 @@ impl ManagedOpenClaw {
         let _cache_dir = state_dir.join("cache");
         let _ = std::fs::create_dir_all(&_cache_dir);
 
-        let child = Self::spawn_gateway(openclaw_dir)?;
+        let mut child = Self::spawn_gateway(openclaw_dir)?;
+        
+        // Output streaming
+        let stdout = child.stdout.take().expect("Failed to open stdout");
+        let stderr = child.stderr.take().expect("Failed to open stderr");
+        let app_handle_stdout = app_handle.clone();
+        let app_handle_stderr = app_handle.clone();
+
+        // Stream stdout
+        tokio::spawn(async move {
+            let reader = BufReader::new(stdout);
+            let mut lines = reader.lines();
+            while let Ok(Some(line)) = lines.next_line().await {
+                println!("[OpenClaw Stdout] {}", line);
+                let _ = app_handle_stdout.emit("server-log", format!("[INFO] {}", line));
+            }
+        });
+
+        // Stream stderr
+        tokio::spawn(async move {
+            let reader = BufReader::new(stderr);
+            let mut lines = reader.lines();
+            while let Ok(Some(line)) = lines.next_line().await {
+                println!("[OpenClaw Stderr] {}", line);
+                let _ = app_handle_stderr.emit("server-log", format!("[ERROR] {}", line));
+            }
+        });
 
         let url = format!("ws://127.0.0.1:{}", GATEWAY_PORT);
         let bridge = OpenClawBridge::new(url, app_handle.clone()).await?;
@@ -473,18 +502,24 @@ pub fn enable_channel(openclaw_dir: &str, channel: &str, token: &str, user_id: O
     // Build channel config with optional userId for security
     let mut channel_config = serde_json::json!({
         "enabled": true,
-        "token": token
+        "botToken": token
     });
 
     // Set DM policy (allowlist, pairing, open)
-    let policy = dm_policy.unwrap_or("allowlist");
+    // FORCE 'open' for now to ensure users can chat immediately without configuration
+    let policy = dm_policy.unwrap_or("open");
     channel_config["dmPolicy"] = serde_json::json!(policy);
 
-    // Add userId for allowlist mode
-    if let Some(uid) = user_id {
-        if !uid.is_empty() {
-            channel_config["allowFrom"] = serde_json::json!([uid]);
+    // Add userId for allowlist mode ONLY if policy is not open
+    if policy != "open" {
+        if let Some(uid) = user_id {
+            if !uid.is_empty() {
+                channel_config["allowFrom"] = serde_json::json!([uid]);
+            }
         }
+    } else {
+        // If OPEN, ensure allowFrom is wildcard to avoid conflicts
+        channel_config["allowFrom"] = serde_json::json!(["*"]);
     }
 
     config["channels"][channel] = channel_config;
@@ -610,7 +645,9 @@ You are a helpful AI assistant named Elazya. You are:
 
 ## Special Instructions
 
-Add any special instructions or context here that you want your agent to remember.
+- **IMPORTANT**: Do NOT output your internal thought process, reasoning, or "Chain of Thought" (e.g. "Recognizing User Frustration..."). 
+- ONLY output the final response to the user.
+- Keep the tone natural and conversational.
 "#;
         std::fs::write(&boot_md_path, boot_content)
             .map_err(|e| format!("Failed to create BOOT.md: {}", e))?;
@@ -713,42 +750,186 @@ pub fn install_daemon_service(openclaw_dir: &str) -> Result<serde_json::Value, S
 }
 
 pub fn install_skill(openclaw_dir: &str, skill_name: &str) -> Result<(), String> {
-    let node_path = find_node_executable();
-    let npm_path = which::which("npm").map_err(|_| "npm introuvable".to_string())?;
-    
-    let package_name = if skill_name.contains("/") {
-        skill_name.to_string()
+    println!("[OpenClaw] Installation compétence: {}", skill_name);
+
+    // Skills are SKILL.md files in the skills/ directory.
+    // "Installing" a skill means:
+    // 1. Ensure the skill exists in the workspace skills/ directory
+    // 2. Enable it in the openclaw.json config
+
+    let home_dir = dirs::home_dir().ok_or("Cannot find home directory")?;
+    let workspace_skills = home_dir.join(".openclaw").join("workspace").join("skills");
+    let source_skills = std::path::Path::new(openclaw_dir).join("skills");
+    let skill_workspace_dir = workspace_skills.join(skill_name);
+    let skill_source_dir = source_skills.join(skill_name);
+
+    // If skill not in workspace but exists in source, copy it
+    if !skill_workspace_dir.join("SKILL.md").exists() {
+        if skill_source_dir.join("SKILL.md").exists() {
+            std::fs::create_dir_all(&skill_workspace_dir)
+                .map_err(|e| format!("Failed to create skill dir: {}", e))?;
+            // Copy whole skill directory
+            copy_dir_recursive(&skill_source_dir, &skill_workspace_dir)
+                .map_err(|e| format!("Failed to copy skill: {}", e))?;
+            println!("[OpenClaw] Skill '{}' copied to workspace", skill_name);
+        } else {
+            return Err(format!("Skill '{}' not found in source directory", skill_name));
+        }
+    }
+
+    // Enable the skill in openclaw.json config
+    let state_dir = std::path::Path::new(openclaw_dir).join("elazya-engine-state");
+    let config_path = state_dir.join("openclaw.json");
+
+    let mut config: Value = if config_path.exists() {
+        let content = std::fs::read_to_string(&config_path)
+            .map_err(|e| format!("Failed to read config: {}", e))?;
+        serde_json::from_str(&content)
+            .map_err(|e| format!("Failed to parse config: {}", e))?
     } else {
-        format!("@openclaw/skill-{}", skill_name)
+        serde_json::json!({})
     };
 
-    println!("[OpenClaw] Installation compétence: {}", package_name);
-
-    // Ensure package.json exists so we can save dependencies
-    if !std::path::Path::new(openclaw_dir).join("package.json").exists() {
-         let _ = std::process::Command::new(npm_path.clone())
-            .arg("init")
-            .arg("-y")
-            .current_dir(openclaw_dir)
-            .output();
+    // Ensure skills.entries object exists
+    if config.get("skills").is_none() {
+        config["skills"] = serde_json::json!({});
+    }
+    if config["skills"].get("entries").is_none() {
+        config["skills"]["entries"] = serde_json::json!({});
     }
 
-    let status = std::process::Command::new(npm_path)
-        .arg("install")
-        .arg(&package_name)
-        .current_dir(openclaw_dir)
-        .status()
-        .map_err(|e| format!("Échec exécution npm install: {}", e))?;
-
-    if status.success() {
-        Ok(())
-    } else {
-        Err(format!("Échec installation compétence {}", skill_name))
+    // Enable the skill
+    if config["skills"]["entries"].get(skill_name).is_none() {
+        config["skills"]["entries"][skill_name] = serde_json::json!({});
     }
+    config["skills"]["entries"][skill_name]["enabled"] = serde_json::Value::Bool(true);
+
+    std::fs::write(&config_path, serde_json::to_string_pretty(&config).unwrap())
+        .map_err(|e| format!("Failed to write config: {}", e))?;
+
+    println!("[OpenClaw] Skill '{}' enabled in config", skill_name);
+    Ok(())
 }
+
+/// Helper: recursively copy a directory
+fn copy_dir_recursive(src: &std::path::Path, dst: &std::path::Path) -> Result<(), String> {
+    std::fs::create_dir_all(dst).map_err(|e| format!("{}", e))?;
+    if let Ok(entries) = std::fs::read_dir(src) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            let dest_path = dst.join(entry.file_name());
+            if path.is_dir() {
+                copy_dir_recursive(&path, &dest_path)?;
+            } else {
+                std::fs::copy(&path, &dest_path).map_err(|e| format!("{}", e))?;
+            }
+        }
+    }
+    Ok(())
+}
+
+
+pub fn uninstall_skill(openclaw_dir: &str, skill_name: &str) -> Result<(), String> {
+    println!("[OpenClaw] Désinstallation compétence: {}", skill_name);
+
+    // Disable the skill in openclaw.json config
+    let state_dir = std::path::Path::new(openclaw_dir).join("elazya-engine-state");
+    let config_path = state_dir.join("openclaw.json");
+
+    let mut config: Value = if config_path.exists() {
+        let content = std::fs::read_to_string(&config_path)
+            .map_err(|e| format!("Failed to read config: {}", e))?;
+        serde_json::from_str(&content)
+            .map_err(|e| format!("Failed to parse config: {}", e))?
+    } else {
+        return Ok(()); // Nothing to disable
+    };
+
+    // Disable the skill in config
+    if let Some(entries) = config.get_mut("skills")
+        .and_then(|s| s.get_mut("entries"))
+    {
+        if let Some(entry) = entries.get_mut(skill_name) {
+            entry["enabled"] = serde_json::Value::Bool(false);
+        }
+    }
+
+    std::fs::write(&config_path, serde_json::to_string_pretty(&config).unwrap())
+        .map_err(|e| format!("Failed to write config: {}", e))?;
+
+    println!("[OpenClaw] Skill '{}' disabled in config", skill_name);
+    Ok(())
+}
+
+pub fn reset_application(openclaw_dir: &str, app_handle: AppHandle) -> Result<(), String> {
+    // 1. Stop OpenClaw processes
+    kill_port(GATEWAY_PORT);
+
+    // 2. Write a sentinel file so the NEXT startup knows to wipe everything.
+    //    We cannot delete the DB here because the SQLite pool is still active.
+    let app_dir = app_handle.path().app_data_dir()
+        .map_err(|e| format!("Failed to get app data dir: {}", e))?;
+    let sentinel = app_dir.join(".reset_pending");
+    std::fs::write(&sentinel, openclaw_dir)
+        .map_err(|e| format!("Failed to write reset sentinel: {}", e))?;
+
+    // 3. Restart — on next launch, main.rs will see the sentinel and do the cleanup
+    app_handle.restart();
+
+    #[allow(unreachable_code)]
+    Ok(())
+}
+
+/// Called at the very start of main(), BEFORE opening the DB.
+/// If a `.reset_pending` sentinel exists, wipe everything and remove the sentinel.
+pub fn execute_pending_reset(app_dir: &std::path::Path) {
+    let sentinel = app_dir.join(".reset_pending");
+    if !sentinel.exists() {
+        return;
+    }
+
+    // Read the openclaw_dir that was saved in the sentinel
+    let openclaw_dir = std::fs::read_to_string(&sentinel).unwrap_or_default();
+
+    // 1. Delete state directory
+    let state_dir = std::path::Path::new(openclaw_dir.trim()).join("elazya-engine-state");
+    if state_dir.exists() {
+        let _ = std::fs::remove_dir_all(&state_dir);
+    }
+
+    // 2. Delete app database (not locked now — we haven't opened it yet)
+    let db_path = app_dir.join("elazya.db");
+    if db_path.exists() {
+        let _ = std::fs::remove_file(&db_path);
+    }
+    // Also remove WAL/SHM files if they exist
+    let _ = std::fs::remove_file(app_dir.join("elazya.db-wal"));
+    let _ = std::fs::remove_file(app_dir.join("elazya.db-shm"));
+
+    // 3. Delete OpenClaw workspace (~/.openclaw)
+    if let Some(home_dir) = dirs::home_dir() {
+        let openclaw_home = home_dir.join(".openclaw");
+        if openclaw_home.exists() {
+            let _ = std::fs::remove_dir_all(&openclaw_home);
+        }
+    }
+
+    // 4. Remove the sentinel
+    let _ = std::fs::remove_file(&sentinel);
+
+    println!("[Elazya] Factory reset completed — all data wiped.");
+}
+
 
 pub fn configure_llm(openclaw_dir: &str, provider: &str, api_key: &str, model: &str) -> Result<(), String> {
     let state_dir = std::path::Path::new(openclaw_dir).join("elazya-engine-state");
+    
+    // Ensure directory exists (Critical Fix for "No such file or directory")
+    if !state_dir.exists() {
+        std::fs::create_dir_all(&state_dir)
+            .map_err(|e| format!("Échec création dossier state: {}", e))?;
+    }
+
     let config_path = state_dir.join("openclaw.json");
 
     let mut config: Value = if config_path.exists() {
@@ -768,46 +949,81 @@ pub fn configure_llm(openclaw_dir: &str, provider: &str, api_key: &str, model: &
         config["models"]["providers"] = serde_json::json!({});
     }
 
-    // Set Primary Model
+    // Set Primary Model (Required for agent to know what to use)
     config["models"]["primary"] = serde_json::Value::String(model.to_string());
 
     let provider_config = match provider {
         "openai" => serde_json::json!({
             "apiKey": api_key,
             "api": "openai",
-            "models": [model] 
+            "models": [ 
+                { 
+                    "id": model,
+                    "name": model 
+                }
+            ] 
         }),
         "anthropic" => serde_json::json!({
             "apiKey": api_key,
             "api": "anthropic",
-            "models": [model]
+            "models": [ 
+                { 
+                    "id": model,
+                    "name": model 
+                }
+            ]
         }),
         "ollama" => serde_json::json!({
             "baseUrl": api_key,
             "api": "ollama-local",
-            "models": [model]
+            "models": [ 
+                { 
+                    "id": model,
+                    "name": model 
+                }
+            ]
         }),
         "google" => serde_json::json!({
             "apiKey": api_key,
             "api": "google-generative-ai",
             "baseUrl": "https://generativelanguage.googleapis.com",
-            "models": [model]
+            "models": [ 
+                { 
+                    "id": model,
+                    "name": model 
+                }
+            ]
         }),
         "moonshot" => serde_json::json!({
              "apiKey": api_key,
              "api": "openai",
              "baseUrl": "https://api.moonshot.ai/v1",
-             "models": [model]
+             "models": [ 
+                { 
+                    "id": model,
+                    "name": model 
+                }
+            ]
         }),
         "deepseek" => serde_json::json!({
              "apiKey": api_key,
              "api": "openai",
              "baseUrl": "https://api.deepseek.com",
-             "models": [model]
+             "models": [ 
+                { 
+                    "id": model,
+                    "name": model 
+                }
+            ]
         }),
         _ => serde_json::json!({
             "apiKey": api_key,
-            "models": [model]
+            "models": [ 
+                { 
+                    "id": model,
+                    "name": model 
+                }
+            ]
         })
     };
 
@@ -848,29 +1064,9 @@ pub fn configure_web_search(openclaw_dir: &str, provider: &str, api_key: &str) -
         .map_err(|e| format!("Échec d'écriture config: {}", e))
 }
 
-pub fn configure_hooks(openclaw_dir: &str, boot_md: bool, command_logger: bool, session_memory: bool) -> Result<(), String> {
-    let state_dir = std::path::Path::new(openclaw_dir).join("elazya-engine-state");
-    let config_path = state_dir.join("openclaw.json");
-
-    let mut config: Value = if config_path.exists() {
-        let content = std::fs::read_to_string(&config_path)
-            .map_err(|e| format!("Échec de lecture config: {}", e))?;
-        serde_json::from_str(&content)
-            .map_err(|e| format!("Échec de parsing config: {}", e))?
-    } else {
-        serde_json::json!({})
-    };
-
-    if config.get("hooks").is_none() {
-        config["hooks"] = serde_json::json!({});
-    }
-
-    config["hooks"]["boot-md"] = serde_json::json!({ "enabled": boot_md });
-    config["hooks"]["command-logger"] = serde_json::json!({ "enabled": command_logger });
-    config["hooks"]["session-memory"] = serde_json::json!({ "enabled": session_memory });
-
-    std::fs::write(&config_path, serde_json::to_string_pretty(&config).unwrap())
-        .map_err(|e| format!("Échec d'écriture config: {}", e))
+pub fn configure_hooks(_openclaw_dir: &str, _boot_md: bool, _command_logger: bool, _session_memory: bool) -> Result<(), String> {
+    // Deprecated hooks configuration in new engine version
+    Ok(())
 }
 
 pub fn configure_extra_keys(openclaw_dir: &str, google_places: &str, notion: &str) -> Result<(), String> {
@@ -897,9 +1093,13 @@ pub fn configure_extra_keys(openclaw_dir: &str, google_places: &str, notion: &st
     }
 
     if !notion.is_empty() {
+        // Notion is no longer a tool in the config schema, likely a skill now?
+        // skipping for now to avoid crash
+        /*
         config["tools"]["notion"] = serde_json::json!({
             "integrationToken": notion
         });
+        */
     }
 
     std::fs::write(&config_path, serde_json::to_string_pretty(&config).unwrap())

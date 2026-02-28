@@ -1,0 +1,28 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+send "put api_proxy.php elazya/api_proxy.php\r"
+expect "sftp>"
+
+send "bye\r"
+
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya\r"
+expect -re {[$#] ?$}
+
+# We know the proxy file is there, now we append exactly to .htaccess without expect errors
+send "printf '\\n<IfModule mod_rewrite.c>\\nRewriteEngine On\\nRewriteRule ^api/(.*)$ api_proxy.php\\n</IfModule>\\n' >> .htaccess\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

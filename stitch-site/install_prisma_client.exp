@@ -1,0 +1,39 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Remove old client
+send "rm -rf node_modules/@prisma/client\r"
+expect -re {[$#] ?$}
+
+# Extract new (tar contains node_modules/@prisma/client path)
+# We are in elazya-server, tar is in home
+# Tar content is relative to local CWD: node_modules/@prisma/client
+# So we need to be in elazya-server? No, locally I tarred from project root.
+# So tar contains node_modules/@prisma/client.
+# If I extract in elazya-server, it will overwrite node_modules/@prisma/client.
+# Wait, elazya-server structure is:
+# elazya-server/node_modules
+# elazya-server/server.js
+# So if I extract `node_modules/@prisma/client` in `elazya-server`, it matches.
+
+send "tar -xzf ~/prisma_client.tar.gz\r"
+expect -re {[$#] ?$}
+
+# Check content
+send "ls -F node_modules/@prisma/client/\r"
+expect -re {[$#] ?$}
+
+# Run check
+send "node check_prisma.js\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

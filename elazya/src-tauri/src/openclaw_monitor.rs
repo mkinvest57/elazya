@@ -59,7 +59,7 @@ pub fn get_connected_channels(openclaw_dir: &str) -> Vec<ChannelInfo> {
         let connected = if let Some(c_config) = config_channels.get(channel_id) {
             // Check if enabled and has token/key
             let enabled = c_config.get("enabled").and_then(|b| b.as_bool()).unwrap_or(false);
-            let has_token = c_config.get("token").is_some() || c_config.get("apiKey").is_some() || 
+            let has_token = c_config.get("botToken").is_some() || c_config.get("token").is_some() || c_config.get("apiKey").is_some() || 
                            (c_config.get("auth").is_some() && c_config["auth"].get("token").is_some());
             enabled && has_token
         } else {
@@ -77,26 +77,40 @@ pub fn get_connected_channels(openclaw_dir: &str) -> Vec<ChannelInfo> {
 }
 
 pub fn get_installed_skills(openclaw_dir: &str) -> Vec<String> {
-    let package_json_path = Path::new(openclaw_dir).join("package.json");
+    // Skills live as SKILL.md files in the workspace skills/ directory
+    // Check both: the workspace (~/.openclaw/workspace/skills/) and the source skills/ dir
     let mut skills = Vec::new();
-
-    if let Ok(content) = std::fs::read_to_string(&package_json_path) {
-        if let Ok(json) = serde_json::from_str::<Value>(&content) {
-            if let Some(deps) = json.get("dependencies").and_then(|v| v.as_object()) {
-                for (key, _) in deps {
-                    if key.starts_with("@openclaw/skill-") || key.contains("openclaw-skill") {
-                        // Extract nice name: @openclaw/skill-browser -> browser
-                        let name = if key.starts_with("@openclaw/skill-") {
-                            key.replace("@openclaw/skill-", "")
-                        } else {
-                            key.to_string()
-                        };
-                        skills.push(name);
+    
+    // Primary: workspace skills directory
+    let home_dir = dirs::home_dir();
+    let workspace_skills = home_dir.as_ref().map(|h| h.join(".openclaw").join("workspace").join("skills"));
+    
+    // Fallback: source skills directory (inside openclaw_dir)
+    let source_skills = Path::new(openclaw_dir).join("skills");
+    
+    // Try workspace first, then source
+    let skills_dir = if let Some(ref ws) = workspace_skills {
+        if ws.exists() { ws.clone() } else { source_skills.clone() }
+    } else {
+        source_skills.clone()
+    };
+    
+    if skills_dir.exists() {
+        if let Ok(entries) = std::fs::read_dir(&skills_dir) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.is_dir() {
+                    let skill_md = path.join("SKILL.md");
+                    if skill_md.exists() {
+                        if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                            skills.push(name.to_string());
+                        }
                     }
                 }
             }
         }
     }
+    
     skills
 }
 

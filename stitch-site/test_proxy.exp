@@ -1,0 +1,26 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[0] ?$}
+
+# Kill any existing python servers
+send "pkill -f http.server\r"
+expect -re {[0] ?$}
+
+# Start python server in background on port 3000
+send "nohup python3 -m http.server 3000 > py_log 2>&1 &\r"
+expect -re {[0] ?$}
+
+# Wait a sec
+send "sleep 2\r"
+expect -re {[0] ?$}
+
+# Check if it is running
+send "ps aux | grep python\r"
+expect -re {[0] ?$}
+
+send "exit\r"

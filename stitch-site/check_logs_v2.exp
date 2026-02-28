@@ -1,0 +1,29 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[0] ?$}
+
+# List all files in HOME to catch hidden configs
+send "ls -la\r"
+expect -re {[0] ?$}
+
+# Check permissions of HOME
+send "ls -ld .\r"
+expect -re {[0] ?$}
+
+# Try to read the error log.
+# Sometimes it's in a slightly different path or requires sudo (which we don't have, but we should own it).
+send "ls -F logs/\r"
+expect -re {[0] ?$}
+
+# Tail the last 50 lines of anything that looks like an error log
+send "tail -n 50 logs/error_log\r"
+expect -re {[0] ?$}
+send "tail -n 50 logs/error.log\r"
+expect -re {[0] ?$}
+
+send "exit\r"

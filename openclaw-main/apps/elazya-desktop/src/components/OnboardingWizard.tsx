@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { OpenClawClient } from '@/lib/openclaw-client';
 import { open } from '@tauri-apps/plugin-shell';
-import { ChevronRight, ChevronLeft, Check, Key, Shield, AlertTriangle, Zap, Terminal, RefreshCw, ExternalLink, Copy, CheckCircle, Sparkles, User, Cpu } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, Key, Zap, ExternalLink, Copy, CheckCircle, Sparkles, FileText, Mail, Search, Shield, Cpu } from 'lucide-react';
 
 // Generate random hex token (like OpenClaw's randomToken)
 function generateToken(): string {
@@ -14,20 +14,15 @@ interface Props {
     onComplete: () => void;
 }
 
-type SetupPart = 'welcome' | 'security' | 'mode' | 'provider' | 'profiling' | 'skills' | 'gateway' | 'channels' | 'hooks' | 'install';
+type SetupPart = 'welcome' | 'provider' | 'channels' | 'chains' | 'install';
 
-const STEPS: SetupPart[] = ['welcome', 'security', 'mode', 'provider', 'profiling', 'skills', 'gateway', 'channels', 'hooks', 'install'];
+const STEPS: SetupPart[] = ['welcome', 'provider', 'channels', 'chains', 'install'];
 
 const STEP_LABELS: Record<SetupPart, string> = {
     welcome: 'BIENVENUE',
-    security: 'SÉCURITÉ',
-    mode: 'MODE',
-    provider: 'FOURNISSEUR IA',
-    profiling: 'VOTRE PROFIL',
-    skills: 'COMPÉTENCES',
-    gateway: 'GATEWAY',
+    provider: 'INTELLIGENCE',
     channels: 'CANAUX',
-    hooks: 'HOOKS',
+    chains: 'AGENTS',
     install: 'INSTALLATION'
 };
 
@@ -37,69 +32,33 @@ export default function OnboardingWizard({ onComplete }: Props) {
 
     // Comprehensive Configuration State
     const [config, setConfig] = useState({
-        // Part 1: Security
-        securityAck: false,
-
-        // Part 2: Mode
-        mode: 'quickstart', // quickstart | manual
-
-        // Part 3: Provider
+        // Part 1: Provider
         provider: 'google',
         model: 'google/gemini-3-pro-preview',
         apiKey: '',
 
-        // Part 4: Gateway
-        gatewayMode: 'local' as 'local' | 'remote', // C1: Local or Remote
-        gateway: {
-            port: 18789,
-            bind: 'loopback' as 'loopback' | 'lan' | 'auto' | 'tailnet',
-            authMode: 'token' as 'token' | 'password',
-            token: 'elazya-v1000-internal-token', // Fixed internal token
-            password: '',
-            // C2: Tailscale
-            tailscaleMode: 'off' as 'off' | 'serve' | 'funnel',
-        },
-        // Remote gateway (C1)
-        remoteGateway: {
-            url: '',
-            token: '',
-        },
-
-        // Part 5: Channels
+        // Part 2: Channels
         activeChannels: [] as string[],
         channelConfig: {} as Record<string, { token?: string, userId?: string, dmPolicy?: 'allowlist' | 'pairing' | 'open' }>,
 
-        // Part 6: Extra Keys
+        // Part 3: Chains
+        chains: {
+            facturation: true,
+            email: true,
+            veille: true
+        },
+
+        // Internal / Hidden defaults
+        mode: 'hybrid',
+        gateway: {
+            port: 18789,
+            bind: 'loopback' as const,
+            authMode: 'token' as const,
+            token: 'elazya-v2-internal-token',
+            password: ''
+        },
         extraKeys: {
-            googlePlaces: '',
-            notion: '',
-            openai: '',
-            elevenlabs: '',
             brave: ''
-        },
-
-        // Part 6b: Skills to install
-        selectedSkills: ['weather', 'spotify-player'] as string[],
-
-        // Part 7: Hooks
-        hooks: {
-            bootMd: true,
-            commandLogger: true,
-            sessionMemory: true
-        },
-
-        // Part NEW: User Profile (questionnaire)
-        profile: {
-            domain: [] as string[],
-            tools: [] as string[],
-            devices: [] as string[],
-            smartHome: '',
-            expectations: [] as string[],
-            techLevel: '',
-            socials: [] as string[],
-            managesTeams: false,
-            audience: [] as string[],
-            interactionStyle: [] as string[]
         }
     });
 
@@ -123,10 +82,6 @@ export default function OnboardingWizard({ onComplete }: Props) {
         if (currentStep === 'install') {
             startInstallation();
         }
-        // Auto-skip gateway step in quickstart mode
-        if (currentStep === 'gateway' && config.mode === 'quickstart') {
-            next();
-        }
     }, [currentStepIndex]);
 
     const startInstallation = async () => {
@@ -135,36 +90,34 @@ export default function OnboardingWizard({ onComplete }: Props) {
         log("🚀 Démarrage de l'initialisation...");
 
         try {
-            // 1. Save Base Settings
-            log("💾 Sauvegarde de la configuration...");
+            // 1. Save Base Settings & Defaults
+            log("💾 Configuration d'Elazya v2.0.0...");
             await OpenClawClient.setSetting('elazya_provider', config.provider);
             await OpenClawClient.setSetting('elazya_model', config.model);
             await OpenClawClient.setSetting('elazya_api_key', config.apiKey);
+
+            // Force secure defaults for removed steps
+            await OpenClawClient.setSetting('elazya_mode', 'hybrid');
+            await OpenClawClient.setSetting('elazya_security_sandbox', 'true');
+            
+            // Configure Gateway (defaults)
+            const gatewayToken = config.gateway.token || generateToken();
+            await OpenClawClient.configureGateway(
+                config.gateway.port,
+                config.gateway.bind,
+                config.gateway.authMode,
+                gatewayToken,
+                config.gateway.password
+            );
+            await OpenClawClient.setSetting('elazya_gateway_token', gatewayToken);
+
 
             // 2. Configure Engine LLM
             log("⚙️ Configuration du moteur LLM...");
             await OpenClawClient.configureLLM(config.provider, config.apiKey, config.model);
 
-            // 3. Configure Gateway (always - includes auth token!)
-            log("🌐 Configuration du Gateway...");
-            try {
-                // For quickstart mode, auto-generate token if not set
-                const gatewayToken = config.gateway.token || generateToken();
-                const gatewayPassword = config.gateway.password || '';
+            // 3. Configure Gateway (Already done above, skipping log)
 
-                await OpenClawClient.configureGateway(
-                    config.gateway.port,
-                    config.gateway.bind,
-                    config.gateway.authMode,
-                    gatewayToken,
-                    gatewayPassword
-                );
-
-                // Save token for display/later use
-                await OpenClawClient.setSetting('elazya_gateway_token', gatewayToken);
-            } catch (e) {
-                log(`⚠️ Avertissement config Gateway : ${e}`);
-            }
 
             // 4. Configure Channels
             for (const channel of config.activeChannels) {
@@ -180,8 +133,20 @@ export default function OnboardingWizard({ onComplete }: Props) {
                 }
             }
 
-            // 5. Install Selected Skills
-            for (const skill of config.selectedSkills) {
+            // 5. Install Skills based on Chains
+            const skillsToInstall = new Set<string>();
+            skillsToInstall.add('gog'); // Core
+            skillsToInstall.add('browser');
+            skillsToInstall.add('fs');
+
+            if (config.activeChannels.includes('telegram')) skillsToInstall.add('telegram');
+            if (config.activeChannels.includes('whatsapp')) skillsToInstall.add('wacli');
+
+            if (config.chains?.facturation) { skillsToInstall.add('tesseract'); skillsToInstall.add('fs'); }
+            if (config.chains?.email) { skillsToInstall.add('gog'); }
+            if (config.chains?.veille) { skillsToInstall.add('browser'); }
+
+            for (const skill of Array.from(skillsToInstall)) {
                 log(`📦 Installation du skill : ${skill}...`);
                 try {
                     await OpenClawClient.installSkill(skill);
@@ -201,27 +166,10 @@ export default function OnboardingWizard({ onComplete }: Props) {
                 }
             }
 
-            // 6. Configure Extra Keys (Google Places, Notion)
-            if (config.extraKeys.googlePlaces || config.extraKeys.notion) {
-                log("🔑 Configuration des clés additionnelles...");
-                try {
-                    await OpenClawClient.configureExtraKeys(
-                        config.extraKeys.googlePlaces || '',
-                        config.extraKeys.notion || ''
-                    );
-                } catch (e) {
-                    log(`⚠️ Avertissement config clés : ${e}`);
-                }
-            }
-
-            // 7. Configure Hooks
+            // 7. Configure Hooks (Defaults)
             log("⚙️ Configuration des hooks système...");
             try {
-                await OpenClawClient.configureHooks(
-                    config.hooks.bootMd,
-                    config.hooks.commandLogger,
-                    config.hooks.sessionMemory
-                );
+                await OpenClawClient.configureHooks(true, true, true); // bootMd, commandLogger, sessionMemory
             } catch (e) {
                 log(`⚠️ Avertissement config hooks : ${e}`);
             }
@@ -272,10 +220,10 @@ export default function OnboardingWizard({ onComplete }: Props) {
             await OpenClawClient.setSetting('elazya_configured', 'true');
             // Force frontend flag for v2 check in App.tsx
             localStorage.setItem('elazya_v2_configured', 'true');
-            // Persist Tech Level for Adaptive Interface
-            const techLevel = config.profile.techLevel || 'intermediate';
-            localStorage.setItem('elazya_tech_level', techLevel);
-            await OpenClawClient.setSetting('elazya_tech_level', techLevel);
+            
+            // Set default tech level
+            localStorage.setItem('elazya_tech_level', 'intermediate');
+            await OpenClawClient.setSetting('elazya_tech_level', 'intermediate');
 
             setTimeout(onComplete, 1000);
 
@@ -301,45 +249,17 @@ export default function OnboardingWizard({ onComplete }: Props) {
                     </div>
                 </div>
                 <div className="text-xs font-mono text-zinc-600">
-                    Elazya v1.2.3
+                    Elazya v2.0.0
                 </div>
             </div>
 
             {/* Content Area */}
             <div className="flex-1 overflow-y-auto p-8 max-w-5xl mx-auto w-full relative z-10">
-                {currentStep === 'welcome' && (
-                    <StepWelcomeV2 />
-                )}
-                {currentStep === 'security' && (
-                    <StepSecurity ack={config.securityAck} toggleAck={() => setConfig({ ...config, securityAck: !config.securityAck })} />
-                )}
-                {currentStep === 'mode' && (
-                    <StepMode mode={config.mode} setMode={(m) => setConfig({ ...config, mode: m })} />
-                )}
-                {currentStep === 'provider' && (
-                    <StepProvider config={config} setConfig={setConfig} />
-                )}
-                {currentStep === 'gateway' && config.mode === 'manual' && (
-                    <StepGateway config={config} setConfig={setConfig} />
-                )}
-                {currentStep === 'gateway' && config.mode === 'quickstart' && (
-                    // Quickstart mode auto-skips via useEffect
-                    <div className="flex items-center justify-center h-40">
-                        <span className="text-zinc-500 animate-pulse">Configuration automatique...</span>
-                    </div>
-                )}
-                {currentStep === 'channels' && (
-                    <StepChannels config={config} setConfig={setConfig} />
-                )}
-                {currentStep === 'profiling' && (
-                    <StepProfiling config={config} setConfig={setConfig} />
-                )}
-                {currentStep === 'skills' && (
-                    <StepRecommendedSkills config={config} setConfig={setConfig} />
-                )}
-                {currentStep === 'hooks' && (
-                    <StepHooks config={config} setConfig={setConfig} />
-                )}
+                {currentStep === 'welcome' && <StepWelcomeV2 />}
+                {currentStep === 'provider' && <StepProvider config={config} setConfig={setConfig} />}
+                {currentStep === 'channels' && <StepChannels config={config} setConfig={setConfig} />}
+                {currentStep === 'chains' && <StepChains config={config} setConfig={setConfig} />}
+                
                 {currentStep === 'install' && (
                     <StepInstall
                         log={installLog}
@@ -368,7 +288,6 @@ export default function OnboardingWizard({ onComplete }: Props) {
                     <button
                         onClick={next}
                         disabled={
-                            (currentStep === 'security' && !config.securityAck) ||
                             (currentStep === 'provider' && config.provider !== 'ollama' && !config.apiKey.trim())
                         }
                         className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:from-indigo-400 hover:to-violet-400 rounded-xl font-bold flex items-center gap-2 transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)] active:scale-95"
@@ -382,626 +301,104 @@ export default function OnboardingWizard({ onComplete }: Props) {
     );
 }
 
-// --- HELPER: Profile → Skill Recommendations ---
-function getRecommendedSkills(profile: any): { id: string, reason: string }[] {
-    const recs: { id: string, reason: string }[] = [];
 
-    // Core recommendations based on expectations
-    // if (profile.expectations.includes('research') || profile.expectations.includes('productivity')) {
-    //     recs.push({ id: 'web-search', reason: 'Recherche instantanée sur le web pour trouver des infos en temps réel.' });
-    // }
-    if (profile.expectations.includes('productivity') || profile.managesTeams) {
-        recs.push({ id: 'apple-reminders', reason: 'Programmer des rappels et ne jamais oublier une échéance.' });
-    }
-    recs.push({ id: 'weather', reason: 'Météo locale pour planifier vos journées.' });
-
-    // Tools-based
-    if (profile.tools.includes('notion')) {
-        recs.push({ id: 'notion', reason: 'Synchroniser vos notes et bases de données Notion.' });
-    }
-    // if (profile.tools.includes('todoist')) {
-    //     recs.push({ id: 'todoist-integration', reason: 'Gérer vos tâches Todoist par la voix ou le texte.' });
-    // }
-    if (profile.tools.includes('spotify')) {
-        recs.push({ id: 'spotify-player', reason: 'Contrôler votre musique Spotify directement depuis Elazya.' });
-    }
-    // if (profile.tools.includes('google-docs')) {
-    //     recs.push({ id: 'google-workspace', reason: 'Accéder à vos Google Docs, Sheets et Drive.' });
-    // }
-
-    // Smart home
-    // if (profile.smartHome === 'yes') {
-    //     recs.push({ id: 'home-assistant', reason: 'Contrôler vos appareils connectés (lumières, thermostat...).' });
-    // }
-
-    // Domain-based
-    // if (profile.domain.includes('creative')) {
-    //     recs.push({ id: 'calculator', reason: 'Calculs rapides pour vos devis et budgets créatifs.' });
-    // }
-    // if (profile.domain.includes('student')) {
-    //     recs.push({ id: 'translate', reason: 'Traduction instantanée pour vos cours et recherches.' });
-    // }
-    // if (profile.domain.includes('developer')) {
-    //     recs.push({ id: 'code-runner', reason: 'Exécuter du code et automatiser des tâches dev.' });
-    // }
-
-    // Social / channels
-    // if (profile.socials.includes('telegram') || profile.socials.includes('discord')) {
-    //     recs.push({ id: 'news', reason: 'Résumés d\'actualités pour alimenter vos communautés.' });
-    // }
-
-    // Deduplicate
-    const seen = new Set<string>();
-    return recs.filter(r => {
-        if (seen.has(r.id)) return false;
-        seen.add(r.id);
-        return true;
-    });
-}
-
-// --- PROFILING QUESTIONS DATA ---
-const PROFILING_QUESTIONS = [
-    {
-        key: 'domain',
-        question: 'Quel est votre domaine d\'activité ?',
-        subtitle: 'Sélectionnez un ou plusieurs domaines.',
-        type: 'multi' as const,
-        options: [
-            { id: 'creative', label: 'Créatif', emoji: '🎨', hint: 'Design, musique, vidéo, écriture' },
-            { id: 'business', label: 'Business', emoji: '💼', hint: 'Entrepreneur, freelance, commerce' },
-            { id: 'student', label: 'Étudiant', emoji: '🎓', hint: 'Études, recherche, apprentissage' },
-            { id: 'developer', label: 'Développeur', emoji: '💻', hint: 'Code, DevOps, data' },
-            { id: 'personal', label: 'Particulier', emoji: '🏠', hint: 'Usage personnel, famille' },
-        ]
-    },
-    {
-        key: 'tools',
-        question: 'Quels outils utilisez-vous au quotidien ?',
-        subtitle: 'On adaptera Elazya à vos habitudes.',
-        type: 'multi' as const,
-        options: [
-            { id: 'notion', label: 'Notion', emoji: '📝' },
-            { id: 'todoist', label: 'Todoist', emoji: '✅' },
-            { id: 'slack', label: 'Slack', emoji: '💬' },
-            { id: 'spotify', label: 'Spotify', emoji: '🎵' },
-            { id: 'google-docs', label: 'Google Docs', emoji: '📄' },
-            { id: 'other', label: 'Autre', emoji: '🔧' },
-        ]
-    },
-    {
-        key: 'devices',
-        question: 'Quels appareils utilisez-vous ?',
-        subtitle: 'Pour optimiser la compatibilité.',
-        type: 'multi' as const,
-        options: [
-            { id: 'mac', label: 'Mac', emoji: '🍎' },
-            { id: 'iphone', label: 'iPhone', emoji: '📱' },
-            { id: 'ipad', label: 'iPad', emoji: '📱' },
-            { id: 'pc', label: 'PC Windows', emoji: '🖥️' },
-            { id: 'android', label: 'Android', emoji: '🤖' },
-        ]
-    },
-    {
-        key: 'smartHome',
-        question: 'Avez-vous une maison connectée ?',
-        subtitle: 'Lumières, thermostats, enceintes...',
-        type: 'single' as const,
-        options: [
-            { id: 'yes', label: 'Oui', emoji: '🏠' },
-            { id: 'no', label: 'Non', emoji: '❌' },
-            { id: 'unknown', label: 'Je ne sais pas', emoji: '🤷' },
-        ]
-    },
-    {
-        key: 'expectations',
-        question: 'Qu\'attendez-vous d\'Elazya ?',
-        subtitle: 'Vos objectifs principaux.',
-        type: 'multi' as const,
-        options: [
-            { id: 'productivity', label: 'Productivité', emoji: '⚡' },
-            { id: 'research', label: 'Recherche', emoji: '🔍' },
-            { id: 'automation', label: 'Automatisation', emoji: '🤖' },
-            { id: 'fun', label: 'Divertissement', emoji: '🎮' },
-            { id: 'learning', label: 'Apprentissage', emoji: '📚' },
-        ]
-    },
-    {
-        key: 'techLevel',
-        question: 'Quel est votre niveau technique ?',
-        subtitle: 'Pour adapter la complexité de l\'interface.',
-        type: 'single' as const,
-        options: [
-            { id: 'beginner', label: 'Débutant', emoji: '🌱', hint: 'Je découvre l\'IA' },
-            { id: 'intermediate', label: 'Intermédiaire', emoji: '🌿', hint: 'J\'utilise ChatGPT/Gemini' },
-            { id: 'advanced', label: 'Avancé', emoji: '🌳', hint: 'J\'ai déjà codé avec des APIs' },
-        ]
-    },
-    {
-        key: 'socials',
-        question: 'Quels réseaux / messageries utilisez-vous ?',
-        subtitle: 'Pour connecter Elazya à vos canaux.',
-        type: 'multi' as const,
-        options: [
-            { id: 'telegram', label: 'Telegram', emoji: '✈️' },
-            { id: 'discord', label: 'Discord', emoji: '🎮' },
-            { id: 'whatsapp', label: 'WhatsApp', emoji: '💬' },
-            { id: 'twitter', label: 'Twitter/X', emoji: '🐦' },
-        ]
-    },
-    {
-        key: 'managesTeams',
-        question: 'Gérez-vous des projets ou une équipe ?',
-        subtitle: 'Pour activer les fonctionnalités de gestion.',
-        type: 'single' as const,
-        options: [
-            { id: 'yes', label: 'Oui', emoji: '👥' },
-            { id: 'no', label: 'Non', emoji: '👤' },
-        ]
-    },
-    {
-        key: 'audience',
-        question: 'Qui est votre public / audience ?',
-        subtitle: 'Pour personnaliser les interactions.',
-        type: 'multi' as const,
-        options: [
-            { id: 'clients', label: 'Clients', emoji: '🤝' },
-            { id: 'students', label: 'Étudiants', emoji: '🎓' },
-            { id: 'family', label: 'Famille', emoji: '👨‍👩‍👧‍👦' },
-            { id: 'community', label: 'Communauté', emoji: '🌍' },
-            { id: 'myself', label: 'Moi-même', emoji: '🧘' },
-        ]
-    },
-    {
-        key: 'interactionStyle',
-        question: 'Comment préférez-vous interagir ?',
-        subtitle: 'Elazya s\'adapte à votre style.',
-        type: 'multi' as const,
-        options: [
-            { id: 'text', label: 'Commandes texte', emoji: '⌨️' },
-            { id: 'natural', label: 'Conversation naturelle', emoji: '💬' },
-            { id: 'shortcuts', label: 'Raccourcis rapides', emoji: '⚡' },
-            { id: 'voice', label: 'Voix', emoji: '🎤' },
-        ]
-    },
-];
-
-// --- PART 0: WELCOME ---
-// --- PART 4.5: PROFILING QUESTIONNAIRE ---
-function StepProfiling({ config, setConfig }: { config: any, setConfig: (c: any) => void }) {
-    const [currentQ, setCurrentQ] = useState(0);
-    const [showSummary, setShowSummary] = useState(false);
-    const q = PROFILING_QUESTIONS[currentQ];
-
-    const toggleOption = (optionId: string) => {
-        const profile = { ...config.profile };
-        if (q.type === 'single') {
-            if (q.key === 'managesTeams') {
-                profile[q.key] = optionId === 'yes';
-            } else {
-                profile[q.key] = optionId;
-            }
-        } else {
-            const arr = [...(profile[q.key] || [])];
-            const idx = arr.indexOf(optionId);
-            if (idx >= 0) arr.splice(idx, 1);
-            else arr.push(optionId);
-            profile[q.key] = arr;
-        }
-        setConfig({ ...config, profile });
-    };
-
-    const isSelected = (optionId: string) => {
-        const val = config.profile[q.key];
-        if (q.type === 'single') {
-            if (q.key === 'managesTeams') return (optionId === 'yes') === val;
-            return val === optionId;
-        }
-        return Array.isArray(val) && val.includes(optionId);
-    };
-
-    const nextQ = () => {
-        if (currentQ < PROFILING_QUESTIONS.length - 1) {
-            setCurrentQ(currentQ + 1);
-        } else {
-            // Auto-recommend skills based on profile
-            const recommended = getRecommendedSkills(config.profile);
-            const skillIds = recommended.map(r => r.id);
-            setConfig({ ...config, selectedSkills: skillIds });
-            setShowSummary(true);
-        }
-    };
-
-    const prevQ = () => {
-        if (showSummary) {
-            setShowSummary(false);
-        } else if (currentQ > 0) {
-            setCurrentQ(currentQ - 1);
-        }
-    };
-
-    // Summary view after all questions
-    if (showSummary) {
-        const p = config.profile;
-        const recommended = getRecommendedSkills(p);
-        const domainLabels: Record<string, string> = { creative: 'créatif', business: 'entrepreneur', student: 'étudiant', developer: 'développeur', personal: 'particulier' };
-        const primaryDomain = p.domain[0] ? domainLabels[p.domain[0]] || p.domain[0] : 'utilisateur';
-
-        return (
-            <div className="space-y-8">
-                <div className="text-center space-y-3">
-                    <div className="inline-block p-3 rounded-full bg-fuchsia-500/10 mb-2">
-                        <User className="w-10 h-10 text-fuchsia-400" />
-                    </div>
-                    <h2 className="text-3xl font-black">Votre Profil Elazya</h2>
-                    <p className="text-zinc-400">Voilà ce que nous avons compris de vos besoins.</p>
-                </div>
-
-                <div className="bg-gradient-to-br from-indigo-500/10 via-violet-500/5 to-fuchsia-500/10 border border-violet-500/20 rounded-2xl p-6 space-y-4">
-                    <p className="text-white leading-relaxed">
-                        D'après vos réponses, vous êtes un(e) <span className="text-fuchsia-400 font-bold">{primaryDomain}</span>
-                        {p.tools.length > 0 && <> qui utilise <span className="text-violet-400 font-bold">{p.tools.slice(0, 3).join(', ')}</span></>}
-                        {p.expectations.length > 0 && <> et cherche à <span className="text-indigo-400 font-bold">{p.expectations.map((e: string) => {
-                            const labels: Record<string, string> = { productivity: 'être plus productif', research: 'rechercher efficacement', automation: 'automatiser des tâches', fun: 's\'amuser', learning: 'apprendre' };
-                            return labels[e] || e;
-                        }).join(', ')}</span></>}.
-                    </p>
-                </div>
-
-                <div className="space-y-3">
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500">
-                        {recommended.length} compétences recommandées pour vous
-                    </h3>
-                    <div className="grid grid-cols-1 gap-2">
-                        {recommended.map(r => (
-                            <div key={r.id} className="flex items-center gap-3 bg-black/40 backdrop-blur-xl border border-fuchsia-500/20 rounded-xl p-3">
-                                <div className="w-2 h-2 rounded-full bg-fuchsia-500" />
-                                <div className="flex-1">
-                                    <span className="font-bold text-sm text-white">{r.id}</span>
-                                    <p className="text-xs text-zinc-500">{r.reason}</p>
-                                </div>
-                                <Check className="w-4 h-4 text-fuchsia-400" />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="flex gap-3">
-                    <button
-                        onClick={prevQ}
-                        className="px-4 py-2 text-zinc-500 hover:text-white transition-colors text-sm"
-                    >
-                        ← Modifier mes réponses
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="space-y-8">
-            {/* Progress */}
-            <div className="flex items-center gap-2">
-                {PROFILING_QUESTIONS.map((_, i) => (
-                    <div
-                        key={i}
-                        className={`h-1.5 flex-1 rounded-full transition-all ${i < currentQ ? 'bg-fuchsia-500' : i === currentQ ? 'bg-gradient-to-r from-indigo-500 to-fuchsia-500' : 'bg-zinc-800'}`}
-                    />
-                ))}
-            </div>
-
-            <div className="space-y-2">
-                <p className="text-xs text-fuchsia-400 font-bold uppercase tracking-widest">
-                    Question {currentQ + 1} / {PROFILING_QUESTIONS.length}
-                </p>
-                <h2 className="text-2xl font-black">{q.question}</h2>
-                <p className="text-zinc-500 text-sm">{q.subtitle}</p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {q.options.map(opt => (
-                    <button
-                        key={opt.id}
-                        onClick={() => toggleOption(opt.id)}
-                        className={`p-4 rounded-xl border text-left transition-all ${isSelected(opt.id)
-                            ? 'bg-fuchsia-500/10 border-fuchsia-500/50 shadow-[0_0_15px_rgba(217,70,239,0.15)]'
-                            : 'bg-black/40 backdrop-blur-xl border-white/10 hover:border-white/20'
-                            }`}
-                    >
-                        <span className="text-2xl block mb-2">{opt.emoji}</span>
-                        <span className={`font-bold text-sm ${isSelected(opt.id) ? 'text-fuchsia-300' : 'text-white'}`}>
-                            {opt.label}
-                        </span>
-                        {'hint' in opt && opt.hint && (
-                            <p className="text-[10px] text-zinc-500 mt-1">{opt.hint}</p>
-                        )}
-                    </button>
-                ))}
-            </div>
-
-            <div className="flex justify-between">
-                <button
-                    onClick={prevQ}
-                    disabled={currentQ === 0}
-                    className="px-4 py-2 text-zinc-500 hover:text-white disabled:opacity-0 transition-colors text-sm font-bold"
-                >
-                    ← Précédent
-                </button>
-                <button
-                    onClick={nextQ}
-                    className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-fuchsia-500 text-white rounded-xl font-bold text-sm hover:from-indigo-400 hover:to-fuchsia-400 transition-all active:scale-95"
-                >
-                    {currentQ === PROFILING_QUESTIONS.length - 1 ? 'Voir mes recommandations' : 'Suivant →'}
-                </button>
-            </div>
-        </div>
-    );
-}
-
-// --- PART 4.6: RECOMMENDED SKILLS (Profile-based) ---
-// --- PART 4.6: RECOMMENDED SKILLS (Profile-based) ---
-function StepRecommendedSkills({ config, setConfig }: { config: any, setConfig: (c: any) => void }) {
-    const recommended = getRecommendedSkills(config.profile);
-    const recommendedIds = new Set(recommended.map(r => r.id));
-
-    const ALL_SKILLS = [
-        { id: 'weather', name: 'Météo', desc: 'Prévisions et conditions météo', emoji: '🌤️' },
-        { id: 'apple-reminders', name: 'Rappels', desc: 'Rappels Apple Reminders', emoji: '⏰' },
-        { id: 'notion', name: 'Notion', desc: 'Notes et bases de données', emoji: '📝' },
-        { id: 'spotify-player', name: 'Spotify', desc: 'Contrôle musical', emoji: '🎵' },
-        { id: 'slack', name: 'Slack', desc: 'Messagerie Slack', emoji: '💬' },
-        { id: 'discord', name: 'Discord', desc: 'Messagerie Discord', emoji: '🎮' },
-        // { id: 'web-search', name: 'Recherche Web', desc: 'Rechercher sur Internet', emoji: '🔍' }, // Removed: No matching skill dir found
-        // { id: 'calculator', name: 'Calculatrice', desc: 'Calculs et conversions', emoji: '🧮' }, // Removed: No matching skill dir found
-        // { id: 'news', name: 'Actualités', desc: 'Flux d\'actualités', emoji: '📰' }, // Removed: No matching skill dir found
-        // { id: 'translate', name: 'Traduction', desc: 'Traduire entre langues', emoji: '🌐' }, // Removed: No matching skill dir found
-        // { id: 'home-assistant', name: 'Maison Connectée', desc: 'Domotique et IoT', emoji: '🏠' }, // Removed: No matching skill dir found
-        // { id: 'code-runner', name: 'Code Runner', desc: 'Exécuter du code', emoji: '💻' }, // Removed: No matching skill dir found
+// --- PART 4.7: CHAIN SELECTION (Section VIII) ---
+function StepChains({ config, setConfig }: { config: any, setConfig: (c: any) => void }) {
+    const CHAIN_OPTIONS = [
+        {
+            id: 'facturation',
+            name: 'Pack Administratif',
+            icon: FileText,
+            color: 'from-green-400 to-emerald-600',
+            description: 'Factures, relances, classement automatique',
+            details: 'Détecte vos factures PDF dans ~/Documents/Factures/, les classe par client, vous rappelle les échéances et prépare les relances.',
+            roi: '45 min/semaine',
+        },
+        {
+            id: 'email',
+            name: 'Réponses Email Intelligentes',
+            icon: Mail,
+            color: 'from-blue-400 to-indigo-600',
+            description: 'Brouillons automatiques pour vos clients',
+            details: 'Analyse vos emails non-lus, génère des brouillons de réponse adaptés au contexte et trie les urgences.',
+            roi: '1-2h/jour',
+        },
+        {
+            id: 'veille',
+            name: 'Veille & Idées Contenu',
+            icon: Search,
+            color: 'from-purple-400 to-violet-600',
+            description: 'Résumés quotidiens + angles de posts',
+            details: 'Surveille vos sources préférées, résume les actualités importantes et suggère des angles de contenu pour vos publications.',
+            roi: '30 min/jour',
+        },
     ];
 
-    const toggleSkill = (id: string, e?: React.MouseEvent) => {
-        // Prevent toggling when clicking input
-        if (e && (e.target as HTMLElement).tagName === 'INPUT') return;
-
-        const selected = config.selectedSkills.includes(id)
-            ? config.selectedSkills.filter((s: string) => s !== id)
-            : [...config.selectedSkills, id];
-        setConfig({ ...config, selectedSkills: selected });
-    };
-
-    const updateExtraKey = (key: string, val: string) => {
+    const toggleChain = (chainId: string) => {
         setConfig({
             ...config,
-            extraKeys: { ...config.extraKeys, [key]: val }
+            chains: { ...config.chains, [chainId]: !config.chains[chainId] }
         });
     };
 
-    const recommendedSkills = ALL_SKILLS.filter(s => recommendedIds.has(s.id));
-    const otherSkills = ALL_SKILLS.filter(s => !recommendedIds.has(s.id));
-
-    const renderSkillRow = (skill: typeof ALL_SKILLS[0], isRecommendedSection: boolean) => {
-        const isSelected = config.selectedSkills.includes(skill.id);
-        const rec = recommended.find(r => r.id === skill.id);
-
-        return (
-            <div
-                key={skill.id}
-                onClick={(e) => toggleSkill(skill.id, e)}
-                className={`p-4 rounded-xl border cursor-pointer transition-all ${isSelected
-                    ? isRecommendedSection ? 'bg-fuchsia-500/10 border-fuchsia-500/30' : 'bg-indigo-500/10 border-indigo-500/30'
-                    : 'bg-black/40 backdrop-blur-xl/50 border-white/10 hover:border-white/20'
-                    }`}
-            >
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <span className="text-2xl">{skill.emoji}</span>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h3 className="font-bold text-sm">{skill.name}</h3>
-                                {isRecommendedSection && (
-                                    <span className="text-[9px] bg-fuchsia-500/20 text-fuchsia-400 px-1.5 py-0.5 rounded font-bold">POUR VOUS</span>
-                                )}
-                            </div>
-                            <p className="text-xs text-zinc-500 mt-0.5">
-                                {isRecommendedSection ? (rec?.reason || skill.desc) : skill.desc}
-                            </p>
-                        </div>
-                    </div>
-                    <div className={`w-5 h-5 rounded flex items-center justify-center border ${isSelected
-                        ? (isRecommendedSection ? 'bg-fuchsia-500 border-fuchsia-500' : 'bg-indigo-500 border-indigo-500')
-                        : 'border-zinc-600'}`}>
-                        {isSelected && <Check className="w-3 h-3 text-white" />}
-                    </div>
-                </div>
-
-                {/* Inline API Keys */}
-                {isSelected && skill.id === '@anthropic/web-search' && (
-                    <div className="mt-4 pt-4 border-t border-white/5 animate-in fade-in slide-in-from-top-2">
-                        <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Clé API Brave Search (Gratuit)</label>
-                        <input
-                            type="password"
-                            value={config.extraKeys.brave || ''}
-                            onChange={(e) => updateExtraKey('brave', e.target.value)}
-                            placeholder="Entrez votre clé Brave..."
-                            className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-indigo-500/50 transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                        />
-                        <a href="https://api.search.brave.com/app/keys" target="_blank" rel="noreferrer" className="text-[10px] text-indigo-400 hover:underline mt-1 inline-block" onClick={(e) => e.stopPropagation()}>
-                            Obtenir une clé gratuitement →
-                        </a>
-                    </div>
-                )}
-
-                {isSelected && skill.id === 'notion-integration' && (
-                    <div className="mt-4 pt-4 border-t border-white/5 animate-in fade-in slide-in-from-top-2">
-                        <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Clé d'intégration Notion</label>
-                        <input
-                            type="password"
-                            value={config.extraKeys.notion || ''}
-                            onChange={(e) => updateExtraKey('notion', e.target.value)}
-                            placeholder="secret_..."
-                            className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-indigo-500/50 transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                        />
-                        <a href="https://www.notion.so/my-integrations" target="_blank" rel="noreferrer" className="text-[10px] text-indigo-400 hover:underline mt-1 inline-block" onClick={(e) => e.stopPropagation()}>
-                            Créer une intégration Notion →
-                        </a>
-                    </div>
-                )}
-            </div>
-        );
-    };
-
     return (
         <div className="space-y-8">
-            <div>
-                <h2 className="text-3xl font-black">Compétences Recommandées</h2>
-                <p className="text-zinc-400 mt-2">
-                    Basé sur votre profil, voici les compétences qu'Elazya peut activer pour vous.
-                </p>
+            <div className="text-center space-y-3">
+                <div className="inline-block p-3 rounded-full bg-emerald-500/10 mb-2">
+                    <Zap className="w-10 h-10 text-emerald-400" />
+                </div>
+                <h2 className="text-3xl font-black">Choisissez vos agents</h2>
+                <p className="text-zinc-400">Sélectionnez les automatisations à activer dès le démarrage.</p>
             </div>
 
-            {/* Personalized recommendations */}
-            {recommendedSkills.length > 0 && (
-                <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-fuchsia-400" />
-                        <h3 className="text-sm font-bold uppercase tracking-widest text-fuchsia-400">
-                            Sélectionnées pour vous
-                        </h3>
-                    </div>
-                    <div className="grid grid-cols-1 gap-2">
-                        {recommendedSkills.map(skill => renderSkillRow(skill, true))}
-                    </div>
-                </div>
-            )}
-
-            {/* Other available skills */}
-            {otherSkills.length > 0 && (
-                <div className="space-y-3">
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500">
-                        Autres compétences disponibles
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {otherSkills.map(skill => renderSkillRow(skill, false))}
-                    </div>
-                </div>
-            )}
+            <div className="grid grid-cols-1 gap-4">
+                {CHAIN_OPTIONS.map(chain => {
+                    const isEnabled = config.chains[chain.id];
+                    return (
+                        <button
+                            key={chain.id}
+                            onClick={() => toggleChain(chain.id)}
+                            className={`p-5 rounded-2xl border text-left transition-all ${
+                                isEnabled
+                                    ? 'bg-emerald-500/10 border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.1)]'
+                                    : 'bg-black/40 backdrop-blur-xl border-white/10 hover:border-white/20'
+                            }`}
+                        >
+                            <div className="flex items-start gap-4">
+                                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${chain.color} flex items-center justify-center flex-shrink-0`}>
+                                    <chain.icon className="w-6 h-6 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <h3 className="font-bold text-white">{chain.name}</h3>
+                                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+                                            isEnabled
+                                                ? 'bg-emerald-500 border-emerald-500'
+                                                : 'border-zinc-600'
+                                        }`}>
+                                            {isEnabled && <Check className="w-3.5 h-3.5 text-white" />}
+                                        </div>
+                                    </div>
+                                    <p className="text-sm text-zinc-400 mb-2">{chain.description}</p>
+                                    <p className="text-xs text-zinc-500 leading-relaxed">{chain.details}</p>
+                                    <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                                        <span className="text-emerald-400 text-xs font-bold">ROI : {chain.roi}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+                    );
+                })}
+            </div>
 
             <p className="text-xs text-zinc-600 text-center">
-                💡 Vous pourrez modifier vos compétences à tout moment dans l'onglet <span className="text-violet-400">Compétences</span>.
+                💡 Vous pourrez activer ou désactiver les agents à tout moment dans <span className="text-emerald-400">Mission Control</span>.
             </p>
         </div>
     );
 }
 
-// --- PART 1: SECURITY ---
-function StepSecurity({ ack, toggleAck }: { ack: boolean, toggleAck: () => void }) {
-    return (
-        <div className="space-y-8">
-            <div className="text-center space-y-2">
-                <div className="inline-block p-4 rounded-full bg-fuchsia-500/10 mb-4">
-                    <Shield className="w-12 h-12 text-fuchsia-500" />
-                </div>
-                <h2 className="text-3xl font-black">Sécurité — Veuillez Lire</h2>
-                <p className="text-zinc-400">OpenClaw est puissant et s'exécute localement. Un grand pouvoir implique de grandes responsabilités.</p>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-fuchsia-500/5 border border-fuchsia-500/20 p-6 rounded-2xl space-y-4">
-                    <h3 className="font-bold flex items-center gap-2 text-fuchsia-400">
-                        <AlertTriangle className="w-5 h-5" /> Risques
-                    </h3>
-                    <ul className="space-y-3 text-sm text-zinc-400">
-                        <li className="flex gap-2">
-                            <span className="text-fuchsia-500">✓</span>
-                            <span>L'agent peut lire les fichiers de votre système.</span>
-                        </li>
-                        <li className="flex gap-2">
-                            <span className="text-fuchsia-500">✓</span>
-                            <span>L'agent peut exécuter des commandes et des actions.</span>
-                        </li>
-                        <li className="flex gap-2">
-                            <span className="text-fuchsia-500">✓</span>
-                            <span>Un prompt malveillant pourrait le tromper.</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <div className="bg-violet-500/5 border border-violet-500/20 p-6 rounded-2xl space-y-4">
-                    <h3 className="font-bold flex items-center gap-2 text-violet-400">
-                        <Shield className="w-5 h-5" /> Recommandations
-                    </h3>
-                    <ul className="space-y-3 text-sm text-zinc-400">
-                        <li className="flex gap-2">
-                            <span className="text-violet-500">●</span>
-                            <span>Utilisez des listes blanches pour contrôler l'accès.</span>
-                        </li>
-                        <li className="flex gap-2">
-                            <span className="text-violet-500">●</span>
-                            <span>Gardez les secrets sensibles hors de l'espace de travail.</span>
-                        </li>
-                        <li className="flex gap-2">
-                            <span className="text-violet-500">●</span>
-                            <span>Utilisez le modèle le plus performant possible (Gemini Pro/GPT-4).</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div
-                onClick={toggleAck}
-                className={`p-4 rounded-xl border flex items-center justify-center gap-3 cursor-pointer transition-all ${ack ? 'bg-fuchsia-500/10 border-fuchsia-500/50 text-white' : 'bg-zinc-800/50 border-white/20 text-zinc-400 hover:border-zinc-500'}`}
-            >
-                <div className={`w-5 h-5 rounded border flex items-center justify-center ${ack ? 'bg-fuchsia-500 border-fuchsia-500' : 'border-zinc-500'}`}>
-                    {ack && <Check className="w-3 h-3 text-white" />}
-                </div>
-                <span className="font-mono text-sm">"Je comprends que cet outil est puissant et comporte des risques."</span>
-            </div>
-        </div>
-    );
-}
-
-// --- PART 2: MODE ---
-function StepMode({ mode, setMode }: { mode: string, setMode: (m: string) => void }) {
-    return (
-        <div className="space-y-8">
-            <h2 className="text-3xl font-black">Mode de Démarrage</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button
-                    onClick={() => setMode('quickstart')}
-                    className={`p-6 rounded-2xl border text-left transition-all ${mode === 'quickstart'
-                        ? 'bg-blue-600 border-blue-600 shadow-lg scale-[1.02]'
-                        : 'bg-black/40 backdrop-blur-xl border-white/10 hover:border-white/20'}`}
-                >
-                    <div className="flex justify-between items-start mb-4">
-                        <Zap className={`w-8 h-8 ${mode === 'quickstart' ? 'text-white' : 'text-blue-500'}`} />
-                        {mode === 'quickstart' && <Check className="w-6 h-6 text-white" />}
-                    </div>
-                    <h3 className="text-xl font-bold">Démarrage Rapide</h3>
-                    <p className={`text-sm mt-2 ${mode === 'quickstart' ? 'text-blue-200' : 'text-zinc-400'}`}>
-                        Recommandé pour les débutants. Configure des paramètres sûrs automatiquement.
-                    </p>
-                </button>
-
-                <button
-                    onClick={() => setMode('manual')}
-                    className={`p-6 rounded-2xl border text-left transition-all ${mode === 'manual'
-                        ? 'bg-zinc-800 border-zinc-600 shadow-lg scale-[1.02]'
-                        : 'bg-black/40 backdrop-blur-xl border-white/10 hover:border-white/20'}`}
-                >
-                    <div className="flex justify-between items-start mb-4">
-                        <Terminal className={`w-8 h-8 ${mode === 'manual' ? 'text-white' : 'text-zinc-500'}`} />
-                        {mode === 'manual' && <Check className="w-6 h-6 text-white" />}
-                    </div>
-                    <h3 className="text-xl font-bold">Manuel</h3>
-                    <p className={`text-sm mt-2 ${mode === 'manual' ? 'text-zinc-300' : 'text-zinc-400'}`}>
-                        Contrôle granulaire sur chaque paramètre. Pour les utilisateurs avancés.
-                    </p>
-                </button>
-            </div>
-        </div>
-    );
-}
 
 // --- PART 3: PROVIDER ---
 function StepProvider({ config, setConfig }: { config: any, setConfig: (c: any) => void }) {
@@ -1158,181 +555,7 @@ function StepProvider({ config, setConfig }: { config: any, setConfig: (c: any) 
     );
 }
 
-// --- PART 4: GATEWAY CONFIG ---
-function StepGateway({ config, setConfig }: { config: any, setConfig: (c: any) => void }) {
-    const BIND_OPTIONS = [
-        { id: 'loopback', name: 'Loopback (127.0.0.1)', desc: 'Sécurisé - accès local uniquement.' },
-        { id: 'lan', name: 'LAN (0.0.0.0)', desc: 'Accessible depuis le réseau local.' },
-        { id: 'auto', name: 'Auto', desc: 'Détection automatique.' },
-    ];
 
-    return (
-        <div className="space-y-8">
-            <div>
-                <h2 className="text-3xl font-black">Configuration du Gateway</h2>
-                <p className="text-zinc-400 mt-2">Paramètres réseau pour le serveur OpenClaw local.</p>
-            </div>
-
-            <div className="space-y-6">
-                {/* Port */}
-                <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 space-y-4">
-                    <label className="block text-sm font-bold uppercase tracking-widest text-zinc-500">Port du Gateway</label>
-                    <input
-                        type="number"
-                        value={config.gateway.port}
-                        onChange={(e) => setConfig({
-                            ...config,
-                            gateway: { ...config.gateway, port: parseInt(e.target.value) || 18789 }
-                        })}
-                        className="w-full bg-black/50 p-4 rounded-xl border border-white/5 outline-none font-mono text-sm"
-                        placeholder="18789"
-                    />
-                    <p className="text-xs text-zinc-500">Port WebSocket (par défaut: 18789)</p>
-                </div>
-
-                {/* Bind Mode */}
-                <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 space-y-4">
-                    <label className="block text-sm font-bold uppercase tracking-widest text-zinc-500">Mode d'écoute</label>
-                    <div className="space-y-3">
-                        {BIND_OPTIONS.map(opt => (
-                            <div
-                                key={opt.id}
-                                onClick={() => setConfig({
-                                    ...config,
-                                    gateway: { ...config.gateway, bind: opt.id }
-                                })}
-                                className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${config.gateway.bind === opt.id
-                                    ? 'bg-blue-600/20 border-blue-500/50'
-                                    : 'bg-black/30 border-white/5 hover:border-white/20'
-                                    }`}
-                            >
-                                <div>
-                                    <h3 className="font-bold text-sm">{opt.name}</h3>
-                                    <p className="text-xs text-zinc-500">{opt.desc}</p>
-                                </div>
-                                <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${config.gateway.bind === opt.id ? 'bg-blue-500 border-blue-500' : 'border-zinc-600'
-                                    }`}>
-                                    {config.gateway.bind === opt.id && <Check className="w-3 h-3 text-white" />}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Auth Mode */}
-                <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 space-y-4">
-                    <label className="block text-sm font-bold uppercase tracking-widest text-zinc-500">Authentification</label>
-                    <div className="flex gap-4">
-                        <button
-                            onClick={() => setConfig({
-                                ...config,
-                                gateway: {
-                                    ...config.gateway,
-                                    authMode: 'token',
-                                    token: config.gateway.token || generateToken()
-                                }
-                            })}
-                            className={`flex-1 p-4 rounded-xl border text-center font-bold transition-all ${config.gateway.authMode === 'token'
-                                ? 'bg-blue-600/20 border-blue-500/50'
-                                : 'bg-black/30 border-white/5 hover:border-white/20'
-                                }`}
-                        >
-                            Token (Recommandé)
-                        </button>
-                        <button
-                            onClick={() => setConfig({
-                                ...config,
-                                gateway: { ...config.gateway, authMode: 'password' }
-                            })}
-                            className={`flex-1 p-4 rounded-xl border text-center font-bold transition-all ${config.gateway.authMode === 'password'
-                                ? 'bg-blue-600/20 border-blue-500/50'
-                                : 'bg-black/30 border-white/5 hover:border-white/20'
-                                }`}
-                        >
-                            Mot de passe
-                        </button>
-                    </div>
-
-                    {config.gateway.authMode === 'token' && (
-                        <div className="space-y-2">
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={config.gateway.token || ''}
-                                    onChange={(e) => setConfig({
-                                        ...config,
-                                        gateway: { ...config.gateway, token: e.target.value }
-                                    })}
-                                    className="flex-1 bg-black/50 p-3 rounded-lg border border-white/5 font-mono text-xs"
-                                    placeholder="Token auto-généré..."
-                                />
-                                <button
-                                    onClick={() => setConfig({
-                                        ...config,
-                                        gateway: { ...config.gateway, token: generateToken() }
-                                    })}
-                                    className="p-3 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
-                                    title="Générer nouveau token"
-                                >
-                                    <RefreshCw className="w-4 h-4" />
-                                </button>
-                            </div>
-                            <p className="text-[10px] text-zinc-500">Ce token sécurise l'accès au Gateway et à l'interface web.</p>
-                        </div>
-                    )}
-
-                    {config.gateway.authMode === 'password' && (
-                        <div className="space-y-2">
-                            <input
-                                type="password"
-                                value={config.gateway.password || ''}
-                                onChange={(e) => setConfig({
-                                    ...config,
-                                    gateway: { ...config.gateway, password: e.target.value }
-                                })}
-                                className="w-full bg-black/50 p-3 rounded-lg border border-white/5 font-mono text-sm"
-                                placeholder="Mot de passe..."
-                            />
-                            <p className="text-[10px] text-zinc-500">Utilisez un mot de passe fort.</p>
-                        </div>
-                    )}
-                </div>
-
-                {/* C2: Tailscale Mode */}
-                <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 space-y-4">
-                    <label className="block text-sm font-bold uppercase tracking-widest text-zinc-500">Tailscale (Accès Remote)</label>
-                    <div className="grid grid-cols-3 gap-3">
-                        {[
-                            { id: 'off', name: 'Désactivé', desc: 'Accès local uniquement' },
-                            { id: 'serve', name: 'Serve', desc: 'Partage sur votre Tailnet' },
-                            { id: 'funnel', name: 'Funnel', desc: 'Accès public internet' },
-                        ].map(opt => (
-                            <button
-                                key={opt.id}
-                                onClick={() => setConfig({
-                                    ...config,
-                                    gateway: { ...config.gateway, tailscaleMode: opt.id }
-                                })}
-                                className={`p-3 rounded-lg border text-center transition-all ${config.gateway.tailscaleMode === opt.id
-                                    ? 'bg-purple-600/20 border-purple-500/50'
-                                    : 'bg-black/30 border-white/5 hover:border-white/20'
-                                    }`}
-                            >
-                                <div className="text-sm font-bold">{opt.name}</div>
-                                <div className="text-[10px] text-zinc-500">{opt.desc}</div>
-                            </button>
-                        ))}
-                    </div>
-                    {config.gateway.tailscaleMode !== 'off' && (
-                        <p className="text-xs text-purple-400 bg-purple-500/10 p-2 rounded-lg">
-                            ⚠️ Nécessite Tailscale installé et authentifié sur ce système.
-                        </p>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
 
 // --- PART 5: CHANNELS ---
 function StepChannels({ config, setConfig }: { config: any, setConfig: (c: any) => void }) {
@@ -1476,7 +699,7 @@ function StepChannels({ config, setConfig }: { config: any, setConfig: (c: any) 
                                 value={config.channelConfig['whatsapp']?.userId || ''}
                                 onChange={(e) => updateChannelConfig('whatsapp', 'userId', e.target.value)}
                             />
-                            <p className="text-[10px] text-zinc-500">Consultez la <a href="https://developers.facebook.com/docs/whatsapp" target="_blank" className="text-green-400 underline">documentation Meta</a> pour obtenir vos identifiants.</p>
+                            <p className="text-[10px] text-zinc-500">Consultez la <a href="https://developers.facebook.com/docs/whatsapp" target="_blank" rel="noreferrer" className="text-green-400 underline">documentation Meta</a> pour obtenir vos identifiants.</p>
                         </div>
                     )}
                 </div>
@@ -1485,67 +708,7 @@ function StepChannels({ config, setConfig }: { config: any, setConfig: (c: any) 
     );
 }
 
-// --- PART 6: HOOKS ---
-function StepHooks({ config, setConfig }: { config: any, setConfig: (c: any) => void }) {
-    const toggle = (key: string) => {
-        // @ts-ignore
-        const current = config.hooks[key];
-        setConfig({
-            ...config,
-            hooks: { ...config.hooks, [key]: !current }
-        });
-    };
 
-    const HOOKS = [
-        { id: 'bootMd', name: 'boot-md', desc: 'Charger BOOT.md pour personnaliser votre agent.', rec: true },
-        { id: 'commandLogger', name: 'command-logger', desc: 'Logger toutes les commandes exécutées.', rec: true },
-        { id: 'sessionMemory', name: 'session-memory', desc: 'Sauvegarde automatique des sessions.', rec: true },
-        { id: 'autoTitleSessions', name: 'auto-title-sessions', desc: 'Générer des titres de session automatiquement.', rec: false },
-        { id: 'transcriptExport', name: 'transcript-export', desc: 'Exporter les transcripts en markdown.', rec: false },
-        { id: 'memoTracker', name: 'memo-tracker', desc: 'Tracker les mémos et notes dans les conversations.', rec: false },
-    ];
-
-    return (
-        <div className="space-y-8">
-            <div>
-                <h2 className="text-3xl font-black">Hooks Système</h2>
-                <p className="text-zinc-400 mt-2">Automatisez des actions lors de l'exécution de commandes.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {HOOKS.map(h => (
-                    <div
-                        key={h.id}
-                        onClick={() => toggle(h.id)}
-                        className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
-                            // @ts-ignore
-                            config.hooks[h.id] ? 'bg-black/40 backdrop-blur-xl border-violet-500/30' : 'bg-black/40 backdrop-blur-xl/50 border-white/10 hover:border-white/20'
-                            }`}
-                    >
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h3 className="font-bold font-mono text-sm">{h.name}</h3>
-                                {h.rec && <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">REC</span>}
-                            </div>
-                            <p className="text-xs text-zinc-500 mt-1">{h.desc}</p>
-                        </div>
-                        <div className={`w-5 h-5 rounded flex items-center justify-center border ${
-                            // @ts-ignore
-                            config.hooks[h.id] ? 'bg-violet-500 border-violet-500' : 'border-zinc-600'
-                            }`}>
-                            {/* @ts-ignore */}
-                            {config.hooks[h.id] && <Check className="w-3 h-3 text-white" />}
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            <p className="text-xs text-zinc-500">
-                💡 Les hooks <span className="text-blue-400">REC</span> sont recommandés pour la plupart des utilisateurs.
-            </p>
-        </div>
-    );
-}
 
 // --- PART 7: INSTALL ---
 function StepInstall({ log, config, onOpenDashboard }: {
@@ -1627,7 +790,7 @@ function StepInstall({ log, config, onOpenDashboard }: {
 
                     <p className="text-xs text-zinc-500 text-center">
                         Conservez ce lien pour accéder à OpenClaw Control UI.
-                        <br />Docs: <a href="https://docs.openclaw.ai/web/control-ui" className="text-blue-400 hover:underline" target="_blank">docs.openclaw.ai/web/control-ui</a>
+                        <br />Docs: <a href="https://docs.openclaw.ai/web/control-ui" className="text-blue-400 hover:underline" target="_blank" rel="noreferrer">docs.openclaw.ai/web/control-ui</a>
                     </p>
                 </div>
             )}
@@ -1661,7 +824,7 @@ function StepWelcomeV2() {
                 </p>
             </div>
 
-            {/* Feature Showcase (Glassmorphism V2) */}
+            // Feature Showcase (Glassmorphism V2)
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl px-4 shrink-0">
                 {[
                     { icon: Shield, color: 'text-indigo-400', title: '100% Privé', desc: 'Vos données ne quittent jamais votre Mac. Zéro télémétrie.' },

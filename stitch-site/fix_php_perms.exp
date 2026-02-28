@@ -1,0 +1,17 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "chmod 644 start_node.php\r"
+expect -re {[$#] ?$}
+
+# Also ensure elazya-server is executable/readable
+send "chmod 755 elazya-server\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

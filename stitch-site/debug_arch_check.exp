@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server/node_modules/.prisma/client/\r"
+expect -re {[$#] ?$}
+
+send "file query-engine-linux-musl-openssl-3.0.x\r"
+expect -re {[$#] ?$}
+
+send "file /bin/ls\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

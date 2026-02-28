@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { OpenClawClient, RequirementsStatus } from '@/lib/openclaw-client';
-import { AlertTriangle, CheckCircle, Download, RefreshCw, Terminal } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Download, RefreshCw, Terminal, Wifi } from 'lucide-react';
 
 interface Props {
     onReady: () => void;
@@ -10,6 +10,9 @@ export default function PrerequisitesCheck({ onReady }: Props) {
     const [status, setStatus] = useState<RequirementsStatus | null>(null);
     const [checking, setChecking] = useState(true);
     const [installing, setInstalling] = useState(false);
+    const [testingConnection, setTestingConnection] = useState(false);
+    const [connectionOk, setConnectionOk] = useState<boolean | null>(null);
+    const [connectionError, setConnectionError] = useState<string | null>(null);
 
     const check = async () => {
         setChecking(true);
@@ -17,12 +20,39 @@ export default function PrerequisitesCheck({ onReady }: Props) {
             const res = await OpenClawClient.checkRequirements();
             setStatus(res);
             if (res.node_ok && res.openclaw_installed) {
-                setTimeout(onReady, 800); // Small delay for visual confirmation
+                // Requirements met — now test the bridge connection
+                await testConnection();
             }
         } catch (e) {
             console.error("Check failed:", e);
         } finally {
             setChecking(false);
+        }
+    };
+
+    const testConnection = async () => {
+        setTestingConnection(true);
+        setConnectionOk(null);
+        setConnectionError(null);
+        try {
+            // Wait a moment for the bridge to establish (it starts in ManagedOpenClaw.start)
+            await new Promise(r => setTimeout(r, 1500));
+            
+            const result = await OpenClawClient.sendTestMessage();
+            setConnectionOk(true);
+            console.log("[PrerequisitesCheck] Test message response:", result);
+            // Small delay for visual confirmation before proceeding
+            setTimeout(onReady, 800);
+        } catch (e: any) {
+            console.error("Test message failed:", e);
+            setConnectionOk(false);
+            setConnectionError(e?.message || e?.toString() || "Erreur inconnue");
+            // Log the error for debugging
+            try {
+                await OpenClawClient.logError('prerequisites_check', 'Test message failed', e?.toString());
+            } catch { /* silent */ }
+        } finally {
+            setTestingConnection(false);
         }
     };
 
@@ -55,13 +85,27 @@ export default function PrerequisitesCheck({ onReady }: Props) {
 
     if (!status) return null;
 
-    if (status.node_ok && status.openclaw_installed) {
+    // All good: prerequisites met AND connection verified
+    if (status.node_ok && status.openclaw_installed && connectionOk === true) {
         return (
             <div className="min-h-screen bg-black text-white flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <CheckCircle className="w-16 h-16 text-green-500" />
                     <h1 className="text-2xl font-bold">Système Prêt</h1>
                     <p className="text-zinc-500">Lancement d'Elazya...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Testing connection in progress
+    if (status.node_ok && status.openclaw_installed && testingConnection) {
+        return (
+            <div className="min-h-screen bg-black text-white flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Wifi className="w-12 h-12 text-blue-400 animate-pulse" />
+                    <h1 className="text-xl font-bold">Connexion au moteur...</h1>
+                    <p className="text-zinc-500 text-sm">Vérification de la communication avec OpenClaw</p>
                 </div>
             </div>
         );
@@ -110,11 +154,36 @@ export default function PrerequisitesCheck({ onReady }: Props) {
                             </p>
                         </div>
                     </div>
+
+                    {/* Connection Test (shown only when prerequisites met) */}
+                    {status.node_ok && status.openclaw_installed && connectionOk !== null && (
+                        <div className={`p-4 rounded-xl border flex items-center gap-4 ${connectionOk ? 'bg-green-500/5 border-green-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
+                            {connectionOk ? (
+                                <Wifi className="w-6 h-6 text-green-500" />
+                            ) : (
+                                <AlertTriangle className="w-6 h-6 text-red-500" />
+                            )}
+                            <div className="flex-1">
+                                <h3 className="font-bold text-sm">Communication Moteur</h3>
+                                <p className="text-xs text-zinc-500">
+                                    {connectionOk ? 'Connecté' : 'Le moteur ne répond pas'}
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </div>
+
+                {/* Connection error details */}
+                {connectionError && (
+                    <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-xs text-red-300">
+                        Le moteur OpenClaw ne répond pas. Essayez de relancer l'application. 
+                        Si le problème persiste, vérifiez que le port 18789 n'est pas utilisé par un autre programme.
+                    </div>
+                )}
 
                 {!status.node_ok && (
                     <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-xs text-red-300">
-                        Veuillez installer Node.js v22+ manuellement depuis <a href="https://nodejs.org" target="_blank" className="underline font-bold">nodejs.org</a> puis relancer Elazya.
+                        Veuillez installer Node.js v22+ manuellement depuis <a href="https://nodejs.org" target="_blank" rel="noreferrer" className="underline font-bold">nodejs.org</a> puis relancer Elazya.
                     </div>
                 )}
 

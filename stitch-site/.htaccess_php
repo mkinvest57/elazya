@@ -1,0 +1,8 @@
+RewriteEngine On
+RewriteBase /
+
+# Allow access to startup script
+RewriteRule ^start_node\.php$ - [L]
+
+# Proxy everything else to Next.js
+RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]

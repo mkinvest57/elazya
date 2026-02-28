@@ -1,0 +1,29 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "killall -u su594661 node\r"
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Start with nohup
+send "nohup node server.js > stdout.log 2> stderr.log & \r"
+# Need to detach
+expect -re {[$#] ?$}
+
+# Check if running
+send "ps aux | grep node\r"
+expect -re {[$#] ?$}
+
+# Check port
+send "netstat -tuln | grep 3000\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

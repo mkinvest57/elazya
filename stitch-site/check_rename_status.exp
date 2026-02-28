@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[0] ?$}
+
+send "ls -la .htaccess .htaccess_bak\r"
+expect -re {[0] ?$}
+
+send "ls -ld .\r"
+expect -re {[0] ?$}
+
+send "exit\r"

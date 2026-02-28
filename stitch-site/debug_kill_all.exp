@@ -1,0 +1,23 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Check disk usage
+send "df -h .\r"
+expect -re {[$#] ?$}
+
+# Check running processes
+send "ps aux | grep su594661\r"
+expect -re {[$#] ?$}
+
+# Kill all user processes
+send "pkill -u su594661\r"
+# Expect might lose connection immediately if sshd is killed?
+# Wait, pkill -u su594661 kills sshd too!
+# So we expect EOF or close.
+expect eof

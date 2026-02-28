@@ -1,0 +1,31 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "echo '--- HTACCESS ---'\r"
+send "ls -l .htaccess\r"
+send "cat .htaccess\r"
+expect -re {[$#] ?$}
+
+send "echo '--- NODE PROCS ---'\r"
+send "ps aux | grep node\r"
+expect -re {[$#] ?$}
+
+send "echo '--- PORTS ---'\r"
+send "netstat -an | grep 3000\r"
+expect -re {[$#] ?$}
+
+send "echo '--- STDOUT ---'\r"
+send "tail -n 20 elazya-server/stdout.log\r"
+expect -re {[$#] ?$}
+
+send "echo '--- STDERR ---'\r"
+send "tail -n 20 elazya-server/stderr.log\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

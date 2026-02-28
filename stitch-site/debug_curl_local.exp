@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Try curl to domain
+send "curl -v -I http://elazya.com/hello.html\r"
+expect -re {[$#] ?$}
+
+# Try curl to localhost if possible (might default to 80)
+send "curl -v -I http://localhost/hello.html\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

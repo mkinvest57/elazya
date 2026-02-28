@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/Button"
 import { Menu, X } from "lucide-react"
@@ -14,86 +15,78 @@ export function Header() {
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 10)
+            setIsScrolled(window.scrollY > 20)
         }
         window.addEventListener("scroll", handleScroll)
         return () => window.removeEventListener("scroll", handleScroll)
     }, [])
 
     const navLinks = [
-        { href: "/#features", label: "Fonctionnalités" },
+        { href: "/", label: "Accueil" },
+        { href: "/agents", label: "Agents IA" },
         { href: "/pricing", label: "Tarifs" },
-        { href: "/faq", label: "FAQ" },
+        { href: "/docs", label: "Documentation" },
     ]
 
     return (
         <header
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b",
+                "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
                 isScrolled
-                    ? "bg-surface-0/80 backdrop-blur-md border-surface-3 py-3"
-                    : "bg-transparent border-transparent py-5"
+                    ? "bg-white/70 backdrop-blur-2xl border-b border-slate-200/50 py-3"
+                    : "bg-transparent border-b border-transparent py-5"
             )}
         >
             <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="text-2xl font-black flex items-center gap-2 group">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-primary/30">
-                        <span className="text-black font-black text-lg">E</span>
-                    </div>
-                    <span className="bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent font-display italic tracking-tight">
-                        ELAZYA
+                <Link href="/" className="flex items-center gap-2.5 group">
+                    <Image
+                        src="/logo.png"
+                        alt="Elazya"
+                        width={32}
+                        height={32}
+                        className="rounded-lg group-hover:scale-105 transition-transform"
+                    />
+                    <span className="text-xl font-bold tracking-tight text-slate-800">
+                        Elazya
                     </span>
                 </Link>
 
                 {/* Desktop Nav */}
-                <nav className="hidden md:flex items-center gap-8">
+                <nav className="hidden md:flex items-center gap-10">
                     {navLinks.map((link) => (
                         <Link
                             key={link.href}
                             href={link.href}
-                            className={cn(
-                                "text-sm font-medium transition-colors hover:text-primary",
-                                pathname === link.href ? "text-primary" : "text-foreground/80"
-                            )}
+                            className="text-[15px] font-medium text-slate-500 hover:text-slate-900 transition-colors"
                         >
                             {link.label}
                         </Link>
                     ))}
-                    <Link href="/checkout">
-                        <Button variant="primary" size="sm" className="shadow-glow-cyan animate-pulse-slow">
-                            Acheter pour 200€
-                        </Button>
-                    </Link>
                 </nav>
 
                 {/* Mobile Toggle */}
                 <button
-                    className="md:hidden p-2 text-foreground"
+                    className="md:hidden flex items-center justify-center px-4 py-2 text-[14px] font-medium text-slate-700 bg-white/50 border border-slate-300/80 rounded-full hover:bg-slate-50 transition-colors"
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
-                    {isMobileMenuOpen ? <X /> : <Menu />}
+                    Menu
                 </button>
             </div>
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-                <div className="absolute top-full left-0 right-0 bg-surface-0 border-b border-surface-3 p-4 md:hidden flex flex-col gap-4 animate-in slide-in-from-top-2">
+                <div className="absolute top-full left-0 right-0 bg-white/95 backdrop-blur-2xl border-b border-slate-200/50 p-6 md:hidden flex flex-col gap-2">
                     {navLinks.map((link) => (
                         <Link
                             key={link.href}
                             href={link.href}
-                            className="text-lg font-medium py-2 px-4 hover:bg-surface-2 rounded-lg"
+                            className="text-base font-medium py-3 px-4 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
                             {link.label}
                         </Link>
                     ))}
-                    <Link href="/checkout" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button variant="primary" className="w-full">
-                            Acheter Maintenant
-                        </Button>
-                    </Link>
                 </div>
             )}
         </header>

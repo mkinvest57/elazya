@@ -1,0 +1,26 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+# Create candidates
+send "mkdir -p Elazya elazya stitch stitch-site web site html dist build\r"
+expect -re {[$#] ?$}
+
+# Copy hello
+foreach dir {Elazya elazya stitch stitch-site web site html dist build} {
+    send "cp hello.html $dir/\r"
+    expect -re {[$#] ?$}
+}
+
+# Perms
+send "chmod 755 Elazya elazya stitch stitch-site web site html dist build\r"
+expect -re {[$#] ?$}
+send "chmod 644 */hello.html\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

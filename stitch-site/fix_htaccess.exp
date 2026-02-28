@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect "password:"
+send "Yassine.2011\r"
+expect -re {[$#] ?$}
+
+send "cat << 'END' > append.txt
+RewriteRule ^api/(.*)$ http://127.0.0.1:3001/api/\\\$1 \[P,L\]
+END\r"
+expect -re {[$#] ?$}
+
+send "cat append.txt >> ~/elazya/.htaccess\r"
+expect -re {[$#] ?$}
+
+send "curl -sI http://127.0.0.1:3001/api/checkout\r"
+expect -re {[$#] ?$}
+
+send "exit\r"

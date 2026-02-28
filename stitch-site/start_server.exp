@@ -1,0 +1,25 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+
+# Install PM2 if not present (local user scope)
+send "npm install -g pm2 || npm install pm2\r"
+expect "$ "
+
+# Go to app dir
+send "cd elazya-server\r"
+expect "$ "
+
+# Start app with PM2
+send "npx pm2 start ecosystem.config.js --env production\r"
+expect "$ "
+
+# Save PM2 list
+send "npx pm2 save\r"
+expect "$ "
+
+send "exit\r"

@@ -1,0 +1,34 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[0] ?$}
+
+# Backup existing www content just in case
+send "mkdir -p www_backup\r"
+expect -re {[0] ?$}
+send "cp -r www/* www_backup/ 2>/dev/null\r"
+expect -re {[0] ?$}
+
+# Clear www
+send "rm -rf www/*\r"
+expect -re {[0] ?$}
+
+# Move elazya content to www
+send "cp -r elazya/* www/\r"
+expect -re {[0] ?$}
+send "cp elazya/.htaccess www/\r"
+expect -re {[0] ?$}
+
+# Fix permissions
+send "chmod 755 www\r"
+expect -re {[0] ?$}
+send "find www -type d -exec chmod 755 {} \;\r"
+expect -re {[0] ?$}
+send "find www -type f -exec chmod 644 {} \;\r"
+expect -re {[0] ?$}
+
+send "exit\r"

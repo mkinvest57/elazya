@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn sftp su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect "sftp>"
+
+send "put .htaccess_fixed .htaccess\r"
+expect "sftp>"
+# try public folder
+send "cd public\r"
+expect "sftp>"
+send "put hello.html\r"
+expect "sftp>"
+
+send "bye\r"

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Elazya - Tarification Souveraine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#6366f1",
+              accent: "#eab308", // Gold accent
+              "background-light": "#f8fafc",
+              "background-dark": "#0a0a0c",
+              "card-dark": "#16161a",
+            },
+            fontFamily: {
+              display: ["Plus Jakarta Sans", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "12px",
+            },
+          },
+        },
+      };
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .glow-border {
+            position: relative;
+        }
+        .glow-border::after {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(to bottom right, rgba(99,102,241,0.5), transparent, rgba(234,179,8,0.3));
+            z-index: -1;
+            border-radius: inherit;
+        }
+        .bg-grid {
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased bg-grid">
+<nav class="sticky top-0 z-50 backdrop-blur-md border-b border-slate-200/10 dark:border-slate-800/50">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-rounded text-white text-xl">bolt</span>
+</div>
+<span class="text-xl font-extrabold tracking-tight">Elazya</span>
+</div>
+<div class="hidden md:flex items-center gap-8 text-sm font-medium">
+<a class="hover:text-primary transition-colors" href="#">Fonctionnalités</a>
+<a class="text-primary" href="#">Tarifs</a>
+<a class="hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="hover:text-primary transition-colors" href="#">FAQ</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-5 py-2.5 text-sm font-semibold hover:text-primary transition-colors">Connexion</button>
+<button class="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform">Commencer</button>
+</div>
+</div>
+</nav>
+<header class="relative pt-24 pb-16 px-6 text-center overflow-hidden">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/20 blur-[120px] rounded-full -z-10"></div>
+<div class="max-w-4xl mx-auto">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-8">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                Souveraineté Totale
+            </div>
+<h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
+                Choisissez votre <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-400 to-accent">souveraineté.</span>
+</h1>
+<p class="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mb-12">
+                Achetez une fois. Abonnez-vous pour la sérénité. L'IA locale qui remplace vos abonnements cloud mensuels et protège vos données.
+            </p>
+<div class="flex flex-wrap justify-center gap-4">
+<button class="px-8 py-4 bg-primary text-white font-extrabold rounded-xl shadow-xl shadow-primary/30 hover:translate-y-[-2px] transition-all flex items-center gap-2">
+                    ACHETER STARTER 197€
+                    <span class="material-symbols-rounded">arrow_forward</span>
+</button>
+<button class="px-8 py-4 bg-slate-200 dark:bg-white/5 font-extrabold rounded-xl hover:bg-slate-300 dark:hover:bg-white/10 transition-all">
+                    ESSAI GRATUIT 14J
+                </button>
+<button class="px-8 py-4 border border-slate-300 dark:border-white/10 font-extrabold rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
+                    DEMANDE DÉMO
+                </button>
+</div>
+</div>
+</header>
+<section class="max-w-5xl mx-auto px-6 mb-24">
+<div class="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-indigo-900/40 dark:to-slate-900/40 border border-white/10 p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2 opacity-10">
+<span class="material-symbols-rounded text-[120px]">savings</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-2xl font-bold text-white mb-2">Rentabilisé en 3 semaines.</h3>
+<p class="text-slate-300">197€ Elazya <span class="mx-2 text-slate-500">vs</span> 216€/mois ChatGPT Pro</p>
+</div>
+<div class="relative z-10 text-right">
+<div class="text-accent text-3xl font-black">ÉCONOMIE 2 500€/AN</div>
+<div class="text-slate-400 text-sm uppercase tracking-widest font-bold">Pour une productivité équivalente</div>
+</div>
+</div>
+</section>
+<main class="max-w-7xl mx-auto px-6 pb-32">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 relative">
+<div class="space-y-8">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-rounded text-primary">inventory_2</span>
+<h2 class="text-2xl font-black uppercase tracking-tighter">Packs Installation</h2>
+</div>
+<div class="bg-white dark:bg-card-dark border border-slate-200 dark:border-white/5 p-8 rounded-3xl shadow-sm hover:shadow-xl transition-shadow group">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-xl font-bold">Starter Pack</h3>
+<p class="text-slate-500 text-sm">Idéal pour les particuliers</p>
+</div>
+<div class="text-3xl font-black">197€</div>
+</div>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-green-500">check_circle</span> Installation IA Locale sur 1 poste</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-green-500">check_circle</span> 3 Agents IA standards</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-green-500">check_circle</span> Privacy Dashboard inclus</li>
+</ul>
+<button class="w-full py-3 rounded-xl border-2 border-primary text-primary font-bold group-hover:bg-primary group-hover:text-white transition-all">Choisir Starter</button>
+</div>
+<div class="bg-white dark:bg-card-dark border-2 border-primary p-8 rounded-3xl shadow-2xl shadow-primary/10 relative overflow-hidden">
+<div class="absolute top-4 right-[-35px] bg-primary text-white text-[10px] font-black py-1 px-10 rotate-45 uppercase">Populaire</div>
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-xl font-bold">Pro Pack</h3>
+<p class="text-slate-500 text-sm">Pour les freelances &amp; PME</p>
+</div>
+<div class="text-3xl font-black">497€</div>
+</div>
+<ul class="space-y-4 mb-8 text-slate-300">
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-primary">check_circle</span> Installation sur 3 postes</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-primary">check_circle</span> 10 Agents IA personnalisables</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-primary">check_circle</span> Connecteurs SaaS (Notion, Slack)</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-primary">check_circle</span> Support VIP 48h</li>
+</ul>
+<button class="w-full py-3 rounded-xl bg-primary text-white font-bold hover:scale-[1.02] transition-transform">Acheter Pro</button>
+</div>
+<div class="bg-white dark:bg-card-dark border border-slate-200 dark:border-white/5 p-8 rounded-3xl opacity-80 hover:opacity-100 transition-opacity">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-xl font-bold">Master Pack</h3>
+<p class="text-slate-500 text-sm">Souveraineté totale entreprise</p>
+</div>
+<div class="text-3xl font-black">997€</div>
+</div>
+<button class="w-full py-3 rounded-xl border border-slate-300 dark:border-white/10 font-bold">Contacter Sales</button>
+</div>
+</div>
+<div class="hidden lg:flex absolute left-1/2 top-[10%] bottom-[10%] -translate-x-1/2 flex-col justify-around pointer-events-none opacity-20">
+<span class="material-symbols-rounded text-6xl">link</span>
+<span class="material-symbols-rounded text-6xl">link</span>
+<span class="material-symbols-rounded text-6xl">link</span>
+</div>
+<div class="space-y-8">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-rounded text-accent">auto_renew</span>
+<h2 class="text-2xl font-black uppercase tracking-tighter">Abonnements Sérénité</h2>
+</div>
+<div class="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 p-8 rounded-3xl">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-xl font-bold">Maintenance Core</h3>
+<p class="text-slate-500 text-sm">Mises à jour &amp; sécurité</p>
+</div>
+<div class="text-right">
+<div class="text-3xl font-black">79€<span class="text-sm text-slate-500 font-normal">/mois</span></div>
+</div>
+</div>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-accent text-sm">star</span> Update hebdomadaire des LLM</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-accent text-sm">star</span> Support technique email</li>
+</ul>
+<button class="w-full py-3 rounded-xl border border-slate-300 dark:border-white/10 font-bold hover:bg-white/5 transition-colors">S'abonner</button>
+</div>
+<div class="bg-gradient-to-br from-indigo-900/20 to-slate-900/40 border-2 border-accent/40 p-8 rounded-3xl relative">
+<div class="absolute -top-3 left-6 bg-accent text-black text-[10px] font-black px-3 py-1 rounded-full uppercase">Recommandé</div>
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-xl font-bold">Expert Managed</h3>
+<p class="text-slate-400 text-sm">Optimisation continue</p>
+</div>
+<div class="text-right">
+<div class="text-3xl font-black">199€<span class="text-sm text-slate-500 font-normal">/mois</span></div>
+</div>
+</div>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-accent text-sm">auto_awesome</span> Fine-tuning de vos agents IA</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-accent text-sm">auto_awesome</span> Cloud relay optionnel chiffré</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-rounded text-accent text-sm">auto_awesome</span> Garantie 99.9% disponibilité</li>
+</ul>
+<button class="w-full py-3 rounded-xl bg-accent text-black font-extrabold hover:scale-[1.02] transition-transform">Prendre l'abonnement</button>
+</div>
+<div class="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 p-8 rounded-3xl">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-xl font-bold">Enterprise Elite</h3>
+<p class="text-slate-500 text-sm">Sur-mesure total</p>
+</div>
+<div class="text-3xl font-black">599€<span class="text-sm text-slate-500 font-normal">/mois</span></div>
+</div>
+<button class="w-full py-3 rounded-xl border border-slate-300 dark:border-white/10 font-bold">Demander un devis</button>
+</div>
+</div>
+</div>
+</main>
+<section class="max-w-6xl mx-auto px-6 mb-32">
+<h2 class="text-3xl font-bold text-center mb-16">Pourquoi Elazya plutôt que le cloud ?</h2>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="border-b border-white/10 text-left">
+<th class="py-6 px-4 font-bold text-slate-500">Critères</th>
+<th class="py-6 px-4 font-bold text-primary">ELAZYA IA</th>
+<th class="py-6 px-4 font-bold text-slate-400">CLOUD IA TRADITIONNEL</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr>
+<td class="py-6 px-4 font-medium">Confidentialité</td>
+<td class="py-6 px-4 text-green-400"><span class="material-symbols-rounded align-middle mr-2">verified_user</span> 100% Locale</td>
+<td class="py-6 px-4 text-slate-500">Données exploitées</td>
+</tr>
+<tr>
+<td class="py-6 px-4 font-medium">Accès système</td>
+<td class="py-6 px-4"><span class="material-symbols-rounded align-middle mr-2 text-primary">folder_open</span> Finder, mails, apps</td>
+<td class="py-6 px-4 text-slate-500">Navigateur uniquement</td>
+</tr>
+<tr>
+<td class="py-6 px-4 font-medium">Mode hors-ligne</td>
+<td class="py-6 px-4 text-green-400"><span class="material-symbols-rounded align-middle mr-2">wifi_off</span> Fonctionnel</td>
+<td class="py-6 px-4 text-slate-500">Inexploitable</td>
+</tr>
+<tr>
+<td class="py-6 px-4 font-medium">Coût mensuel</td>
+<td class="py-6 px-4"><span class="material-symbols-rounded align-middle mr-2 text-primary">payments</span> À partir de 0€/mois</td>
+<td class="py-6 px-4 text-slate-500">20€ à 200€+/mois</td>
+</tr>
+<tr>
+<td class="py-6 px-4 font-medium">Vos données</td>
+<td class="py-6 px-4 text-green-400"><span class="material-symbols-rounded align-middle mr-2">lock</span> Restent chez vous</td>
+<td class="py-6 px-4 text-slate-500">Servent à l'entraînement</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="max-w-3xl mx-auto px-6 mb-32">
+<h2 class="text-4xl font-bold text-center mb-12">Questions <span class="text-primary">fréquentes</span></h2>
+<div class="space-y-4">
+<div class="p-6 bg-white dark:bg-card-dark rounded-2xl border border-slate-200 dark:border-white/5 cursor-pointer flex items-center justify-between group">
+<span class="font-bold">C'est quoi exactement Elazya ?</span>
+<span class="material-symbols-rounded group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+</div>
+<div class="p-6 bg-white dark:bg-card-dark rounded-2xl border border-slate-200 dark:border-white/5 cursor-pointer flex items-center justify-between group">
+<span class="font-bold">Je n'ai aucune compétence technique, c'est faisable ?</span>
+<span class="material-symbols-rounded group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+</div>
+<div class="p-6 bg-white dark:bg-card-dark rounded-2xl border border-slate-200 dark:border-white/5 cursor-pointer flex items-center justify-between group">
+<span class="font-bold">Mes données restent vraiment privées ?</span>
+<span class="material-symbols-rounded group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+</div>
+<div class="p-6 bg-white dark:bg-card-dark rounded-2xl border border-slate-200 dark:border-white/5 cursor-pointer flex items-center justify-between group">
+<span class="font-bold">En quoi c'est différent de ChatGPT ?</span>
+<span class="material-symbols-rounded group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+</div>
+</div>
+</section>
+<section class="max-w-7xl mx-auto px-6 mb-32">
+<div class="bg-primary rounded-[40px] p-12 md:p-24 text-center text-white relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
+<div class="absolute bottom-0 left-0 w-64 h-64 bg-accent/20 blur-3xl rounded-full -translate-x-1/2 translate-y-1/2"></div>
+<div class="relative z-10">
+<h2 class="text-4xl md:text-6xl font-black mb-8 leading-tight">Prêt à reprendre<br/>le contrôle ?</h2>
+<p class="text-xl opacity-90 mb-12 max-w-2xl mx-auto">Rejoignez les utilisateurs qui ont choisi la souveraineté numérique.</p>
+<div class="flex flex-col md:flex-row items-center justify-center gap-6">
+<button class="px-10 py-5 bg-white text-primary font-black rounded-2xl shadow-2xl hover:scale-105 transition-transform">Commencer maintenant</button>
+<div class="flex gap-8 text-sm font-medium opacity-80">
+<span class="flex items-center gap-2"><span class="material-symbols-rounded">check</span> Installation 1 min</span>
+<span class="flex items-center gap-2"><span class="material-symbols-rounded">check</span> Essai gratuit</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<footer class="border-t border-slate-200 dark:border-white/5 py-20 bg-slate-50 dark:bg-background-dark">
+<div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="col-span-1 md:col-span-1">
+<div class="flex items-center gap-2 mb-6">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-rounded text-white text-xl">bolt</span>
+</div>
+<span class="text-xl font-extrabold tracking-tight">Elazya</span>
+</div>
+<p class="text-slate-500 text-sm mb-6">L'assistant IA qui vit sur votre machine. Privé, local, et puissant.</p>
+<div class="flex items-center gap-2 text-xs text-green-500 font-bold uppercase tracking-widest">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    Tous les systèmes opérationnels
+                </div>
+</div>
+<div>
+<h4 class="font-bold mb-6">Produit</h4>
+<ul class="space-y-4 text-sm text-slate-500">
+<li><a class="hover:text-primary transition-colors" href="#">Fonctionnalités</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Tarifs</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Changelog</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Documentation</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-6">Ressources</h4>
+<ul class="space-y-4 text-sm text-slate-500">
+<li><a class="hover:text-primary transition-colors" href="#">FAQ</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Communauté</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Discord</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-6">Légal</h4>
+<ul class="space-y-4 text-sm text-slate-500">
+<li><a class="hover:text-primary transition-colors" href="#">Confidentialité</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">CGV</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-6 mt-20 pt-8 border-t border-slate-200 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
+<p>© 2024 Elazya AI. Tous droits réservés.</p>
+<p class="flex items-center gap-4">
+<span>Conçu à Paris 🇫🇷</span>
+<span class="w-1 h-1 rounded-full bg-slate-500"></span>
+<a class="hover:text-primary transition-colors" href="#">Privacy-first by design</a>
+</p>
+</div>
+</footer>
+
+</body></html>

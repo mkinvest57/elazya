@@ -1,0 +1,28 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+
+send "cd elazya-server\r"
+expect -re {[$#] ?$}
+
+# Check if table exists
+send "mysql -h db5019545004.hosting-data.io -u dbu4443655 '-p\$Etudes.psych@.2025\$' dbs15269470 -e 'SHOW TABLES LIKE \"Customer\";'\r"
+
+expect {
+    "Customer" {
+        send_user "\nSUCCESS: Customer Table Found!\n"
+    }
+    "Empty set" {
+        send_user "\nFAILURE: Table not found.\n"
+    }
+    timeout {
+        send_user "\nTIMEOUT: Verification failed.\n"
+    }
+}
+
+send "exit\r"

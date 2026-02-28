@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+
+send "curl -I http://localhost:3000\r"
+expect {
+    "HTTP/1.1 200 OK" {
+        send_user "\nServer is UP!\n"
+    }
+    timeout {
+        send_user "\nServer seems DOWN.\n"
+    }
+}
+send "exit\r"

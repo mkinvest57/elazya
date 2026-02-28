@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[0] ?$}
+
+# Test PHP index
+send "cp www/test.html www/test.php\r"
+expect -re {[0] ?$}
+send "cp www/index.html www/index.php\r"
+expect -re {[0] ?$}
+
+# Check for other dirs
+send "ls -ld htdocs web public_html\r"
+expect -re {[0] ?$}
+
+send "exit\r"
