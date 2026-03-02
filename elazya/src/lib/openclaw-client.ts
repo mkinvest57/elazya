@@ -253,6 +253,10 @@ export class OpenClawClient {
         return invoke('run_agent', { agentId });
     }
 
+    static async testAgent(agentId: string): Promise<any> {
+        return invoke('test_agent', { agentId });
+    }
+
     static async getAgentLogs(agentId: string, limit: number = 10): Promise<any[]> {
         try {
             return await invoke('get_agent_logs', { agentId, limit });

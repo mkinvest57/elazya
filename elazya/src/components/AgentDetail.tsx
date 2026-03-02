@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowLeft, CheckCircle2, Play, Save,
     FolderOpen, ToggleLeft, ToggleRight,
-    ChevronRight, Sparkles, Zap, Loader2,
+    ChevronRight, Sparkles, Zap, Loader2, Beaker
 } from 'lucide-react';
 import { listen } from '@tauri-apps/api/event';
 import { type AgentDef } from '@/lib/plan-limits';
@@ -194,16 +194,34 @@ export default function AgentDetail({ agent, onBack }: AgentDetailProps) {
         setSaving(false);
     }
 
-    async function handleRun() {
+    async function handleTest() {
         setRunning(true);
-        try { await OpenClawClient.runAgent(agent.id); }
-        catch (e) { console.error('Run agent error:', e); }
+        try {
+            await OpenClawClient.testAgent(agent.id);
+            // Force reload logs to get the test result
+            await loadData();
+        }
+        catch (e) { console.error('Test agent error:', e); }
         setRunning(false);
     }
 
     function updateSetting(key: string, value: string) {
         setSettings(prev => ({ ...prev, [key]: value }));
     }
+
+    // Safely parse details from recent log
+    const getRecentTestDetails = () => {
+        if (!logs || logs.length === 0) return null;
+        const recent = logs[0];
+        if (recent.status !== 'success' || !recent.details) return null;
+        try {
+            return typeof recent.details === 'string' ? JSON.parse(recent.details) : recent.details;
+        } catch {
+            return null;
+        }
+    };
+
+    const testDetails = getRecentTestDetails();
 
     return (
         <motion.div variants={container} initial="hidden" animate="show"
@@ -243,8 +261,8 @@ export default function AgentDetail({ agent, onBack }: AgentDetailProps) {
                         {/* Toggle */}
                         <button onClick={handleToggle}
                             className={`btn-base focus-ring flex items-center gap-2.5 px-4 py-2 rounded-[var(--radius-md)] font-semibold transition-all ${isActive
-                                    ? 'bg-[var(--color-success-bg)] text-[var(--color-success)] ring-1 ring-[var(--color-success-ring)]'
-                                    : 'bg-[var(--surface-overlay)] text-white/25 ring-1 ring-[var(--border-subtle)]'
+                                ? 'bg-[var(--color-success-bg)] text-[var(--color-success)] ring-1 ring-[var(--color-success-ring)]'
+                                : 'bg-[var(--surface-overlay)] text-white/25 ring-1 ring-[var(--border-subtle)]'
                                 }`}
                             style={{ fontSize: 'var(--text-body)' }}
                         >
@@ -257,13 +275,13 @@ export default function AgentDetail({ agent, onBack }: AgentDetailProps) {
                             {isActive ? 'Activé' : 'Désactivé'}
                         </button>
 
-                        {/* Run */}
-                        <button onClick={handleRun} disabled={running}
+                        {/* Test */}
+                        <button onClick={handleTest} disabled={running}
                             className="btn-base focus-ring flex items-center gap-2 px-4 py-2 rounded-[var(--radius-md)] bg-[var(--surface-overlay)] border border-[var(--border-subtle)] text-white/35 hover:text-white/55 hover:bg-[var(--surface-hover)] font-semibold disabled:opacity-35"
                             style={{ fontSize: 'var(--text-body)' }}
                         >
-                            {running ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
-                            {running ? 'Exécution...' : 'Tester sur un exemple'}
+                            {running ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Beaker className="w-3.5 h-3.5" />}
+                            {running ? 'Test en cours...' : 'Tester sur un exemple'}
                         </button>
                     </div>
                 </div>
@@ -392,6 +410,122 @@ export default function AgentDetail({ agent, onBack }: AgentDetailProps) {
                     </div>
                 </motion.div>
             )}
+
+            {/* ── Résultat du test (if available) ──────────────── */}
+            <AnimatePresence>
+                {testDetails && !running && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                        animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
+                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                        className="rounded-[var(--radius-lg)] border border-[var(--color-success-ring)] bg-[var(--color-success-bg)] backdrop-blur-xl mb-4 overflow-hidden"
+                    >
+                        <div style={{ padding: 'var(--space-card-pad)' }}>
+                            <div className="flex items-center gap-2.5 mb-4">
+                                <div className="w-7 h-7 rounded-[var(--radius-sm)] bg-green-500/20 flex items-center justify-center">
+                                    <Beaker className="w-3.5 h-3.5 text-[var(--color-success)]" />
+                                </div>
+                                <h2 className="font-bold text-[var(--color-success)] tracking-wide" style={{ fontSize: 'var(--text-body)' }}>Résultat du test</h2>
+                            </div>
+
+                            <div className="space-y-3">
+                                {/* Facturation Auto */}
+                                {agent.id === 'facturation' && testDetails.parsed && (
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="bg-white/5 rounded-lg p-3">
+                                            <div className="text-[10px] text-white/30 uppercase font-bold mb-1">Source</div>
+                                            <div className="font-mono text-xs text-white/70 truncate" title={testDetails.source}>{testDetails.source.split('/').pop()}</div>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg p-3">
+                                            <div className="text-[10px] text-white/30 uppercase font-bold mb-1">Cible (Simulation)</div>
+                                            <div className="font-mono text-xs text-[var(--color-success)] truncate" title={testDetails.destination}>{testDetails.destination}</div>
+                                        </div>
+                                        <div className="col-span-2 bg-white/5 rounded-lg p-3 flex gap-4">
+                                            <div className="flex-1">
+                                                <div className="text-[10px] text-white/30 uppercase font-bold mb-1">Client détecté</div>
+                                                <div className="font-medium text-sm text-white/80">{testDetails.parsed.client}</div>
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="text-[10px] text-white/30 uppercase font-bold mb-1">Montant</div>
+                                                <div className="font-medium text-sm text-white/80">{testDetails.parsed.montant} €</div>
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="text-[10px] text-white/30 uppercase font-bold mb-1">Échéance</div>
+                                                <div className="font-medium text-sm text-white/80">{testDetails.parsed.date_echeance}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Onboarding Client Express */}
+                                {agent.id === 'onboarding-client' && testDetails.response && (
+                                    <div className="bg-white/5 rounded-lg p-4">
+                                        <div className="text-[10px] text-[var(--color-success)] uppercase font-bold mb-2 flex items-center gap-1.5">
+                                            <CheckCircle2 className="w-3 h-3" /> Email généré
+                                        </div>
+                                        <p className="text-sm text-white/70 italic leading-relaxed">
+                                            "{testDetails.response}"
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* LinkedIn Digest */}
+                                {agent.id === 'linkedin-digest' && testDetails.post && (
+                                    <div className="bg-white/5 rounded-lg p-4">
+                                        <div className="text-[10px] text-[var(--color-indigo)] uppercase font-bold mb-2 flex items-center gap-1.5">
+                                            Post généré
+                                        </div>
+                                        <p className="text-sm text-white/80 leading-relaxed whitespace-pre-wrap mb-4">
+                                            {testDetails.post}
+                                        </p>
+                                        {testDetails.hashtags && (
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                {testDetails.hashtags.map((tag: string, i: number) => (
+                                                    <span key={i} className="text-xs text-[var(--color-indigo)] bg-[var(--color-indigo-bg)] px-2 py-0.5 rounded-full">
+                                                        {tag.startsWith('#') ? tag : `#${tag}`}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {testDetails.comments && testDetails.comments.length > 0 && (
+                                            <div className="border-t border-white/5 pt-3">
+                                                <div className="text-[10px] text-white/30 uppercase font-bold mb-2">Commentaires suggérés</div>
+                                                <ul className="space-y-2">
+                                                    {testDetails.comments.map((comment: string, i: number) => (
+                                                        <li key={i} className="text-xs text-white/50 italic flex items-start gap-2">
+                                                            <span className="text-white/20 mt-0.5">💬</span> {comment}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Qualification Leads */}
+                                {agent.id === 'qualification' && testDetails.hot !== undefined && (
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <div className="bg-white/5 rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                                            <div className="text-2xl font-bold text-white/80 mb-1">{testDetails.total}</div>
+                                            <div className="text-[10px] text-white/30 uppercase font-bold">Total leads</div>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                                            <div className="text-2xl font-bold text-[var(--color-warning)] mb-1">{testDetails.warm}</div>
+                                            <div className="text-[10px] text-[var(--color-warning)] uppercase font-bold">À recontacter</div>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg p-4 flex flex-col items-center justify-center text-center shadow-[0_0_15px_rgba(34,197,94,0.15)]">
+                                            <div className="text-2xl font-bold text-[var(--color-success)] mb-1">{testDetails.hot}</div>
+                                            <div className="text-[10px] text-[var(--color-success)] uppercase font-bold flex items-center justify-center gap-1">
+                                                <Zap className="w-3 h-3" /> Chauds !
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* ── Dernières actions ──────────────────────── */}
             <motion.div variants={item}
