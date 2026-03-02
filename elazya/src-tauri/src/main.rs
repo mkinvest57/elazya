@@ -8,11 +8,17 @@ use sqlx::Row;
 
 mod openclaw;
 mod openclaw_monitor;
+mod openclaw_client;
+mod agent_base;
 mod agent_facturation;
+mod agents;
+mod agent_engine;
 
 use openclaw::ManagedOpenClaw;
 use openclaw_monitor::{get_connected_channels, get_installed_skills, watch_token_usage, TokenUsage, ChannelInfo};
 use agent_facturation::FacturationWatcher;
+use openclaw_client::OpenClawAgentClient;
+use agent_engine::AgentEngine;
 
 // Application State
 struct AppState {
@@ -20,6 +26,7 @@ struct AppState {
     openclaw: Arc<ManagedOpenClaw>,
     openclaw_dir: String,
     facturation_watcher: Arc<FacturationWatcher>,
+    engine: Arc<AgentEngine>,
 }
 
 #[tauri::command]
@@ -431,7 +438,7 @@ async fn toggle_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_i
             agent_facturation::start_watcher(
                 app.clone(),
                 state.db.clone(),
-                state.openclaw.bridge.clone(),
+                state.engine.client().clone(),
                 state.facturation_watcher.clone(),
                 watch_dir,
                 client_dir,
@@ -499,134 +506,24 @@ async fn get_active_agent_count(state: State<'_, AppState>) -> Result<i32, Strin
 
 #[tauri::command]
 async fn run_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_id: String) -> Result<AgentLogEntry, String> {
-    // ── Facturation Auto: real execution via OpenClaw ────────
-    if agent_id == "facturation" {
-        let settings = get_agent_settings(&state.db, "facturation").await;
-        let watch_dir = settings.get("watch_dir")
-            .and_then(|v| v.as_str())
-            .unwrap_or("~/Documents/Factures")
-            .to_string();
-        let client_dir = settings.get("client_dir")
-            .and_then(|v| v.as_str())
-            .unwrap_or("~/Clients")
-            .to_string();
+    // All agents go through the engine now
+    let result = state.engine.test_agent(&app, &state.db, &agent_id).await?;
 
-        let summary = agent_facturation::run_test(
-            &app,
-            &state.db,
-            &state.openclaw.bridge,
-            &watch_dir,
-            &client_dir,
-        ).await?;
-
-        // Read back the last inserted log
-        let row = sqlx::query("SELECT id, agent_id, timestamp, status, summary, details FROM agent_log WHERE agent_id = 'facturation' ORDER BY id DESC LIMIT 1")
-            .fetch_one(&state.db)
-            .await
-            .map_err(|e| e.to_string())?;
-
-        return Ok(AgentLogEntry {
-            id: row.get("id"),
-            agent_id: row.get("agent_id"),
-            timestamp: row.get("timestamp"),
-            status: row.get("status"),
-            summary: row.get("summary"),
-            details: row.get("details"),
-        });
-    }
-
-    // ── Other agents: simulated (for now) ────────────────────
-    let config_row = sqlx::query("SELECT settings FROM agent_config WHERE agent_id = ?")
+    // Read back the last inserted log
+    let row = sqlx::query("SELECT id, agent_id, timestamp, status, summary, details FROM agent_log WHERE agent_id = ? ORDER BY id DESC LIMIT 1")
         .bind(&agent_id)
-        .fetch_optional(&state.db)
-        .await
-        .map_err(|e| e.to_string())?;
-
-    let _settings = match config_row {
-        Some(r) => r.get::<String, _>("settings"),
-        None => "{}".to_string(),
-    };
-
-    let (status, summary) = match agent_id.as_str() {
-        "onboarding-client" => {
-            let prospects = ["Martin", "Legrand", "Petit", "Robert", "Bernard"];
-            let prospect = prospects[rand_index(prospects.len())];
-            ("success", format!("Réponse prospect {} envoyée en 4 min", prospect))
-        }
-        "linkedin-digest" => {
-            let posts = rand_index(3) + 1;
-            let comments = rand_index(5) + 1;
-            ("success", format!("{} post(s) + {} commentaire(s) générés", posts, comments))
-        }
-        "qualification" => {
-            let leads = rand_index(15) + 3;
-            let hot = rand_index(leads.min(5)) + 1;
-            ("success", format!("{} leads triés · {} qualifiés chauds", leads, hot))
-        }
-        "routine-matinale" => {
-            ("success", "Briefing quotidien généré et envoyé".to_string())
-        }
-        "crm-prospect" => {
-            let count = rand_index(5) + 1;
-            ("success", format!("Relance automatique envoyée à {} prospects", count))
-        }
-        "devis-express" => {
-            let num = rand_index(100) + 2024000;
-            ("success", format!("Devis #{} généré", num))
-        }
-        "email-intelligent" => {
-            let sorted = rand_index(30) + 10;
-            let replies = rand_index(8) + 2;
-            ("success", format!("{} emails triés · {} réponses suggérées", sorted, replies))
-        }
-        "compta-export" => {
-            ("success", "Export comptable mensuel généré".to_string())
-        }
-        "content-linkedin" => {
-            let variations = rand_index(5) + 3;
-            ("success", format!("{} variations de posts générées", variations))
-        }
-        _ => ("success", "Action exécutée".to_string()),
-    };
-
-    let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-
-    sqlx::query("INSERT INTO agent_log (agent_id, timestamp, status, summary, details) VALUES (?, ?, ?, ?, '{}')")
-        .bind(&agent_id)
-        .bind(&now)
-        .bind(status)
-        .bind(&summary)
-        .execute(&state.db)
-        .await
-        .map_err(|e| e.to_string())?;
-
-    let row = sqlx::query("SELECT last_insert_rowid() as id")
         .fetch_one(&state.db)
         .await
         .map_err(|e| e.to_string())?;
-    let id: i64 = row.get("id");
 
-    let entry = AgentLogEntry {
-        id,
-        agent_id: agent_id.clone(),
-        timestamp: now,
-        status: status.to_string(),
-        summary: summary.clone(),
-        details: "{}".to_string(),
-    };
-
-    let _ = app.emit("agent-action", serde_json::json!({
-        "type": "run",
-        "agentId": agent_id,
-        "log": {
-            "id": entry.id,
-            "timestamp": entry.timestamp,
-            "status": entry.status,
-            "summary": entry.summary,
-        }
-    }));
-
-    Ok(entry)
+    Ok(AgentLogEntry {
+        id: row.get("id"),
+        agent_id: row.get("agent_id"),
+        timestamp: row.get("timestamp"),
+        status: row.get("status"),
+        summary: row.get("summary"),
+        details: row.get("details"),
+    })
 }
 
 /// Helper to read agent settings JSON from config DB
@@ -809,12 +706,17 @@ fn main() {
              let openclaw_dir_clone = openclaw_dir.clone();
              watch_token_usage(app_handle_clone_for_watch, openclaw_dir_clone);
 
-            // 3. Manage State
+            // 3. Create agent engine with shared OpenClaw client
+            let oc_client = Arc::new(OpenClawAgentClient::new(openclaw.bridge.clone()));
+            let engine = Arc::new(AgentEngine::new(oc_client));
+
+            // 4. Manage State
             app.manage(AppState { 
                 db: pool, 
                 openclaw: Arc::new(openclaw),
                 openclaw_dir,
                 facturation_watcher: FacturationWatcher::new(),
+                engine,
             });
 
             // Deep link handler: listen for elazya:// URLs
