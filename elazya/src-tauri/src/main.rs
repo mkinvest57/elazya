@@ -8,15 +8,18 @@ use sqlx::Row;
 
 mod openclaw;
 mod openclaw_monitor;
+mod agent_facturation;
 
 use openclaw::ManagedOpenClaw;
 use openclaw_monitor::{get_connected_channels, get_installed_skills, watch_token_usage, TokenUsage, ChannelInfo};
+use agent_facturation::FacturationWatcher;
 
 // Application State
 struct AppState {
     db: SqlitePool,
     openclaw: Arc<ManagedOpenClaw>,
     openclaw_dir: String,
+    facturation_watcher: Arc<FacturationWatcher>,
 }
 
 #[tauri::command]
@@ -411,6 +414,33 @@ async fn toggle_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_i
         .await
         .map_err(|e| e.to_string())?;
 
+    // ── Facturation Auto: start/stop watcher ────────────────
+    if agent_id == "facturation" {
+        if enabled {
+            // Read config to get watch_dir and client_dir
+            let settings = get_agent_settings(&state.db, "facturation").await;
+            let watch_dir = settings.get("watch_dir")
+                .and_then(|v| v.as_str())
+                .unwrap_or("~/Documents/Factures")
+                .to_string();
+            let client_dir = settings.get("client_dir")
+                .and_then(|v| v.as_str())
+                .unwrap_or("~/Clients")
+                .to_string();
+
+            agent_facturation::start_watcher(
+                app.clone(),
+                state.db.clone(),
+                state.openclaw.bridge.clone(),
+                state.facturation_watcher.clone(),
+                watch_dir,
+                client_dir,
+            );
+        } else {
+            agent_facturation::stop_watcher(&state.facturation_watcher).await;
+        }
+    }
+
     // Emit event so UI updates in real time
     let _ = app.emit("agent-action", serde_json::json!({
         "type": "toggle",
@@ -469,7 +499,43 @@ async fn get_active_agent_count(state: State<'_, AppState>) -> Result<i32, Strin
 
 #[tauri::command]
 async fn run_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_id: String) -> Result<AgentLogEntry, String> {
-    // Check agent is configured
+    // ── Facturation Auto: real execution via OpenClaw ────────
+    if agent_id == "facturation" {
+        let settings = get_agent_settings(&state.db, "facturation").await;
+        let watch_dir = settings.get("watch_dir")
+            .and_then(|v| v.as_str())
+            .unwrap_or("~/Documents/Factures")
+            .to_string();
+        let client_dir = settings.get("client_dir")
+            .and_then(|v| v.as_str())
+            .unwrap_or("~/Clients")
+            .to_string();
+
+        let summary = agent_facturation::run_test(
+            &app,
+            &state.db,
+            &state.openclaw.bridge,
+            &watch_dir,
+            &client_dir,
+        ).await?;
+
+        // Read back the last inserted log
+        let row = sqlx::query("SELECT id, agent_id, timestamp, status, summary, details FROM agent_log WHERE agent_id = 'facturation' ORDER BY id DESC LIMIT 1")
+            .fetch_one(&state.db)
+            .await
+            .map_err(|e| e.to_string())?;
+
+        return Ok(AgentLogEntry {
+            id: row.get("id"),
+            agent_id: row.get("agent_id"),
+            timestamp: row.get("timestamp"),
+            status: row.get("status"),
+            summary: row.get("summary"),
+            details: row.get("details"),
+        });
+    }
+
+    // ── Other agents: simulated (for now) ────────────────────
     let config_row = sqlx::query("SELECT settings FROM agent_config WHERE agent_id = ?")
         .bind(&agent_id)
         .fetch_optional(&state.db)
@@ -481,13 +547,7 @@ async fn run_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_id: 
         None => "{}".to_string(),
     };
 
-    // Generate a realistic simulated action based on agent_id
     let (status, summary) = match agent_id.as_str() {
-        "facturation" => {
-            let clients = ["Dupont", "Martin", "Legrand", "Durand", "Morel"];
-            let client = clients[rand_index(clients.len())];
-            ("success", format!("Facture Client {} classée et archivée", client))
-        }
         "onboarding-client" => {
             let prospects = ["Martin", "Legrand", "Petit", "Robert", "Bernard"];
             let prospect = prospects[rand_index(prospects.len())];
@@ -540,7 +600,6 @@ async fn run_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_id: 
         .await
         .map_err(|e| e.to_string())?;
 
-    // Get the inserted row id
     let row = sqlx::query("SELECT last_insert_rowid() as id")
         .fetch_one(&state.db)
         .await
@@ -556,7 +615,6 @@ async fn run_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_id: 
         details: "{}".to_string(),
     };
 
-    // Emit event for real-time UI updates
     let _ = app.emit("agent-action", serde_json::json!({
         "type": "run",
         "agentId": agent_id,
@@ -569,6 +627,24 @@ async fn run_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_id: 
     }));
 
     Ok(entry)
+}
+
+/// Helper to read agent settings JSON from config DB
+async fn get_agent_settings(db: &SqlitePool, agent_id: &str) -> serde_json::Value {
+    let row = sqlx::query("SELECT settings FROM agent_config WHERE agent_id = ?")
+        .bind(agent_id)
+        .fetch_optional(db)
+        .await
+        .ok()
+        .flatten();
+
+    match row {
+        Some(r) => {
+            let s: String = r.get("settings");
+            serde_json::from_str(&s).unwrap_or(serde_json::json!({}))
+        }
+        None => serde_json::json!({}),
+    }
 }
 
 /// Simple pseudo-random index for varied simulated outputs.
@@ -737,7 +813,8 @@ fn main() {
             app.manage(AppState { 
                 db: pool, 
                 openclaw: Arc::new(openclaw),
-                openclaw_dir
+                openclaw_dir,
+                facturation_watcher: FacturationWatcher::new(),
             });
 
             // Deep link handler: listen for elazya:// URLs
