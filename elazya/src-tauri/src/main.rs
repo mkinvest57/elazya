@@ -4,6 +4,7 @@ use std::fs;
 use tauri::{Emitter, Listener, Manager, State};
 use std::sync::Arc;
 use serde_json::Value;
+use sqlx::Row;
 
 mod openclaw;
 mod openclaw_monitor;
@@ -351,6 +352,235 @@ async fn is_bridge_connected(state: State<'_, AppState>) -> Result<bool, String>
     Ok(state.openclaw.bridge.is_connected())
 }
 
+// ─── Agent Engine Commands ──────────────────────────────────────────────
+
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
+struct AgentConfig {
+    agent_id: String,
+    enabled: bool,
+    settings: String, // JSON string
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
+struct AgentLogEntry {
+    id: i64,
+    agent_id: String,
+    timestamp: String,
+    status: String,
+    summary: String,
+    details: String,
+}
+
+#[tauri::command]
+async fn get_agent_config(state: State<'_, AppState>, agent_id: String) -> Result<Option<AgentConfig>, String> {
+    let row = sqlx::query("SELECT agent_id, enabled, settings FROM agent_config WHERE agent_id = ?")
+        .bind(&agent_id)
+        .fetch_optional(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    match row {
+        Some(r) => Ok(Some(AgentConfig {
+            agent_id: r.get("agent_id"),
+            enabled: r.get::<i32, _>("enabled") != 0,
+            settings: r.get("settings"),
+        })),
+        None => Ok(None),
+    }
+}
+
+#[tauri::command]
+async fn save_agent_config(state: State<'_, AppState>, agent_id: String, enabled: bool, settings: String) -> Result<(), String> {
+    sqlx::query("INSERT OR REPLACE INTO agent_config (agent_id, enabled, settings) VALUES (?, ?, ?)")
+        .bind(&agent_id)
+        .bind(enabled as i32)
+        .bind(&settings)
+        .execute(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn toggle_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_id: String, enabled: bool) -> Result<(), String> {
+    // Upsert the enabled state
+    sqlx::query("INSERT INTO agent_config (agent_id, enabled, settings) VALUES (?, ?, '{}') ON CONFLICT(agent_id) DO UPDATE SET enabled = excluded.enabled")
+        .bind(&agent_id)
+        .bind(enabled as i32)
+        .execute(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    // Emit event so UI updates in real time
+    let _ = app.emit("agent-action", serde_json::json!({
+        "type": "toggle",
+        "agentId": agent_id,
+        "enabled": enabled,
+    }));
+
+    Ok(())
+}
+
+#[tauri::command]
+async fn get_agent_logs(state: State<'_, AppState>, agent_id: String, limit: i32) -> Result<Vec<AgentLogEntry>, String> {
+    let rows = sqlx::query("SELECT id, agent_id, timestamp, status, summary, details FROM agent_log WHERE agent_id = ? ORDER BY id DESC LIMIT ?")
+        .bind(&agent_id)
+        .bind(limit)
+        .fetch_all(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(rows.iter().map(|r| AgentLogEntry {
+        id: r.get("id"),
+        agent_id: r.get("agent_id"),
+        timestamp: r.get("timestamp"),
+        status: r.get("status"),
+        summary: r.get("summary"),
+        details: r.get("details"),
+    }).collect())
+}
+
+#[tauri::command]
+async fn get_recent_logs(state: State<'_, AppState>, limit: i32) -> Result<Vec<AgentLogEntry>, String> {
+    let rows = sqlx::query("SELECT id, agent_id, timestamp, status, summary, details FROM agent_log ORDER BY id DESC LIMIT ?")
+        .bind(limit)
+        .fetch_all(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(rows.iter().map(|r| AgentLogEntry {
+        id: r.get("id"),
+        agent_id: r.get("agent_id"),
+        timestamp: r.get("timestamp"),
+        status: r.get("status"),
+        summary: r.get("summary"),
+        details: r.get("details"),
+    }).collect())
+}
+
+#[tauri::command]
+async fn get_active_agent_count(state: State<'_, AppState>) -> Result<i32, String> {
+    let row = sqlx::query("SELECT COUNT(*) as cnt FROM agent_config WHERE enabled = 1")
+        .fetch_one(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+    Ok(row.get::<i32, _>("cnt"))
+}
+
+#[tauri::command]
+async fn run_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_id: String) -> Result<AgentLogEntry, String> {
+    // Check agent is configured
+    let config_row = sqlx::query("SELECT settings FROM agent_config WHERE agent_id = ?")
+        .bind(&agent_id)
+        .fetch_optional(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let _settings = match config_row {
+        Some(r) => r.get::<String, _>("settings"),
+        None => "{}".to_string(),
+    };
+
+    // Generate a realistic simulated action based on agent_id
+    let (status, summary) = match agent_id.as_str() {
+        "facturation" => {
+            let clients = ["Dupont", "Martin", "Legrand", "Durand", "Morel"];
+            let client = clients[rand_index(clients.len())];
+            ("success", format!("Facture Client {} classée et archivée", client))
+        }
+        "onboarding-client" => {
+            let prospects = ["Martin", "Legrand", "Petit", "Robert", "Bernard"];
+            let prospect = prospects[rand_index(prospects.len())];
+            ("success", format!("Réponse prospect {} envoyée en 4 min", prospect))
+        }
+        "linkedin-digest" => {
+            let posts = rand_index(3) + 1;
+            let comments = rand_index(5) + 1;
+            ("success", format!("{} post(s) + {} commentaire(s) générés", posts, comments))
+        }
+        "qualification" => {
+            let leads = rand_index(15) + 3;
+            let hot = rand_index(leads.min(5)) + 1;
+            ("success", format!("{} leads triés · {} qualifiés chauds", leads, hot))
+        }
+        "routine-matinale" => {
+            ("success", "Briefing quotidien généré et envoyé".to_string())
+        }
+        "crm-prospect" => {
+            let count = rand_index(5) + 1;
+            ("success", format!("Relance automatique envoyée à {} prospects", count))
+        }
+        "devis-express" => {
+            let num = rand_index(100) + 2024000;
+            ("success", format!("Devis #{} généré", num))
+        }
+        "email-intelligent" => {
+            let sorted = rand_index(30) + 10;
+            let replies = rand_index(8) + 2;
+            ("success", format!("{} emails triés · {} réponses suggérées", sorted, replies))
+        }
+        "compta-export" => {
+            ("success", "Export comptable mensuel généré".to_string())
+        }
+        "content-linkedin" => {
+            let variations = rand_index(5) + 3;
+            ("success", format!("{} variations de posts générées", variations))
+        }
+        _ => ("success", "Action exécutée".to_string()),
+    };
+
+    let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+
+    sqlx::query("INSERT INTO agent_log (agent_id, timestamp, status, summary, details) VALUES (?, ?, ?, ?, '{}')")
+        .bind(&agent_id)
+        .bind(&now)
+        .bind(status)
+        .bind(&summary)
+        .execute(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    // Get the inserted row id
+    let row = sqlx::query("SELECT last_insert_rowid() as id")
+        .fetch_one(&state.db)
+        .await
+        .map_err(|e| e.to_string())?;
+    let id: i64 = row.get("id");
+
+    let entry = AgentLogEntry {
+        id,
+        agent_id: agent_id.clone(),
+        timestamp: now,
+        status: status.to_string(),
+        summary: summary.clone(),
+        details: "{}".to_string(),
+    };
+
+    // Emit event for real-time UI updates
+    let _ = app.emit("agent-action", serde_json::json!({
+        "type": "run",
+        "agentId": agent_id,
+        "log": {
+            "id": entry.id,
+            "timestamp": entry.timestamp,
+            "status": entry.status,
+            "summary": entry.summary,
+        }
+    }));
+
+    Ok(entry)
+}
+
+/// Simple pseudo-random index for varied simulated outputs.
+fn rand_index(max: usize) -> usize {
+    use std::time::SystemTime;
+    let nanos = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap_or_default()
+        .subsec_nanos() as usize;
+    nanos % max
+}
+
 /// Process a deep link URL (standalone function, callable from event listener).
 fn process_deep_link_url(app: &tauri::AppHandle, url: &str) {
     if url.contains("upgrade-success") {
@@ -447,6 +677,15 @@ fn main() {
                     .execute(&pool)
                     .await
                     .map_err(|e| format!("Failed to run migration 2: {}", e))?;
+
+                // Agent engine tables
+                let agent_sql = include_str!("../migrations/202603020001_agents.sql");
+                for stmt in agent_sql.split(';').filter(|s| !s.trim().is_empty()) {
+                    sqlx::query(stmt)
+                        .execute(&pool)
+                        .await
+                        .map_err(|e| format!("Failed to run agent migration: {}", e))?;
+                }
                 
                 Ok::<SqlitePool, String>(pool)
             }) {
@@ -455,11 +694,34 @@ fn main() {
             };
 
             // 2. OpenClaw Setup
-            let openclaw_dir = std::env::var("OPENCLAW_DIR")
-                .unwrap_or_else(|_| "/Users/sashimi/Documents/Elazya_Projects/openclaw-main".to_string());
+            let openclaw_dir = std::env::var("OPENCLAW_DIR").unwrap_or_else(|_| {
+                #[cfg(debug_assertions)]
+                {
+                    "/Users/sashimi/Documents/Elazya_Projects/openclaw-main".to_string()
+                }
+                #[cfg(not(debug_assertions))]
+                {
+                    // Use the bundled engine from Contents/Resources/resources/engine/
+                    let resource_dir = app_handle.path().resource_dir()
+                        .unwrap_or_else(|_| app_dir.join("engine"));
+                    let bundled_engine = resource_dir.join("resources").join("engine");
+                    if bundled_engine.exists() && bundled_engine.join("openclaw.mjs").exists() {
+                        bundled_engine.to_string_lossy().to_string()
+                    } else {
+                        // Fallback to app data dir
+                        let default_dir = app_dir.join("engine");
+                        default_dir.to_string_lossy().to_string()
+                    }
+                }
+            });
             
-            if !std::path::Path::new(&openclaw_dir).exists() {
-                return Err(format!("OpenClaw directory not found at: {}. Please set OPENCLAW_DIR environment variable.", openclaw_dir).into());
+            let engine_path = std::path::Path::new(&openclaw_dir);
+            if !engine_path.exists() {
+                if let Err(e) = std::fs::create_dir_all(engine_path) {
+                    println!("[Warning] Failed to create OpenClaw engine directory: {}", e);
+                } else {
+                    println!("[Info] Created OpenClaw engine directory at: {}", openclaw_dir);
+                }
             }
 
             let app_handle_clone = app_handle.clone();
@@ -534,7 +796,15 @@ fn main() {
             uninstall_skill_cmd,
             reset_app_cmd,
             handle_deep_link,
-            handle_upgrade_success
+            handle_upgrade_success,
+            // Agent engine commands
+            get_agent_config,
+            save_agent_config,
+            toggle_agent,
+            get_agent_logs,
+            get_recent_logs,
+            get_active_agent_count,
+            run_agent
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

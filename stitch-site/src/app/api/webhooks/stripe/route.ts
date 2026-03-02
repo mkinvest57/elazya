@@ -2,6 +2,7 @@ import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { stripe } from "@/lib/stripe"
 import Stripe from "stripe"
+import { prisma } from "@/lib/prisma"
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
@@ -50,14 +51,35 @@ export async function POST(req: Request) {
 
         console.log(`[Webhook] ${isUpgrade ? "Upgrade" : "New"} purchase — plan: ${plan}, email: ${session.customer_email}, key: ${licenseKey}`)
 
-        // For upgrades from the app, the deep link handler takes care of license.
-        // For new purchases, we just log the key (it's generated on /success page too).
-        // In production, you'd save to a database and send an email here.
-
+        // Save new purchase details to the database to ensure the license key is valid
         try {
+            const email = session.customer_email
+
+            // Upsert customer with the generated license key if it doesn't already exist or if upgrading
+            // If they already exist and we aren't upgrading, we still want to ensure they have a key
+            const customer = await prisma.customer.findUnique({ where: { email } })
+
+            // Only generate and save a new key if replacing an old one (upgrade/lost) or no key exists
+            let keyToSave = licenseKey
+            if (customer?.licenseKey && customer.licenseKey.startsWith("ELAZYA-") && !isUpgrade) {
+                keyToSave = customer.licenseKey
+                console.log(`[Webhook] Kept existing key for ${email}: ${keyToSave}`)
+            } else {
+                await prisma.customer.upsert({
+                    where: { email },
+                    update: { licenseKey: keyToSave },
+                    create: {
+                        email,
+                        firstName: session.metadata?.firstName || "",
+                        lastName: session.metadata?.lastName || "",
+                        licenseKey: keyToSave,
+                    }
+                })
+                console.log(`[Webhook] Saved license for ${email}: ${keyToSave}`)
+            }
+
             // Optional: send email (if email service is configured)
-            // await sendWelcomeEmail(session.customer_email, session.metadata?.firstName || "Client", licenseKey)
-            console.log(`License generated for ${session.customer_email}: ${licenseKey}`)
+            // await sendWelcomeEmail(session.customer_email, session.metadata?.firstName || "Client", keyToSave)
         } catch (error) {
             console.error("Error processing webhook:", error)
             return new NextResponse("Internal Server Error", { status: 500 })

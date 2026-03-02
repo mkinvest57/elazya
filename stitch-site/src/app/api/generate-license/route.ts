@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { stripe } from "@/lib/stripe"
+import { prisma } from "@/lib/prisma"
 
 /**
  * GET /api/generate-license?session={CHECKOUT_SESSION_ID}
@@ -47,18 +48,47 @@ export async function GET(req: Request) {
             )
         }
 
+        const email = session.customer_email
+        if (!email) {
+            return NextResponse.json(
+                { error: "No email associated with session" },
+                { status: 400 }
+            )
+        }
+
         // 3. Extract plan from metadata
         const plan = session.metadata?.plan || "solo"
+        const firstName = session.metadata?.firstName || ""
+        const lastName = session.metadata?.lastName || ""
 
-        // 4. Generate license key
-        const key = generateLicenseKey(plan)
+        // 4. Retrieve or generate license key from database
+        let customer = await prisma.customer.findUnique({
+            where: { email }
+        })
+
+        let key = customer?.licenseKey || ""
+
+        // Ensure the existing key is valid or generate a new one
+        if (!key || !key.startsWith("ELAZYA-")) {
+            key = generateLicenseKey(plan)
+            customer = await prisma.customer.upsert({
+                where: { email },
+                update: { licenseKey: key },
+                create: {
+                    email,
+                    firstName,
+                    lastName,
+                    licenseKey: key,
+                }
+            })
+        }
 
         // 5. Return key + plan info
         return NextResponse.json({
             key,
             plan,
-            email: session.customer_email,
-            name: `${session.metadata?.firstName || ""} ${session.metadata?.lastName || ""}`.trim(),
+            email,
+            name: `${firstName} ${lastName}`.trim(),
         })
 
     } catch (err: any) {

@@ -61,10 +61,37 @@ export function validateKeyFormat(key: string): ElazyaPlan {
 
 /**
  * Activate a license key.
- * Validates format, extracts plan, generates machine ID, and saves.
+ * Validates format, extracts plan, verifies with server, generates machine ID, and saves.
  */
 export async function activateLicense(key: string): Promise<LicenseData> {
     const plan = validateKeyFormat(key);
+
+    // Verify with server
+    try {
+        const response = await fetch('https://elazya.com/license-api/validate-license.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key }),
+        });
+
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.error || 'Clé de licence invalide ou expirée.');
+        }
+
+        const data = await response.json();
+        if (!data.valid) {
+            throw new Error(data.error || 'Clé de licence invalide ou expirée.');
+        }
+    } catch (err: any) {
+        if (err.message === 'Failed to fetch') {
+            throw new Error('Impossible de contacter le serveur de validation. Vérifiez votre connexion internet.');
+        }
+        throw err;
+    }
+
     const machineId = await getOrCreateMachineId();
 
     const license: LicenseData = {

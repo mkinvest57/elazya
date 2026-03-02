@@ -344,18 +344,29 @@ pub struct ManagedOpenClaw {
 
 impl ManagedOpenClaw {
     fn spawn_gateway(openclaw_dir: &str) -> Result<tokio::process::Child, String> {
-        let node_path = find_node_executable();
         let state_dir = std::path::Path::new(openclaw_dir).join("elazya-engine-state");
         
+        // Prefer bundled node in the engine dir, fallback to system node
+        let bundled_node = std::path::Path::new(openclaw_dir).join("node");
+        let node_path = if bundled_node.exists() {
+            bundled_node.to_string_lossy().to_string()
+        } else {
+            find_node_executable()
+        };
+        
         let mut spawn_cmd = if std::path::Path::new(openclaw_dir).join("openclaw.mjs").exists() {
-            let mut c = Command::new(node_path);
+            let mut c = Command::new(&node_path);
             c.arg("openclaw.mjs");
             c
         } else if let Ok(path) = which::which("openclaw") {
             Command::new(path.to_string_lossy().to_string())
         } else {
-            // Fallback to npx
-            let mut c = Command::new("npx");
+            // Fallback to npx using the npm path as a base
+            let npm_path = find_npm_executable();
+            let npx_path = npm_path.replace("npm", "npx");
+            let executable = if std::path::Path::new(&npx_path).exists() { npx_path } else { "npx".to_string() };
+            
+            let mut c = Command::new(executable);
             c.arg("-y").arg("openclaw@latest");
             c
         };
@@ -374,6 +385,7 @@ impl ManagedOpenClaw {
             .env("OPENCLAW_STATE_DIR", state_dir.to_string_lossy().to_string())
             .env("OPENCLAW_CONFIG_PATH", state_dir.join("openclaw.json").to_string_lossy().to_string())
             .env("OPENCLAW_LOG_DIR", state_dir.join("logs").to_string_lossy().to_string())
+            .env("DYLD_LIBRARY_PATH", openclaw_dir)
             .arg("--config")
             .arg(state_dir.join("openclaw.json").to_string_lossy().to_string())
             .current_dir(openclaw_dir)

@@ -24,18 +24,13 @@ export function Hero() {
                         <h1 className="text-4xl sm:text-5xl md:text-[5.5rem] lg:text-[6.5rem] font-semibold tracking-tight mb-6 text-slate-800 leading-[1.1]">
                             L'assistant IA
                             <span className="inline-flex items-center mx-3 md:mx-4 align-middle translate-y-[-4px]">
-                                <button 
+                                <button
                                     onClick={() => setIsToggled(!isToggled)}
-                                    className="relative flex items-center w-16 h-8 sm:w-20 sm:h-10 md:w-28 md:h-14 rounded-full p-1.5 transition-colors duration-300 toggle-track-gradient shadow-inner"
+                                    className={`relative flex items-center w-16 h-8 sm:w-20 sm:h-10 md:w-28 md:h-14 rounded-full p-1.5 transition-colors duration-300 toggle-track-gradient shadow-inner ${isToggled ? 'bg-primary' : 'bg-slate-300'}`}
                                     aria-label="Toggle capability"
                                 >
-                                    <motion.div 
-                                        layout
-                                        initial={false}
-                                        animate={{ x: isToggled ? '100%' : '0%' }}
-                                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                        className="w-6 h-6 sm:w-8 sm:h-8 md:w-11 md:h-11 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.2)]"
-                                        style={{ marginLeft: isToggled ? '8px' : '4px' }}
+                                    <div
+                                        className={`w-5 h-5 sm:w-7 sm:h-7 md:w-11 md:h-11 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.2)] transform transition-transform duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] ${isToggled ? 'translate-x-[calc(100%+0.5rem)] sm:translate-x-[calc(100%+0.75rem)] md:translate-x-[calc(100%+1.25rem)]' : 'translate-x-0'}`}
                                     />
                                 </button>
                             </span>

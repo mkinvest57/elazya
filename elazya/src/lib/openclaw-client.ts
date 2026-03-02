@@ -230,4 +230,50 @@ export class OpenClawClient {
     static async resetApp(): Promise<void> {
         return invoke('reset_app_cmd');
     }
+
+    // ─── Agent Engine ────────────────────────────────────────
+
+    static async getAgentConfig(agentId: string): Promise<{ agent_id: string; enabled: boolean; settings: string } | null> {
+        try {
+            return await invoke('get_agent_config', { agentId });
+        } catch {
+            return null;
+        }
+    }
+
+    static async saveAgentConfig(agentId: string, enabled: boolean, settings: string): Promise<void> {
+        return invoke('save_agent_config', { agentId, enabled, settings });
+    }
+
+    static async toggleAgent(agentId: string, enabled: boolean): Promise<void> {
+        return invoke('toggle_agent', { agentId, enabled });
+    }
+
+    static async runAgent(agentId: string): Promise<any> {
+        return invoke('run_agent', { agentId });
+    }
+
+    static async getAgentLogs(agentId: string, limit: number = 10): Promise<any[]> {
+        try {
+            return await invoke('get_agent_logs', { agentId, limit });
+        } catch {
+            return [];
+        }
+    }
+
+    static async getRecentLogs(limit: number = 20): Promise<any[]> {
+        try {
+            return await invoke('get_recent_logs', { limit });
+        } catch {
+            return [];
+        }
+    }
+
+    static async getActiveAgentCount(): Promise<number> {
+        try {
+            return await invoke<number>('get_active_agent_count');
+        } catch {
+            return 0;
+        }
+    }
 }
