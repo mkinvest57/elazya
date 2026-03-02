@@ -1,51 +1,111 @@
 /**
- * Elazya 3-Step Onboarding Wizard
- * Step 1: License Activation
- * Step 2: LLM Connection
- * Step 3: First Agent
+ * Elazya 5-Step Onboarding Wizard
+ * 0: Welcome
+ * 1: License Activation
+ * 2: LLM Connection
+ * 3: Folders Setup
+ * 4: Quick Win (activate agents)
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Key, Zap, Bot, Check, ArrowRight, AlertCircle, Copy,
-    ChevronDown, Loader2, ExternalLink, Sparkles
+    Key, Zap, Check, AlertCircle, Loader2, ExternalLink, Sparkles,
+    ChevronDown, FolderOpen, Rocket, Shield, ArrowRight
 } from 'lucide-react';
-import { activateLicense, validateKeyFormat, type ElazyaPlan, type LicenseData } from '@/lib/license';
-import { getAvailableAgents, getLimitsForPlan, type AgentDef } from '@/lib/plan-limits';
+import { activateLicense, type ElazyaPlan, type LicenseData } from '@/lib/license';
 import { OpenClawClient } from '@/lib/openclaw-client';
+import { invoke } from '@tauri-apps/api/core';
 
 interface OnboardingProps {
     onComplete: () => void;
 }
 
-// ----- Step Indicator -----
-function StepIndicator({ current, total }: { current: number; total: number }) {
+const TOTAL_STEPS = 5;
+
+// ─── Shared Animations ─────────────────────────────────────
+const slideIn = {
+    initial: { opacity: 0, x: 40 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -40 },
+    transition: { duration: 0.3 },
+};
+
+// ─── Step Indicator ─────────────────────────────────────────
+function StepIndicator({ current }: { current: number }) {
+    const dots = TOTAL_STEPS;
     return (
-        <div className="flex items-center gap-3 mb-8">
-            {Array.from({ length: total }).map((_, i) => (
-                <div key={i} className="flex items-center gap-3">
-                    <div className={`
-                        w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500
-                        ${i < current
-                            ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]'
-                            : i === current
-                                ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] animate-pulse-glow'
-                                : 'bg-white/5 text-white/30 border border-white/10'
-                        }
-                    `}>
-                        {i < current ? <Check className="w-4 h-4" /> : i + 1}
-                    </div>
-                    {i < total - 1 && (
-                        <div className={`w-16 h-0.5 transition-colors duration-500 ${i < current ? 'bg-green-500/50' : 'bg-white/10'}`} />
-                    )}
-                </div>
+        <div className="flex items-center gap-2 justify-center mb-8">
+            {Array.from({ length: dots }).map((_, i) => (
+                <div
+                    key={i}
+                    className={`
+                        h-1.5 rounded-full transition-all duration-500
+                        ${i < current ? 'w-6 bg-green-500' : i === current ? 'w-8 bg-indigo-500' : 'w-4 bg-white/10'}
+                    `}
+                />
             ))}
         </div>
     );
 }
 
-// ----- Step 1: License -----
+// ═══════════════════════════════════════════════════════════════
+// Step 0 — Welcome
+// ═══════════════════════════════════════════════════════════════
+function WelcomeStep({ onNext }: { onNext: () => void }) {
+    return (
+        <motion.div {...slideIn} className="text-center space-y-8">
+            <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto shadow-[0_0_40px_rgba(99,102,241,0.3)]"
+            >
+                <Sparkles className="w-10 h-10 text-white" />
+            </motion.div>
+
+            <div>
+                <h2 className="text-3xl font-bold text-white mb-3">
+                    Bienvenue dans Elazya
+                </h2>
+                <p className="text-white/50 text-sm leading-relaxed max-w-sm mx-auto">
+                    On va connecter 2-3 choses pour que vos agents puissent travailler.
+                    <br />Ça prend 2 minutes.
+                </p>
+            </div>
+
+            <div className="flex gap-4 justify-center text-xs text-white/30">
+                <div className="flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5" />
+                    100% local
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <Key className="w-3.5 h-3.5" />
+                    Licence
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5" />
+                    IA
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <FolderOpen className="w-3.5 h-3.5" />
+                    Dossiers
+                </div>
+            </div>
+
+            <button
+                onClick={onNext}
+                className="w-full py-4 rounded-xl font-bold text-sm bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] flex items-center justify-center gap-2 transition-all"
+            >
+                Commencer <ArrowRight className="w-4 h-4" />
+            </button>
+        </motion.div>
+    );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Step 1 — License
+// ═══════════════════════════════════════════════════════════════
 function LicenseStep({ onNext }: { onNext: (license: LicenseData) => void }) {
     const [key, setKey] = useState('');
     const [error, setError] = useState('');
@@ -55,11 +115,10 @@ function LicenseStep({ onNext }: { onNext: (license: LicenseData) => void }) {
     const handleActivate = async () => {
         setError('');
         setLoading(true);
-
         try {
             const license = await activateLicense(key);
             setSuccess(true);
-            setTimeout(() => onNext(license), 1200);
+            setTimeout(() => onNext(license), 1000);
         } catch (err: any) {
             setError(err.message || 'Erreur d\'activation');
         } finally {
@@ -67,18 +126,11 @@ function LicenseStep({ onNext }: { onNext: (license: LicenseData) => void }) {
         }
     };
 
-    const isValid = key.trim().length > 0;
-
     return (
-        <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            className="space-y-6"
-        >
+        <motion.div {...slideIn} className="space-y-6">
             <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Bienvenue dans Elazya</h2>
-                <p className="text-white/50 text-sm">Entrez votre clé de licence pour activer votre plan.</p>
+                <h2 className="text-2xl font-bold text-white mb-2">Votre licence</h2>
+                <p className="text-white/50 text-sm">Entrez votre clé pour activer votre plan.</p>
             </div>
 
             <div className="space-y-3">
@@ -99,22 +151,16 @@ function LicenseStep({ onNext }: { onNext: (license: LicenseData) => void }) {
                 />
 
                 {error && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-2 text-red-400 text-sm"
-                    >
+                    <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+                        className="flex items-center gap-2 text-red-400 text-sm">
                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
                         {error}
                     </motion.div>
                 )}
 
                 {success && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex items-center gap-2 text-green-400 text-sm"
-                    >
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-2 text-green-400 text-sm">
                         <Check className="w-4 h-4" />
                         Licence activée !
                     </motion.div>
@@ -123,45 +169,41 @@ function LicenseStep({ onNext }: { onNext: (license: LicenseData) => void }) {
 
             <button
                 onClick={handleActivate}
-                disabled={!isValid || loading || success}
+                disabled={!key.trim() || loading || success}
                 className={`
                     w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all
-                    ${isValid && !loading && !success
+                    ${key.trim() && !loading && !success
                         ? 'bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)]'
                         : 'bg-white/5 text-white/30 cursor-not-allowed'}
                 `}
             >
                 {loading ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Activation...</>
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Vérification...</>
                 ) : success ? (
                     <><Check className="w-4 h-4" /> Activé !</>
                 ) : (
-                    <><Key className="w-4 h-4" /> Activer</>
+                    <><Key className="w-4 h-4" /> Vérifier</>
                 )}
             </button>
 
             <div className="text-center">
-                <a
-                    href="https://elazya.com/pricing"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-indigo-400/60 hover:text-indigo-400 text-xs flex items-center justify-center gap-1 transition-colors"
-                >
-                    Pas de clé ? Acheter une licence
-                    <ExternalLink className="w-3 h-3" />
+                <a href="https://elazya.com/pricing" target="_blank" rel="noopener noreferrer"
+                    className="text-indigo-400/60 hover:text-indigo-400 text-xs flex items-center justify-center gap-1 transition-colors">
+                    Pas de clé ? Acheter une licence <ExternalLink className="w-3 h-3" />
                 </a>
             </div>
         </motion.div>
     );
 }
 
-// ----- Step 2: LLM Connection -----
-
+// ═══════════════════════════════════════════════════════════════
+// Step 2 — LLM Connection
+// ═══════════════════════════════════════════════════════════════
 const LLM_PROVIDERS = [
-    { id: 'anthropic', name: 'Anthropic', model: 'claude-sonnet-4-20250514', placeholder: 'sk-ant-api03-...' },
-    { id: 'openai', name: 'OpenAI', model: 'gpt-4o', placeholder: 'sk-...' },
-    { id: 'google', name: 'Google', model: 'gemini-2.5-flash', placeholder: 'AIza...' },
-    { id: 'groq', name: 'Groq', model: 'llama-3.3-70b-versatile', placeholder: 'gsk_...' },
+    { id: 'anthropic', name: 'Anthropic (Claude)', model: 'claude-sonnet-4-20250514', placeholder: 'sk-ant-api03-...' },
+    { id: 'openai', name: 'OpenAI (GPT-4o)', model: 'gpt-4o', placeholder: 'sk-...' },
+    { id: 'google', name: 'Google (Gemini)', model: 'gemini-2.5-flash', placeholder: 'AIza...' },
+    { id: 'groq', name: 'Groq (Llama 3)', model: 'llama-3.3-70b-versatile', placeholder: 'gsk_...' },
 ];
 
 function LLMStep({ onNext }: { onNext: () => void }) {
@@ -174,35 +216,26 @@ function LLMStep({ onNext }: { onNext: () => void }) {
     const handleTest = async () => {
         setStatus('testing');
         setErrorMsg('');
-
         try {
-            // Configure LLM via OpenClaw
             await OpenClawClient.configureLLM(provider.id, apiKey, provider.model);
-
-            // Quick health check to verify it works
             const health = await OpenClawClient.healthCheck();
             if (health.ok) {
                 setStatus('success');
-                setTimeout(() => onNext(), 1200);
+                setTimeout(() => onNext(), 1000);
             } else {
                 throw new Error(health.detail || 'La connexion a échoué');
             }
         } catch (err: any) {
             setStatus('error');
-            setErrorMsg(err.message || `Vérifiez votre clé API sur le site de ${provider.name}`);
+            setErrorMsg(err.message || `Vérifiez votre clé API ${provider.name}`);
         }
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            className="space-y-6"
-        >
+        <motion.div {...slideIn} className="space-y-6">
             <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Connectez votre IA</h2>
-                <p className="text-white/50 text-sm">Elazya utilise votre propre clé API. Vos données restent privées.</p>
+                <h2 className="text-2xl font-bold text-white mb-2">Fournisseur IA</h2>
+                <p className="text-white/50 text-sm">Vos données restent 100% privées via votre propre clé API.</p>
             </div>
 
             {/* Provider picker */}
@@ -254,18 +287,14 @@ function LLMStep({ onNext }: { onNext: () => void }) {
                 />
             </div>
 
-            {/* Status messages */}
             {errorMsg && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 text-red-400 text-sm">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    {errorMsg}
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" /> {errorMsg}
                 </motion.div>
             )}
-
             {status === 'success' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 text-green-400 text-sm">
-                    <Check className="w-4 h-4" />
-                    Connexion réussie ! ({provider.model})
+                    <Check className="w-4 h-4" /> Connexion réussie !
                 </motion.div>
             )}
 
@@ -291,195 +320,312 @@ function LLMStep({ onNext }: { onNext: () => void }) {
     );
 }
 
-// ----- Step 3: First Agent -----
-function AgentStep({ plan, onNext }: { plan: ElazyaPlan; onNext: () => void }) {
-    const agents = getAvailableAgents(plan).slice(0, 5); // Show first 5 for selection
-    const [selected, setSelected] = useState<string | null>(null);
-    const [installing, setInstalling] = useState(false);
-    const [installed, setInstalled] = useState(false);
+// ═══════════════════════════════════════════════════════════════
+// Step 3 — Folders Setup
+// ═══════════════════════════════════════════════════════════════
+function FoldersStep({ onNext }: { onNext: () => void }) {
+    const [invoiceDir, setInvoiceDir] = useState('~/Documents/Factures');
+    const [clientDir, setClientDir] = useState('~/Clients');
+    const [status, setStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
+    const [errorMsg, setErrorMsg] = useState('');
 
-    const handleInstall = async () => {
-        if (!selected) return;
-        setInstalling(true);
+    const handleTest = async () => {
+        setStatus('testing');
+        setErrorMsg('');
 
         try {
-            // Install the agent skill via OpenClaw
-            await OpenClawClient.installSkill(selected);
-            setInstalled(true);
+            // Save the folder paths to agent config
+            const settings = JSON.stringify({
+                watch_dir: invoiceDir,
+                client_dir: clientDir,
+            });
 
-            // Mark onboarding as complete
-            localStorage.setItem('elazya_v2_configured', 'true');
-            await OpenClawClient.setSetting('elazya_onboarding_complete', 'true');
+            // Save as facturation agent config
+            await OpenClawClient.saveAgentConfig('facturation', false, settings);
 
-            setTimeout(() => onNext(), 1500);
-        } catch (err) {
-            console.error('Failed to install agent:', err);
-            // Still proceed — agent install can be retried from dashboard
-            localStorage.setItem('elazya_v2_configured', 'true');
-            await OpenClawClient.setSetting('elazya_onboarding_complete', 'true');
-            setTimeout(() => onNext(), 500);
-        } finally {
-            setInstalling(false);
+            // Also save as global settings
+            await OpenClawClient.setSetting('default_invoice_dir', invoiceDir);
+            await OpenClawClient.setSetting('default_client_dir', clientDir);
+
+            setStatus('success');
+            setTimeout(() => onNext(), 1000);
+        } catch (err: any) {
+            setStatus('error');
+            setErrorMsg(err.message || 'Erreur lors de la vérification');
         }
     };
 
-    // Icon mapping
-    const getIcon = (iconName: string) => {
-        switch (iconName) {
-            case 'FileText': return '📄';
-            case 'Mail': return '📧';
-            case 'Newspaper': return '📰';
-            case 'Linkedin': return '💼';
-            case 'Receipt': return '🧾';
-            default: return '🤖';
+    const pickFolder = async (setter: (v: string) => void) => {
+        try {
+            const { open } = await import('@tauri-apps/plugin-dialog');
+            const result = await open({ directory: true, multiple: false });
+            if (result) {
+                setter(result as string);
+                setStatus('idle');
+            }
+        } catch (e) {
+            console.error('Folder picker error:', e);
         }
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            className="space-y-6"
-        >
+        <motion.div {...slideIn} className="space-y-6">
             <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Activez votre premier agent</h2>
-                <p className="text-white/50 text-sm">
-                    Agents disponibles ({getLimitsForPlan(plan).label}) — vous pourrez en ajouter d&apos;autres ensuite.
-                </p>
+                <h2 className="text-2xl font-bold text-white mb-2">Vos dossiers</h2>
+                <p className="text-white/50 text-sm">Où vos agents doivent chercher et classer les fichiers.</p>
             </div>
 
+            {/* Invoice dir */}
             <div className="space-y-2">
-                {agents.map((agent) => (
+                <label className="text-sm font-medium text-white/70">📥 Factures entrantes</label>
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        value={invoiceDir}
+                        onChange={(e) => { setInvoiceDir(e.target.value); setStatus('idle'); }}
+                        className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-mono text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                    />
                     <button
-                        key={agent.id}
-                        onClick={() => !installing && !installed && setSelected(agent.id)}
-                        className={`
-                            w-full px-4 py-3.5 rounded-xl border text-left flex items-center gap-4 transition-all
-                            ${selected === agent.id
-                                ? 'border-indigo-500/50 bg-indigo-500/10 shadow-[0_0_15px_rgba(99,102,241,0.15)]'
-                                : 'border-white/10 bg-white/5 hover:bg-white/10'}
-                            ${(installing || installed) ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}
-                        `}
-                        disabled={installing || installed}
+                        onClick={() => pickFolder(setInvoiceDir)}
+                        className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
                     >
-                        <div className="text-2xl">{getIcon(agent.icon)}</div>
-                        <div className="flex-1 min-w-0">
-                            <div className="font-bold text-white text-sm">{agent.name}</div>
-                            <div className="text-white/40 text-xs">{agent.description}</div>
-                        </div>
-                        {selected === agent.id && !installed && (
-                            <div className="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center">
-                                <Check className="w-3 h-3 text-white" />
-                            </div>
-                        )}
-                        {selected === agent.id && installed && (
-                            <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center"
-                            >
-                                <Check className="w-3 h-3 text-white" />
-                            </motion.div>
-                        )}
+                        <FolderOpen className="w-4 h-4 text-white/60" />
                     </button>
-                ))}
+                </div>
+                <p className="text-xs text-white/30">Les nouveaux PDF ici déclencheront l'agent Facturation Auto</p>
             </div>
 
-            {installed && (
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 text-green-400 text-sm justify-center"
-                >
-                    <Sparkles className="w-4 h-4" />
-                    Agent installé ! Bienvenue dans Elazya.
+            {/* Client dir */}
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-white/70">📁 Dossiers clients</label>
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        value={clientDir}
+                        onChange={(e) => { setClientDir(e.target.value); setStatus('idle'); }}
+                        className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-mono text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                    />
+                    <button
+                        onClick={() => pickFolder(setClientDir)}
+                        className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                    >
+                        <FolderOpen className="w-4 h-4 text-white/60" />
+                    </button>
+                </div>
+                <p className="text-xs text-white/30">Les factures classées seront rangées dans ~/Clients/NomClient/2026/</p>
+            </div>
+
+            {errorMsg && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 text-red-400 text-sm">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" /> {errorMsg}
+                </motion.div>
+            )}
+            {status === 'success' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 text-green-400 text-sm">
+                    <Check className="w-4 h-4" /> Dossiers configurés !
                 </motion.div>
             )}
 
             <button
-                onClick={handleInstall}
-                disabled={!selected || installing || installed}
+                onClick={handleTest}
+                disabled={!invoiceDir.trim() || !clientDir.trim() || status === 'testing' || status === 'success'}
                 className={`
                     w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all
-                    ${selected && !installing && !installed
+                    ${invoiceDir.trim() && clientDir.trim() && status !== 'testing' && status !== 'success'
                         ? 'bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)]'
                         : 'bg-white/5 text-white/30 cursor-not-allowed'}
                 `}
             >
-                {installing ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Installation...</>
-                ) : installed ? (
-                    <><Sparkles className="w-4 h-4" /> C&apos;est parti !</>
+                {status === 'testing' ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Vérification...</>
+                ) : status === 'success' ? (
+                    <><Check className="w-4 h-4" /> Configuré !</>
                 ) : (
-                    <><Bot className="w-4 h-4" /> Installer cet agent</>
+                    <><FolderOpen className="w-4 h-4" /> Valider les dossiers</>
                 )}
             </button>
         </motion.div>
     );
 }
 
-// ----- Main Onboarding Component -----
+// ═══════════════════════════════════════════════════════════════
+// Step 4 — Quick Win (activate agents)
+// ═══════════════════════════════════════════════════════════════
+const QUICK_WIN_AGENTS = [
+    { id: 'facturation', name: 'Facturation Auto', emoji: '💰', description: 'Classe vos factures automatiquement' },
+    { id: 'onboarding-client', name: 'Onboarding Client Express', emoji: '📧', description: 'Répond aux prospects en 5 min' },
+];
+
+function QuickWinStep({ onNext }: { onNext: () => void }) {
+    const [selected, setSelected] = useState<Record<string, boolean>>({
+        'facturation': true,
+        'onboarding-client': true,
+    });
+    const [activating, setActivating] = useState(false);
+    const [done, setDone] = useState(false);
+
+    const handleLaunch = async () => {
+        setActivating(true);
+        try {
+            // Activate selected agents
+            for (const agent of QUICK_WIN_AGENTS) {
+                if (selected[agent.id]) {
+                    await OpenClawClient.toggleAgent(agent.id, true);
+                }
+            }
+
+            // Mark onboarding as complete
+            localStorage.setItem('elazya_v2_configured', 'true');
+            await OpenClawClient.setSetting('elazya_onboarding_complete', 'true');
+
+            setDone(true);
+            setTimeout(() => onNext(), 1500);
+        } catch (err) {
+            console.error('Activation error:', err);
+            // Still proceed
+            localStorage.setItem('elazya_v2_configured', 'true');
+            setTimeout(() => onNext(), 500);
+        } finally {
+            setActivating(false);
+        }
+    };
+
+    return (
+        <motion.div {...slideIn} className="text-center space-y-6">
+            <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
+                className="w-16 h-16 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto"
+            >
+                <Rocket className="w-8 h-8 text-green-400" />
+            </motion.div>
+
+            <div>
+                <h2 className="text-2xl font-bold text-white mb-2">Parfait. Vos agents sont prêts.</h2>
+                <p className="text-white/50 text-sm">Activez vos premiers agents pour commencer tout de suite.</p>
+            </div>
+
+            <div className="space-y-2 text-left">
+                {QUICK_WIN_AGENTS.map((agent) => (
+                    <button
+                        key={agent.id}
+                        onClick={() => !activating && !done && setSelected(s => ({ ...s, [agent.id]: !s[agent.id] }))}
+                        className={`
+                            w-full px-4 py-4 rounded-xl border text-left flex items-center gap-4 transition-all
+                            ${selected[agent.id]
+                                ? 'border-green-500/30 bg-green-500/5'
+                                : 'border-white/10 bg-white/5 hover:bg-white/10'}
+                            ${(activating || done) ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}
+                        `}
+                        disabled={activating || done}
+                    >
+                        <div className="text-2xl">{agent.emoji}</div>
+                        <div className="flex-1">
+                            <div className="font-bold text-white text-sm">{agent.name}</div>
+                            <div className="text-white/40 text-xs">{agent.description}</div>
+                        </div>
+                        <div className={`
+                            w-5 h-5 rounded border-2 flex items-center justify-center transition-all
+                            ${selected[agent.id]
+                                ? 'bg-green-500 border-green-500'
+                                : 'border-white/20 bg-transparent'}
+                        `}>
+                            {selected[agent.id] && <Check className="w-3 h-3 text-white" />}
+                        </div>
+                    </button>
+                ))}
+            </div>
+
+            {done && (
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 text-green-400 text-sm justify-center"
+                >
+                    <Sparkles className="w-4 h-4" />
+                    Agents activés ! Bienvenue dans Elazya.
+                </motion.div>
+            )}
+
+            <button
+                onClick={handleLaunch}
+                disabled={activating || done}
+                className={`
+                    w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all
+                    ${!activating && !done
+                        ? 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]'
+                        : 'bg-white/5 text-white/30 cursor-not-allowed'}
+                `}
+            >
+                {activating ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Activation...</>
+                ) : done ? (
+                    <><Sparkles className="w-4 h-4" /> C'est parti !</>
+                ) : (
+                    <><Rocket className="w-4 h-4" /> Accéder au tableau de bord</>
+                )}
+            </button>
+        </motion.div>
+    );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Main Onboarding Component
+// ═══════════════════════════════════════════════════════════════
 export default function Onboarding({ onComplete }: OnboardingProps) {
     const [step, setStep] = useState(0);
     const [license, setLicense] = useState<LicenseData | null>(null);
 
-    const stepLabels = ['Licence', 'IA', 'Agent'];
+    const stepLabels = ['Bienvenue', 'Licence', 'IA', 'Dossiers', 'C\'est parti'];
 
     return (
         <div className="w-full h-full flex items-center justify-center bg-[#09090b]">
             <div className="w-full max-w-md px-8">
-                {/* Header */}
-                <div className="text-center mb-10">
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-widest mb-4"
-                    >
-                        <Sparkles className="w-3 h-3" />
-                        Configuration
-                    </motion.div>
-                </div>
+                {/* Header badge */}
+                {step > 0 && (
+                    <div className="text-center mb-6">
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-widest"
+                        >
+                            <Sparkles className="w-3 h-3" />
+                            Configuration — {step}/{TOTAL_STEPS - 1}
+                        </motion.div>
+                    </div>
+                )}
 
                 {/* Step Indicator */}
-                <div className="flex justify-center mb-8">
-                    <StepIndicator current={step} total={3} />
-                </div>
+                <StepIndicator current={step} />
 
                 {/* Step Content */}
-                <div className="glass-panel rounded-2xl p-8 min-h-[380px] flex flex-col justify-center">
+                <div className="glass-panel rounded-2xl p-8 min-h-[400px] flex flex-col justify-center">
                     <AnimatePresence mode="wait">
                         {step === 0 && (
-                            <LicenseStep
-                                key="license"
-                                onNext={(lic) => {
-                                    setLicense(lic);
-                                    setStep(1);
-                                }}
-                            />
+                            <WelcomeStep key="welcome" onNext={() => setStep(1)} />
                         )}
                         {step === 1 && (
-                            <LLMStep
-                                key="llm"
-                                onNext={() => setStep(2)}
-                            />
+                            <LicenseStep key="license" onNext={(lic) => { setLicense(lic); setStep(2); }} />
                         )}
-                        {step === 2 && license && (
-                            <AgentStep
-                                key="agent"
-                                plan={license.plan}
-                                onNext={onComplete}
-                            />
+                        {step === 2 && (
+                            <LLMStep key="llm" onNext={() => setStep(3)} />
+                        )}
+                        {step === 3 && (
+                            <FoldersStep key="folders" onNext={() => setStep(4)} />
+                        )}
+                        {step === 4 && (
+                            <QuickWinStep key="quickwin" onNext={onComplete} />
                         )}
                     </AnimatePresence>
                 </div>
 
                 {/* Step labels */}
-                <div className="flex justify-between mt-4 px-4">
+                <div className="flex justify-between mt-4 px-2">
                     {stepLabels.map((label, i) => (
                         <span
                             key={i}
-                            className={`text-xs font-medium transition-colors ${i <= step ? 'text-white/50' : 'text-white/20'}`}
+                            className={`text-[10px] font-medium transition-colors ${i <= step ? 'text-white/50' : 'text-white/15'}`}
                         >
                             {label}
                         </span>
