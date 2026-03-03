@@ -606,6 +606,21 @@ async fn get_agent_logs(state: State<'_, AppState>, agent_id: String, limit: i32
 }
 
 #[tauri::command]
+async fn check_macos_permissions() -> Result<serde_json::Value, String> {
+    use std::process::Command;
+    // Quick checks via osascript. This will trigger macOS permission prompts if not granted.
+    let mail_check = Command::new("osascript").arg("-e").arg("tell application \"Mail\" to return true").output();
+    let cal_check = Command::new("osascript").arg("-e").arg("tell application \"Calendar\" to return true").output();
+    let contacts_check = Command::new("osascript").arg("-e").arg("tell application \"Contacts\" to return true").output();
+    
+    Ok(serde_json::json!({
+        "mail": mail_check.is_ok() && mail_check.unwrap().status.success(),
+        "calendar": cal_check.is_ok() && cal_check.unwrap().status.success(),
+        "contacts": contacts_check.is_ok() && contacts_check.unwrap().status.success(),
+    }))
+}
+
+#[tauri::command]
 async fn get_recent_logs(state: State<'_, AppState>, limit: i32) -> Result<Vec<AgentLogEntry>, String> {
     let rows = sqlx::query("SELECT id, agent_id, timestamp, status, summary, details FROM agent_log ORDER BY id DESC LIMIT ?")
         .bind(limit)
@@ -954,7 +969,8 @@ fn main() {
             get_agent_logs,
             get_recent_logs,
             get_active_agent_count,
-            run_agent
+            run_agent,
+            check_macos_permissions
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

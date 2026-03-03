@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { listen } from '@tauri-apps/api/event';
 import { OpenClawClient } from '@/lib/openclaw-client';
-import { Settings, Cpu, Globe, Server, Zap, Key, Save, Loader2, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
+import { Settings, Cpu, Globe, Server, Zap, Key, Save, Loader2, ChevronDown, ChevronUp, AlertTriangle, ShieldCheck, FolderOpen } from 'lucide-react';
 import { Toggle } from '@/components/ui/Toggle';
 import { useToast } from '@/components/ToastProvider';
 
@@ -102,6 +102,8 @@ export default function ConfigPanel() {
     const [llmProvider, setLlmProvider] = useState('google');
     const [llmApiKey, setLlmApiKey] = useState('');
     const [llmModel, setLlmModel] = useState('gemini-2.0-flash');
+    const [workspacePath, setWorkspacePath] = useState('~/Documents/Elazya_Workspace');
+    const [perms, setPerms] = useState<{ mail: boolean, calendar: boolean, contacts: boolean } | null>(null);
 
     // Web Search Config
     const [searchProvider, setSearchProvider] = useState('google');
@@ -127,6 +129,7 @@ export default function ConfigPanel() {
         // Load saved settings
         OpenClawClient.getSetting('elazya_provider').then(v => v && setLlmProvider(v));
         OpenClawClient.getSetting('elazya_model').then(v => v && setLlmModel(v));
+        OpenClawClient.getSetting('elazya_workspace_path').then(v => v && setWorkspacePath(v));
     }, []);
 
     const saveLLM = async () => {
@@ -191,6 +194,35 @@ export default function ConfigPanel() {
         }
     };
 
+    const saveWorkspace = async () => {
+        setLoading('workspace');
+        try {
+            await OpenClawClient.setSetting('elazya_workspace_path', workspacePath);
+            showToast('Dossier workspace sauvegardé', 'success');
+        } catch {
+            showToast('Erreur de sauvegarde', 'error');
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const testPermissions = async () => {
+        setLoading('perms');
+        try {
+            const res = await OpenClawClient.checkMacOSPermissions();
+            setPerms(res);
+            if (res.mail && res.calendar && res.contacts) {
+                showToast('Toutes les permissions macOS sont accordées !', 'success');
+            } else {
+                showToast('Certaines permissions sont manquantes.', 'error');
+            }
+        } catch {
+            showToast('Erreur lors de la vérification', 'error');
+        } finally {
+            setLoading(null);
+        }
+    };
+
     const inputClass = "w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500/50";
     const selectClass = "w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-indigo-500/50";
 
@@ -222,10 +254,25 @@ export default function ConfigPanel() {
                     <FormField label="Modèle">
                         <input type="text" value={llmModel} onChange={e => setLlmModel(e.target.value)} placeholder="gemini-2.0-flash" className={inputClass} />
                     </FormField>
-                    <button onClick={saveLLM} disabled={loading === 'llm'} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-500 text-white font-bold hover:bg-indigo-400 transition-colors disabled:opacity-50">
-                        {loading === 'llm' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                        Sauvegarder
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button onClick={saveLLM} disabled={loading === 'llm'} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-500 text-white font-bold hover:bg-indigo-400 transition-colors disabled:opacity-50">
+                            {loading === 'llm' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                            Sauvegarder
+                        </button>
+                        <button onClick={async () => {
+                            setLoading('ping-llm');
+                            try {
+                                const models = await OpenClawClient.listModels(llmProvider, llmApiKey);
+                                if (models && models.length > 0) showToast(`Connexion OK (${models.length} modèles trouvés)`, 'success');
+                                else showToast('Modèles indisponibles avec cette clé', 'error');
+                            } catch {
+                                showToast('Erreur de connexion LLM', 'error');
+                            } finally { setLoading(null); }
+                        }} disabled={loading === 'ping-llm'} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white font-bold hover:bg-white/20 transition-colors disabled:opacity-50">
+                            {loading === 'ping-llm' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                            Tester la connexion
+                        </button>
+                    </div>
                 </Section>
 
                 {/* Web Search */}
@@ -273,10 +320,25 @@ export default function ConfigPanel() {
                             <input type="password" value={gatewayPassword} onChange={e => setGatewayPassword(e.target.value)} className={inputClass} />
                         </FormField>
                     )}
-                    <button onClick={saveGateway} disabled={loading === 'gateway'} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-500 text-white font-bold hover:bg-indigo-400 transition-colors disabled:opacity-50">
-                        {loading === 'gateway' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                        Sauvegarder
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button onClick={saveGateway} disabled={loading === 'gateway'} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-500 text-white font-bold hover:bg-indigo-400 transition-colors disabled:opacity-50">
+                            {loading === 'gateway' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                            Sauvegarder
+                        </button>
+                        <button onClick={async () => {
+                            setLoading('ping-oc');
+                            try {
+                                const res = await OpenClawClient.healthCheck();
+                                if (res.ok) showToast('Moteur OpenClaw en ligne !', 'success');
+                                else showToast('Moteur hors ligne.', 'error');
+                            } catch {
+                                showToast('Erreur Moteur', 'error');
+                            } finally { setLoading(null); }
+                        }} disabled={loading === 'ping-oc'} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white font-bold hover:bg-white/20 transition-colors disabled:opacity-50">
+                            {loading === 'ping-oc' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                            Ping Moteur
+                        </button>
+                    </div>
                 </Section>
 
                 {/* Hooks */}
@@ -304,6 +366,40 @@ export default function ConfigPanel() {
                         {loading === 'keys' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         Sauvegarder
                     </button>
+                </Section>
+                {/* Workspace & Permissions */}
+                <Section title="Système & Permissions" icon={<ShieldCheck className="w-4 h-4" />}>
+                    <FormField label="Dossier Workspace par défaut">
+                        <input type="text" value={workspacePath} onChange={e => setWorkspacePath(e.target.value)} placeholder="~/Documents/Elazya_Workspace" className={inputClass} />
+                    </FormField>
+                    <button onClick={saveWorkspace} disabled={loading === 'workspace'} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-500 text-white font-bold hover:bg-indigo-400 transition-colors disabled:opacity-50 mb-6">
+                        {loading === 'workspace' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        Sauvegarder Chemin
+                    </button>
+
+                    <div className="pt-4 border-t border-white/10">
+                        <h4 className="font-bold text-white mb-3 text-sm flex justify-between items-center">
+                            Permissions macOS
+                            <button onClick={testPermissions} disabled={loading === 'perms'} className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-md flex items-center gap-1.5">
+                                {loading === 'perms' && <Loader2 className="w-3 h-3 animate-spin" />}
+                                Vérifier les accès
+                            </button>
+                        </h4>
+                        <div className="grid grid-cols-3 gap-3">
+                            <div className={`p-3 rounded-lg border ${perms?.mail ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-white/5 border-white/10 text-zinc-400'} flex flex-col items-center gap-1`}>
+                                <span className="font-semibold text-xs uppercase tracking-wider">Apple Mail</span>
+                                <span className="text-xs">{perms?.mail ? 'Accès Autorisé' : 'Non Vérifié'}</span>
+                            </div>
+                            <div className={`p-3 rounded-lg border ${perms?.calendar ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-white/5 border-white/10 text-zinc-400'} flex flex-col items-center gap-1`}>
+                                <span className="font-semibold text-xs uppercase tracking-wider">Calendrier</span>
+                                <span className="text-xs">{perms?.calendar ? 'Accès Autorisé' : 'Non Vérifié'}</span>
+                            </div>
+                            <div className={`p-3 rounded-lg border ${perms?.contacts ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-white/5 border-white/10 text-zinc-400'} flex flex-col items-center gap-1`}>
+                                <span className="font-semibold text-xs uppercase tracking-wider">Contacts</span>
+                                <span className="text-xs">{perms?.contacts ? 'Accès Autorisé' : 'Non Vérifié'}</span>
+                            </div>
+                        </div>
+                    </div>
                 </Section>
             </div>
 

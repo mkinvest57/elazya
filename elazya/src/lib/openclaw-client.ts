@@ -280,4 +280,12 @@ export class OpenClawClient {
             return 0;
         }
     }
+
+    static async checkMacOSPermissions(): Promise<{ mail: boolean, calendar: boolean, contacts: boolean }> {
+        try {
+            return await invoke('check_macos_permissions');
+        } catch {
+            return { mail: false, calendar: false, contacts: false };
+        }
+    }
 }
