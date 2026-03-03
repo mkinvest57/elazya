@@ -5,18 +5,38 @@ use tauri::{Emitter, Listener, Manager, State};
 use std::sync::Arc;
 use serde_json::Value;
 use sqlx::Row;
+use tauri_plugin_cli::CliExt;
 
 mod openclaw;
 mod openclaw_monitor;
 mod openclaw_client;
 mod agent_base;
+mod apple_mail;
 mod agent_facturation;
+mod agent_onboarding;
+mod agent_linkedin;
+mod agent_qualification;
+mod agent_routine;
+mod agent_crm_prospect;
+mod agent_devis;
+mod agent_email;
+mod agent_compta;
+mod agent_content;
 mod agents;
 mod agent_engine;
 
 use openclaw::ManagedOpenClaw;
 use openclaw_monitor::{get_connected_channels, get_installed_skills, watch_token_usage, TokenUsage, ChannelInfo};
 use agent_facturation::FacturationWatcher;
+use agent_onboarding::OnboardingWatcher;
+use agent_linkedin::LinkedInWatcher;
+use agent_qualification::QualificationWatcher;
+use agent_routine::RoutineWatcher;
+use agent_crm_prospect::CrmWatcher;
+use agent_devis::DevisWatcher;
+use agent_email::EmailWatcher;
+use agent_compta::ComptaWatcher;
+use agent_content::ContentWatcher;
 use openclaw_client::OpenClawAgentClient;
 use agent_engine::AgentEngine;
 
@@ -26,6 +46,15 @@ struct AppState {
     openclaw: Arc<ManagedOpenClaw>,
     openclaw_dir: String,
     facturation_watcher: Arc<FacturationWatcher>,
+    onboarding_watcher: Arc<OnboardingWatcher>,
+    linkedin_watcher: Arc<LinkedInWatcher>,
+    qualification_watcher: Arc<QualificationWatcher>,
+    routine_watcher: Arc<RoutineWatcher>,
+    crm_watcher: Arc<CrmWatcher>,
+    devis_watcher: Arc<DevisWatcher>,
+    email_watcher: Arc<EmailWatcher>,
+    compta_watcher: Arc<ComptaWatcher>,
+    content_watcher: Arc<ContentWatcher>,
     engine: Arc<AgentEngine>,
 }
 
@@ -446,6 +475,105 @@ async fn toggle_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_i
         } else {
             agent_facturation::stop_watcher(&state.facturation_watcher).await;
         }
+    } else if agent_id == "onboarding-client" {
+        if enabled {
+            agent_onboarding::start_onboarding_watcher(
+                app.clone(),
+                state.db.clone(),
+                state.engine.client().clone(),
+                state.onboarding_watcher.clone(),
+            );
+        } else {
+            agent_onboarding::stop_onboarding_watcher(&state.onboarding_watcher).await;
+        }
+    } else if agent_id == "linkedin-digest" {
+        if enabled {
+            agent_linkedin::start_linkedin_watcher(
+                app.clone(),
+                state.db.clone(),
+                state.engine.client().clone(),
+                state.linkedin_watcher.clone(),
+            );
+        } else {
+            agent_linkedin::stop_linkedin_watcher(&state.linkedin_watcher).await;
+        }
+    } else if agent_id == "qualification" {
+        if enabled {
+            agent_qualification::start_qualification_watcher(
+                app.clone(),
+                state.db.clone(),
+                state.engine.client().clone(),
+                state.qualification_watcher.clone(),
+            );
+        } else {
+            agent_qualification::stop_qualification_watcher(&state.qualification_watcher).await;
+        }
+    } else if agent_id == "routine-matinale" {
+        if enabled {
+            agent_routine::start_routine_watcher(
+                app.clone(),
+                state.db.clone(),
+                state.engine.client().clone(),
+                state.routine_watcher.clone(),
+            );
+        } else {
+            agent_routine::stop_routine_watcher(&state.routine_watcher).await;
+        }
+    } else if agent_id == "crm-prospect" {
+        if enabled {
+            agent_crm_prospect::start_crm_watcher(
+                app.clone(),
+                state.db.clone(),
+                state.engine.client().clone(),
+                state.crm_watcher.clone(),
+            );
+        } else {
+            agent_crm_prospect::stop_crm_watcher(&state.crm_watcher).await;
+        }
+    } else if agent_id == "devis-express" {
+        if enabled {
+            agent_devis::start_devis_watcher(
+                app.clone(),
+                state.db.clone(),
+                state.engine.client().clone(),
+                state.devis_watcher.clone(),
+            );
+        } else {
+            agent_devis::stop_devis_watcher(&state.devis_watcher).await;
+        }
+    } else if agent_id == "email-intelligent" {
+        if enabled {
+            agent_email::start_email_watcher(
+                app.clone(),
+                state.db.clone(),
+                state.engine.client().clone(),
+                state.email_watcher.clone(),
+            );
+        } else {
+            agent_email::stop_email_watcher(&state.email_watcher).await;
+        }
+    } else if agent_id == "compta-export" {
+        if enabled {
+            agent_compta::start_compta_watcher(
+                app.clone(),
+                state.db.clone(),
+                state.engine.client().clone(),
+                state.compta_watcher.clone(),
+            );
+        } else {
+            agent_compta::stop_compta_watcher(&state.compta_watcher).await;
+        }
+    } else if agent_id == "content-linkedin" {
+        if enabled {
+            agent_content::start_content_watcher(
+                app.clone(),
+                state.db.clone(),
+                state.engine.client().clone(),
+                state.content_watcher.clone(),
+            );
+        } else {
+            agent_content::stop_content_watcher(&state.content_watcher).await;
+        }
     }
 
     // Emit event so UI updates in real time
@@ -604,6 +732,7 @@ fn process_deep_link_url(app: &tauri::AppHandle, url: &str) {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_cli::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
@@ -708,15 +837,24 @@ fn main() {
 
             // 3. Create agent engine with shared OpenClaw client
             let oc_client = Arc::new(OpenClawAgentClient::new(openclaw.bridge.clone()));
-            let engine = Arc::new(AgentEngine::new(oc_client));
+            let engine = Arc::new(AgentEngine::new(oc_client.clone()));
 
             // 4. Manage State
             app.manage(AppState { 
-                db: pool, 
+                db: pool.clone(), 
                 openclaw: Arc::new(openclaw),
                 openclaw_dir,
                 facturation_watcher: FacturationWatcher::new(),
-                engine,
+                onboarding_watcher: OnboardingWatcher::new(),
+                linkedin_watcher: LinkedInWatcher::new(),
+                qualification_watcher: QualificationWatcher::new(),
+                routine_watcher: RoutineWatcher::new(),
+                crm_watcher: CrmWatcher::new(),
+                devis_watcher: DevisWatcher::new(),
+                email_watcher: EmailWatcher::new(),
+                compta_watcher: ComptaWatcher::new(),
+                content_watcher: ContentWatcher::new(),
+                engine: engine.clone(),
             });
 
             // Deep link handler: listen for elazya:// URLs
@@ -744,6 +882,39 @@ fn main() {
                     });
                 }
             });
+
+            // Handle CLI flags
+            if let Ok(matches) = app.cli().matches() {
+                if let Some(arg) = matches.args.get("test-agent") {
+                    if let Some(agent_id) = arg.value.as_str() {
+                        println!("[CLI] Testing agent: {}", agent_id);
+                        let handle = app_handle.clone();
+                        let db = pool.clone();
+                        let agent_id: String = agent_id.to_string();
+                        let engine = engine.clone();
+                        let oc_client_clone = oc_client.clone();
+
+                        tauri::async_runtime::spawn(async move {
+                            // Wait a tiny bit for app to settle before running tests
+                            tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+                            match engine.test_agent(&handle, &db, &agent_id).await {
+                                Ok(res) => {
+                                    println!("[CLI RESULT] {}", serde_json::to_string_pretty(&res).unwrap());
+                                    if res.status == "success" {
+                                        std::process::exit(0);
+                                    } else {
+                                        std::process::exit(1);
+                                    }
+                                }
+                                Err(e) => {
+                                    println!("[CLI ERROR] {}", e);
+                                    std::process::exit(1);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
 
             Ok(())
         })

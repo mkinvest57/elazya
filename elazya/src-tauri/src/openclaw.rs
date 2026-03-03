@@ -164,6 +164,7 @@ pub struct GatewayFrame {
 pub struct OpenClawBridge {
     tx: mpsc::Sender<GatewayFrame>,
     pending: Arc<Mutex<HashMap<String, oneshot::Sender<Result<Value, String>>>>>,
+    run_listeners: Arc<Mutex<HashMap<String, oneshot::Sender<Value>>>>,
     connected: Arc<Mutex<bool>>,
 }
 
@@ -172,10 +173,12 @@ impl OpenClawBridge {
         let (tx, mut rx) = mpsc::channel::<GatewayFrame>(32);
         let pending = Arc::new(Mutex::new(HashMap::<String, oneshot::Sender<Result<Value, String>>>::new()));
         let connected = Arc::new(Mutex::new(false));
+        let run_listeners = Arc::new(Mutex::new(HashMap::<String, oneshot::Sender<Value>>::new()));
         
         let bridge = Arc::new(Self {
             tx,
             pending: Arc::clone(&pending),
+            run_listeners: Arc::clone(&run_listeners),
             connected: Arc::clone(&connected),
         });
 
@@ -225,12 +228,17 @@ impl OpenClawBridge {
                             }
                         }
 
+                        // Short delay to ensure handshake is processed by the server
+                        // before the bridge is considered "ready" to send other requests
+                        tokio::time::sleep(tokio::time::Duration::from_millis(1500)).await;
+
                         {
                             let mut c = bridge_clone.connected.lock().unwrap();
                             *c = true;
                         }
 
                         let pending_inner = Arc::clone(&bridge_clone.pending);
+                        let run_listeners_inner = Arc::clone(&bridge_clone.run_listeners);
                         let app_inner = app_handle.clone();
 
                         // Inner loop for this specific connection
@@ -256,7 +264,24 @@ impl OpenClawBridge {
                                                 }
                                             }
                                         } else if frame.frame_type == "event" {
-                                            let _ = app_inner.emit(&frame.event.unwrap_or_default(), frame.payload);
+                                            let event_name = frame.event.unwrap_or_default();
+                                            let payload = frame.payload.unwrap_or(Value::Null);
+                                            
+                                            // Intercept run events
+                                            if event_name == "run.completed" || event_name == "run.failed" || event_name == "message" {
+                                                if let Some(run_id) = payload.get("runId").and_then(|v| v.as_str()) {
+                                                    let mut listeners = run_listeners_inner.lock().unwrap();
+                                                    if let Some(otx) = listeners.remove(run_id) {
+                                                        let mut out_payload = payload.clone();
+                                                        if event_name == "run.failed" {
+                                                            out_payload["_run_failed"] = serde_json::json!(true);
+                                                        }
+                                                        let _ = otx.send(out_payload);
+                                                    }
+                                                }
+                                            }
+                                            
+                                            let _ = app_inner.emit(&event_name, payload);
                                         }
                                     }
                                 }
@@ -291,6 +316,31 @@ impl OpenClawBridge {
         });
 
         Ok(bridge)
+    }
+
+    pub async fn chat_request(&self, params: Value) -> Result<Value, String> {
+        let res = self.request("chat.send", params).await?;
+        
+        let run_id = res.get("runId").and_then(|v| v.as_str()).map(|s| s.to_string());
+        if let Some(id) = run_id {
+            let (otx, orx) = oneshot::channel();
+            {
+                let mut listeners = self.run_listeners.lock().unwrap();
+                listeners.insert(id.clone(), otx);
+            }
+            
+            match tokio::time::timeout(tokio::time::Duration::from_secs(120), orx).await {
+                Ok(Ok(payload)) => Ok(payload),
+                Ok(Err(_)) => Err("Run listener channel dropped".to_string()),
+                Err(_) => {
+                    let mut listeners = self.run_listeners.lock().unwrap();
+                    listeners.remove(&id);
+                    Err(format!("LLM generation for run {} timed out after 120s", id))
+                }
+            }
+        } else {
+            Ok(res)
+        }
     }
 
     pub async fn request(&self, method: &str, params: Value) -> Result<Value, String> {
@@ -386,8 +436,6 @@ impl ManagedOpenClaw {
             .env("OPENCLAW_CONFIG_PATH", state_dir.join("openclaw.json").to_string_lossy().to_string())
             .env("OPENCLAW_LOG_DIR", state_dir.join("logs").to_string_lossy().to_string())
             .env("DYLD_LIBRARY_PATH", openclaw_dir)
-            .arg("--config")
-            .arg(state_dir.join("openclaw.json").to_string_lossy().to_string())
             .current_dir(openclaw_dir)
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())

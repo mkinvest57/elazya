@@ -17,6 +17,15 @@ use tauri::AppHandle;
 use crate::agent_base::{ElAgent, AgentInfo, AgentResult, log_agent_action};
 use crate::openclaw_client::OpenClawAgentClient;
 use crate::agent_facturation::FacturationAgent;
+use crate::agent_onboarding::OnboardingClientAgent;
+use crate::agent_linkedin::LinkedInDigestAgent;
+use crate::agent_qualification::QualificationAgent;
+use crate::agent_routine::RoutineMatinaleAgent;
+use crate::agent_crm_prospect::CrmProspectAgent;
+use crate::agent_devis::DevisExpressAgent;
+use crate::agent_email::EmailIntelligentAgent;
+use crate::agent_compta::ComptaExportAgent;
+use crate::agent_content::ContentLinkedInAgent;
 use crate::agents::*;
 
 /// Central agent engine.

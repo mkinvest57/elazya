@@ -81,9 +81,19 @@ impl ElAgent for FacturationAgent {
             filename, file_size
         );
 
-        let parsed = match client.call_llm(&prompt).await {
-            Ok(text) => OpenClawAgentClient::extract_json(&text),
-            Err(_) => fallback_parse(&filename),
+        let parsed = if trigger.get("test").and_then(|v| v.as_bool()).unwrap_or(false) {
+            serde_json::json!({
+                "client": "Test Client",
+                "montant": "1250.00",
+                "date_facture": "2026-03-01",
+                "date_echeance": "2026-04-01",
+                "numero": "FAC-TEST-001"
+            })
+        } else {
+            match client.call_llm(&prompt).await {
+                Ok(text) => OpenClawAgentClient::extract_json(&text),
+                Err(_) => fallback_parse(&filename),
+            }
         };
 
         let client_name = parsed.get("client").and_then(|v| v.as_str()).unwrap_or("Client_Inconnu").to_string();

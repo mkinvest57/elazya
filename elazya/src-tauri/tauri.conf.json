@@ -35,8 +35,20 @@
     "plugins": {
         "deep-link": {
             "desktop": {
-                "schemes": ["elazya"]
+                "schemes": [
+                    "elazya"
+                ]
             }
+        },
+        "cli": {
+            "args": [
+                {
+                    "name": "test-agent",
+                    "short": "t",
+                    "description": "Tests a specific Elazya agent by ID",
+                    "takesValue": true
+                }
+            ]
         }
     },
     "bundle": {
@@ -48,7 +60,9 @@
             "icons/icon.icns",
             "icons/icon.ico"
         ],
-        "targets": ["dmg"],
+        "targets": [
+            "dmg"
+        ],
         "macOS": {
             "entitlements": "entitlements.plist",
             "exceptionDomain": "stripe.com",

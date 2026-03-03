@@ -8,9 +8,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    ArrowLeft, CheckCircle2, Play, Save,
+    ArrowLeft, CheckCircle2, Play, Save, Copy,
     FolderOpen, ToggleLeft, ToggleRight,
-    ChevronRight, Sparkles, Zap, Loader2, Beaker
+    ChevronRight, Sparkles, Zap, Loader2, Beaker,
+    Users, Building2, FileText
 } from 'lucide-react';
 import { listen } from '@tauri-apps/api/event';
 import { type AgentDef } from '@/lib/plan-limits';
@@ -85,7 +86,7 @@ interface ConfigFieldDef {
     label: string;
     type: 'text' | 'toggle' | 'select';
     placeholder?: string;
-    options?: string[];
+    options?: { value: string; label: string }[] | string[];
 }
 
 const AGENT_CONFIG_FIELDS: Record<string, ConfigFieldDef[]> = {
@@ -97,23 +98,54 @@ const AGENT_CONFIG_FIELDS: Record<string, ConfigFieldDef[]> = {
     ],
     'onboarding-client': [
         { id: 'email_account', label: 'Compte email à surveiller', type: 'text', placeholder: 'contact@monentreprise.com' },
-        { id: 'response_tone', label: 'Ton des réponses', type: 'select', options: ['Professionnel', 'Amical', 'Formel'] },
-        { id: 'auto_calendar', label: 'Proposer des créneaux auto', type: 'toggle' },
+        { id: 'calendly_url', label: 'Lien de rendez-vous (Calendly)', type: 'text', placeholder: 'https://calendly.com/votre-profil' },
+        { id: 'notion_sync', label: 'Activer l\'enregistrement CRM (Notion)', type: 'toggle' },
+        { id: 'notion_db', label: 'ID Base de données Notion', type: 'text', placeholder: 'ID de la base prospects' },
     ],
     'linkedin-digest': [
-        { id: 'linkedin_profile', label: 'Profil LinkedIn', type: 'text', placeholder: 'linkedin.com/in/votre-profil' },
+        { id: 'themes', label: 'Thèmes / Angle (séparés par des virgules)', type: 'text', placeholder: 'Ex: IA en agence, SEO, React' },
+        { id: 'schedule_time', label: 'Heure d\'exécution quotidienne', type: 'text', placeholder: '08:00' },
         { id: 'post_tone', label: 'Ton des publications', type: 'select', options: ['Inspirant', 'Éducatif', 'Storytelling', 'Provocateur'] },
-        { id: 'auto_publish', label: 'Publication automatique', type: 'toggle' },
     ],
     'qualification': [
-        { id: 'crm_source', label: 'Source des leads', type: 'select', options: ['Formulaire web', 'Email', 'LinkedIn', 'Tous'] },
-        { id: 'hot_threshold', label: 'Seuil lead chaud', type: 'select', options: ['70%', '80%', '90%'] },
-        { id: 'auto_notify', label: 'Notification leads chauds', type: 'toggle' },
+        { id: 'hot_threshold', label: 'Score minimum (Lead Chaud) %', type: 'text', placeholder: 'Ex: 80' },
+        { id: 'calendly_url', label: 'Lien Calendly (pour leads chauds)', type: 'text', placeholder: 'https://calendly.com/vous' },
+        { id: 'notion_sync', label: 'Ajouter les leads tièdes/froids à Notion', type: 'toggle' },
     ],
     'routine-matinale': [
-        { id: 'send_time', label: 'Heure d\'envoi', type: 'text', placeholder: '07:30' },
+        { id: 'send_time', label: 'Heure d\'exécution quotidienne', type: 'text', placeholder: '07:30' },
         { id: 'include_calendar', label: 'Inclure le calendrier', type: 'toggle' },
-        { id: 'include_emails', label: 'Inclure résumé emails', type: 'toggle' },
+        { id: 'include_emails', label: 'Inclure le résumé des emails', type: 'toggle' },
+    ],
+    'crm-prospect': [
+        { id: 'watch_folder', label: 'Dossier à surveiller', type: 'text', placeholder: '~/Downloads/Prospects' },
+        { id: 'notion_db_id', label: 'Base de données Notion (ID)', type: 'text', placeholder: 'xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' },
+        { id: 'auto_tag', label: 'Création automatique (Notion)', type: 'toggle' },
+    ],
+    'devis-express': [
+        { id: 'watch_folder', label: 'Dossier des briefs (à surveiller)', type: 'text', placeholder: '~/Documents/Briefs' },
+        { id: 'tarifs', label: 'Grille tarifaire de base', type: 'text', placeholder: 'Site vitrine : 2500€, Logo : 800€, Taux horaire : 500€' },
+        { id: 'auto_draft', label: 'Préparer le brouillon email Auto', type: 'toggle' },
+    ],
+    'email-intelligent': [
+        { id: 'watch_folder', label: 'Boîte aux lettres', type: 'text', placeholder: 'Apple Mail (Inbox)' },
+        { id: 'keywords', label: 'Mots-clés urgents', type: 'text', placeholder: 'urgent, asap, erreur, plantage, facture' },
+        { id: 'auto_draft', label: 'Créer les brouillons automatiquement', type: 'toggle' },
+    ],
+    'compta-export': [
+        { id: 'watch_folder', label: 'Dossier Factures', type: 'text', placeholder: '~/Documents/Factures' },
+        { id: 'email_comptable', label: 'Email Expert-Comptable', type: 'text', placeholder: 'expert@cabinet.fr' },
+        {
+            id: 'format', label: 'Format d\'export', type: 'select', options: [
+                { value: 'Pennylane', label: 'Pennylane (CSV)' },
+                { value: 'Indy', label: 'Indy (CSV)' },
+                { value: 'Standard', label: 'Standard (SCV)' }
+            ]
+        }
+    ],
+    'content-linkedin': [
+        { id: 'idea', label: 'Idée ou Thème de la semaine', type: 'text', placeholder: 'Ex: L\'importance de l\'automatisation...' },
+        { id: 'auto_schedule', label: 'Générer automatiquement le lundi', type: 'toggle' },
     ],
 };
 
@@ -373,14 +405,16 @@ export default function AgentDetail({ agent, onBack }: AgentDetailProps) {
                                     <div key={field.id} className="py-3">
                                         <label className="text-white/50 font-medium mb-1.5 block" style={{ fontSize: 'var(--text-body)' }}>{field.label}</label>
                                         <select
-                                            value={settings[field.id] || field.options?.[0] || ''}
+                                            value={settings[field.id] || (field.options?.[0] && typeof field.options[0] === 'object' ? (field.options[0] as any).value : field.options?.[0]) || ''}
                                             onChange={(e) => updateSetting(field.id, e.target.value)}
                                             className="input-base focus-ring w-full px-3 py-2 text-white/60 outline-none appearance-none"
                                             style={{ fontSize: 'var(--text-body)' }}
                                         >
-                                            {field.options?.map((opt) => (
-                                                <option key={opt} value={opt} className="bg-zinc-900">{opt}</option>
-                                            ))}
+                                            {field.options?.map((opt: any, i: number) => {
+                                                const value = typeof opt === 'string' ? opt : opt.value;
+                                                const label = typeof opt === 'string' ? opt : opt.label;
+                                                return <option key={value || i} value={value} className="bg-zinc-900">{label}</option>;
+                                            })}
                                         </select>
                                     </div>
                                 );
@@ -458,22 +492,49 @@ export default function AgentDetail({ agent, onBack }: AgentDetailProps) {
                                 )}
 
                                 {/* Onboarding Client Express */}
-                                {agent.id === 'onboarding-client' && testDetails.response && (
-                                    <div className="bg-white/5 rounded-lg p-4">
-                                        <div className="text-[10px] text-[var(--color-success)] uppercase font-bold mb-2 flex items-center gap-1.5">
-                                            <CheckCircle2 className="w-3 h-3" /> Email généré
+                                {agent.id === 'onboarding-client' && testDetails.generated_response && (
+                                    <div className="flex flex-col gap-3">
+                                        <div className="bg-white/5 rounded-lg p-4 pb-3">
+                                            <div className="text-[10px] text-[var(--color-success)] uppercase font-bold mb-2 flex items-center gap-1.5">
+                                                <CheckCircle2 className="w-3 h-3" /> Brouillon d'email préparé
+                                            </div>
+                                            <p className="text-sm text-white/70 italic leading-relaxed whitespace-pre-wrap">
+                                                "{testDetails.generated_response}"
+                                            </p>
                                         </div>
-                                        <p className="text-sm text-white/70 italic leading-relaxed">
-                                            "{testDetails.response}"
-                                        </p>
+
+                                        <div className="bg-white/5 rounded-lg p-3">
+                                            <div className="text-[10px] text-white/30 uppercase font-bold mb-2 flex items-center gap-1.5">
+                                                <FolderOpen className="w-3 h-3" /> Informations CRM Extraites
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3 text-sm">
+                                                <div><span className="text-white/40">Nom :</span> <span className="text-white/80 font-medium">{testDetails.prospect_name}</span></div>
+                                                <div><span className="text-white/40">Société :</span> <span className="text-white/80 font-medium">{testDetails.company}</span></div>
+                                                <div><span className="text-white/40">Projet :</span> <span className="text-white/80 font-medium">{testDetails.project_type}</span></div>
+                                                <div><span className="text-white/40">Budget :</span> <span className="text-white/80 font-medium">{testDetails.budget}</span></div>
+                                                <div><span className="text-white/40">Délais :</span> <span className="text-white/80 font-medium">{testDetails.deadline}</span></div>
+                                                <div><span className="text-white/40">Intérêt :</span>
+                                                    <span className={`ml-1 font-medium ${testDetails.interest_level?.toLowerCase() === 'chaud' ? 'text-[var(--color-warning)]' : 'text-[var(--color-success)]'}`}>
+                                                        {testDetails.interest_level}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
 
                                 {/* LinkedIn Digest */}
                                 {agent.id === 'linkedin-digest' && testDetails.post && (
                                     <div className="bg-white/5 rounded-lg p-4">
-                                        <div className="text-[10px] text-[var(--color-indigo)] uppercase font-bold mb-2 flex items-center gap-1.5">
-                                            Post généré
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="text-[10px] text-[var(--color-indigo)] uppercase font-bold flex items-center gap-1.5">
+                                                <Sparkles className="w-3 h-3" /> Post généré du jour
+                                            </div>
+                                            <button onClick={() => navigator.clipboard.writeText(testDetails.post)}
+                                                className="flex items-center gap-1 text-[10px] font-bold text-white/40 hover:text-white/80 transition-colors bg-white/5 px-2 py-1 rounded"
+                                            >
+                                                <Copy className="w-3 h-3" /> Copier
+                                            </button>
                                         </div>
                                         <p className="text-sm text-white/80 leading-relaxed whitespace-pre-wrap mb-4">
                                             {testDetails.post}
@@ -488,12 +549,21 @@ export default function AgentDetail({ agent, onBack }: AgentDetailProps) {
                                             </div>
                                         )}
                                         {testDetails.comments && testDetails.comments.length > 0 && (
-                                            <div className="border-t border-white/5 pt-3">
-                                                <div className="text-[10px] text-white/30 uppercase font-bold mb-2">Commentaires suggérés</div>
-                                                <ul className="space-y-2">
+                                            <div className="border-t border-white/5 pt-4 mt-2">
+                                                <div className="text-[10px] text-white/40 uppercase font-bold mb-3 flex items-center gap-1.5">
+                                                    <ToggleRight className="w-3 h-3" /> Commentaires suggérés
+                                                </div>
+                                                <ul className="space-y-3">
                                                     {testDetails.comments.map((comment: string, i: number) => (
-                                                        <li key={i} className="text-xs text-white/50 italic flex items-start gap-2">
-                                                            <span className="text-white/20 mt-0.5">💬</span> {comment}
+                                                        <li key={i} className="text-xs flex items-start justify-between gap-3 bg-black/20 p-2.5 rounded border border-white/5">
+                                                            <span className="text-white/60 italic leading-relaxed">
+                                                                <span className="text-white/20 mr-1 not-italic">💬</span> {comment}
+                                                            </span>
+                                                            <button onClick={() => navigator.clipboard.writeText(comment)}
+                                                                className="flex items-center gap-1 text-[10px] font-bold text-white/30 hover:text-white/70 transition-colors shrink-0 pt-0.5"
+                                                            >
+                                                                <Copy className="w-3 h-3" /> Copier
+                                                            </button>
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -503,21 +573,370 @@ export default function AgentDetail({ agent, onBack }: AgentDetailProps) {
                                 )}
 
                                 {/* Qualification Leads */}
-                                {agent.id === 'qualification' && testDetails.hot !== undefined && (
-                                    <div className="grid grid-cols-3 gap-3">
-                                        <div className="bg-white/5 rounded-lg p-4 flex flex-col items-center justify-center text-center">
-                                            <div className="text-2xl font-bold text-white/80 mb-1">{testDetails.total}</div>
-                                            <div className="text-[10px] text-white/30 uppercase font-bold">Total leads</div>
-                                        </div>
-                                        <div className="bg-white/5 rounded-lg p-4 flex flex-col items-center justify-center text-center">
-                                            <div className="text-2xl font-bold text-[var(--color-warning)] mb-1">{testDetails.warm}</div>
-                                            <div className="text-[10px] text-[var(--color-warning)] uppercase font-bold">À recontacter</div>
-                                        </div>
-                                        <div className="bg-white/5 rounded-lg p-4 flex flex-col items-center justify-center text-center shadow-[0_0_15px_rgba(34,197,94,0.15)]">
-                                            <div className="text-2xl font-bold text-[var(--color-success)] mb-1">{testDetails.hot}</div>
-                                            <div className="text-[10px] text-[var(--color-success)] uppercase font-bold flex items-center justify-center gap-1">
-                                                <Zap className="w-3 h-3" /> Chauds !
+                                {agent.id === 'qualification' && testDetails.score !== undefined && (
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex gap-3">
+                                            {/* Score Gauge */}
+                                            <div className="bg-white/5 rounded-lg p-4 flex flex-col items-center justify-center text-center shadow-[0_4px_20px_rgba(0,0,0,0.2)] flex-shrink-0 w-32 border border-white/5">
+                                                <div className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-2">Score Lead</div>
+                                                <div className={`text-4xl font-black mb-1 ${testDetails.score >= 80 ? 'text-[var(--color-success)] drop-shadow-[0_0_12px_rgba(34,197,94,0.4)]' :
+                                                    testDetails.score >= 40 ? 'text-[var(--color-warning)] drop-shadow-[0_0_12px_rgba(245,158,11,0.4)]' :
+                                                        'text-white/40'
+                                                    }`}>
+                                                    {testDetails.score}
+                                                </div>
+                                                <div className="flex items-center justify-center gap-1.5 mt-1">
+                                                    {testDetails.score >= 80 ? (
+                                                        <><Zap className="w-3 h-3 text-[var(--color-success)]" /><span className="text-[10px] uppercase font-bold text-[var(--color-success)]">Chaud</span></>
+                                                    ) : testDetails.score >= 40 ? (
+                                                        <span className="text-[10px] uppercase font-bold text-[var(--color-warning)]">Tiède</span>
+                                                    ) : (
+                                                        <span className="text-[10px] uppercase font-bold text-white/40">Froid</span>
+                                                    )}
+                                                </div>
                                             </div>
+
+                                            {/* Attributes */}
+                                            <div className="bg-white/5 rounded-lg p-4 flex-1 border border-white/5 hidden sm:block">
+                                                <div className="text-[10px] text-white/30 uppercase font-bold mb-3 flex items-center gap-1.5">
+                                                    <Beaker className="w-3 h-3" /> Analyse LLM
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between items-center bg-black/20 px-2.5 py-1.5 rounded">
+                                                        <span className="text-xs text-white/50">Budget estimé</span>
+                                                        <span className="text-sm font-medium text-white/80">{testDetails.budget}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center bg-black/20 px-2.5 py-1.5 rounded">
+                                                        <span className="text-xs text-white/50">Délai projet</span>
+                                                        <span className="text-sm font-medium text-white/80">{testDetails.delai}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Action Recommended */}
+                                        <div className="bg-gradient-to-r from-[rgba(255,255,255,0.05)] to-transparent rounded-lg p-3 border-l-2 border-l-[var(--color-indigo)] relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--color-indigo)] opacity-5 blur-[40px] rounded-full -mr-10 -mt-10 pointer-events-none"></div>
+                                            <div className="text-[10px] text-[var(--color-indigo)] uppercase font-bold mb-1 flex items-center gap-1.5">
+                                                Action suggérée : <span className="text-white/80">{testDetails.action}</span>
+                                            </div>
+                                            <p className="text-xs text-white/60 italic leading-relaxed mt-2 pr-4 pl-1">
+                                                "{testDetails.raison}"
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Routine Matinale Auto */}
+                                {agent.id === 'routine-matinale' && testDetails.brief_markdown && (
+                                    <div className="bg-white/5 rounded-lg p-4">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="text-[10px] text-[var(--color-success)] uppercase font-bold flex items-center gap-1.5">
+                                                <CheckCircle2 className="w-3 h-3" /> Briefing Matinal Généré
+                                            </div>
+                                            <button onClick={() => navigator.clipboard.writeText(testDetails.brief_markdown)}
+                                                className="flex items-center gap-1 text-[10px] font-bold text-white/40 hover:text-white/80 transition-colors bg-white/5 px-2 py-1 rounded"
+                                            >
+                                                <Copy className="w-3 h-3" /> Copier
+                                            </button>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3 mb-4">
+                                            <div className="bg-black/20 rounded p-3 text-center border border-white/5">
+                                                <div className="text-2xl font-black text-[var(--color-warning)] mb-1">
+                                                    {testDetails.urgent_emails_count}
+                                                </div>
+                                                <div className="text-[10px] uppercase font-bold text-white/40">Emails Urgents</div>
+                                            </div>
+                                            <div className="bg-black/20 rounded p-3 flex flex-col items-center justify-center border border-white/5 text-center">
+                                                <div className="text-[10px] uppercase font-bold text-white/40 mb-1">Priorité du Jour</div>
+                                                <div className="text-sm font-medium text-[var(--color-indigo)] leading-snug">
+                                                    {testDetails.top_priority}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-black/30 rounded p-3 border border-white/5 max-h-64 overflow-y-auto custom-scrollbar">
+                                            <p className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed font-mono">
+                                                {testDetails.brief_markdown}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* CRM Prospect Auto */}
+                                {agent.id === 'crm-prospect' && testDetails.contacts && (
+                                    <div className="bg-white/5 rounded-lg p-0 overflow-hidden border border-white/5">
+                                        <div className="p-4 border-b border-white/5 flex items-center justify-between bg-black/20">
+                                            <div className="flex flex-col">
+                                                <div className="text-[10px] text-[var(--color-violet)] uppercase font-bold flex items-center gap-1.5 mb-1">
+                                                    <Users className="w-3 h-3" /> Contacts Extraits
+                                                </div>
+                                                <div className="text-sm font-medium text-white/80">
+                                                    Fichier : <span className="font-mono text-white/50 text-xs">{testDetails.file}</span>
+                                                </div>
+                                            </div>
+                                            <div className="bg-[var(--color-violet)]/20 text-[var(--color-violet)] px-2.5 py-1 rounded text-xs font-bold border border-[var(--color-violet)]/30">
+                                                {testDetails.total_extracted} trouvés
+                                            </div>
+                                        </div>
+
+                                        <div className="overflow-x-auto custom-scrollbar">
+                                            <table className="w-full text-left text-sm whitespace-nowrap">
+                                                <thead>
+                                                    <tr className="border-b border-white/5 text-[10px] uppercase tracking-wider text-white/30 bg-black/30">
+                                                        <th className="px-4 py-2 font-medium">Nom</th>
+                                                        <th className="px-4 py-2 font-medium">Email</th>
+                                                        <th className="px-4 py-2 font-medium">Société</th>
+                                                        <th className="px-4 py-2 font-medium text-right">Action Notion</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-white/5">
+                                                    {testDetails.contacts.map((c: any, i: number) => (
+                                                        <tr key={i} className="hover:bg-white/[0.02] transition-colors">
+                                                            <td className="px-4 py-2.5 font-medium text-white/80">{c.nom || '-'}</td>
+                                                            <td className="px-4 py-2.5 text-white/50">{c.email || '-'}</td>
+                                                            <td className="px-4 py-2.5 text-white/50 flex items-center gap-1.5">
+                                                                <Building2 className="w-3 h-3 text-white/20" /> {c.societe || '-'}
+                                                            </td>
+                                                            <td className="px-4 py-2.5 text-right">
+                                                                <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${c.status === 'Créé'
+                                                                    ? 'bg-[var(--color-success)]/10 text-[var(--color-success)] border border-[var(--color-success)]/20'
+                                                                    : 'bg-[var(--color-warning)]/10 text-[var(--color-warning)] border border-[var(--color-warning)]/20'
+                                                                    }`}>
+                                                                    {c.status}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Devis Express Auto */}
+                                {agent.id === 'devis-express' && testDetails.quote_markdown && (
+                                    <div className="bg-white/5 rounded-lg p-3 border border-white/5">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="text-[10px] text-[var(--color-success)] uppercase font-bold flex items-center gap-1.5">
+                                                <FileText className="w-3 h-3" /> Devis Généré
+                                            </div>
+                                            <button onClick={() => navigator.clipboard.writeText(testDetails.quote_markdown)}
+                                                className="flex items-center gap-1 text-[10px] font-bold text-white/40 hover:text-white/80 transition-colors bg-white/5 px-2 py-1 rounded"
+                                            >
+                                                <Copy className="w-3 h-3" /> Copier le Markdown
+                                            </button>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3 mb-4">
+                                            <div className="bg-black/20 rounded p-3 text-center border border-white/5">
+                                                <div className="text-sm font-medium text-[var(--color-warning)] mb-1">
+                                                    {testDetails.parsed_brief?.budget || 'Non précisé'}
+                                                </div>
+                                                <div className="text-[10px] uppercase font-bold text-white/40">Budget Identifié</div>
+                                            </div>
+                                            <div className="bg-black/20 rounded p-3 text-center border border-white/5">
+                                                <div className="text-sm font-medium text-[var(--color-indigo)] mb-1">
+                                                    {testDetails.parsed_brief?.delai || 'Non précisé'}
+                                                </div>
+                                                <div className="text-[10px] uppercase font-bold text-white/40">Délai Estimé</div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-black/30 rounded p-3 border border-white/5 max-h-64 overflow-y-auto custom-scrollbar">
+                                            <p className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed font-mono">
+                                                {testDetails.quote_markdown}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Email Intelligent Auto */}
+                                {agent.id === 'email-intelligent' && testDetails.counts && (
+                                    <div className="flex flex-col gap-4">
+                                        <div className="grid grid-cols-4 gap-2">
+                                            <div className="bg-white/5 border border-[var(--color-error)]/20 rounded-lg p-3 text-center">
+                                                <div className="text-xl font-bold text-[var(--color-error)] mb-0.5">{testDetails.counts.urgent}</div>
+                                                <div className="text-[9px] uppercase font-bold text-white/40">Urgents</div>
+                                            </div>
+                                            <div className="bg-white/5 border border-[var(--color-warning)]/20 rounded-lg p-3 text-center">
+                                                <div className="text-xl font-bold text-[var(--color-warning)] mb-0.5">{testDetails.counts.todo}</div>
+                                                <div className="text-[9px] uppercase font-bold text-white/40">À Faire</div>
+                                            </div>
+                                            <div className="bg-white/5 border border-[var(--color-indigo)]/20 rounded-lg p-3 text-center">
+                                                <div className="text-xl font-bold text-[var(--color-indigo)] mb-0.5">{testDetails.counts.draft}</div>
+                                                <div className="text-[9px] uppercase font-bold text-white/40">Brouillons</div>
+                                            </div>
+                                            <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center opacity-50">
+                                                <div className="text-xl font-bold text-white mb-0.5">{testDetails.counts.spam}</div>
+                                                <div className="text-[9px] uppercase font-bold text-white/40">Spam</div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-black/20 rounded-lg border border-white/5 overflow-hidden">
+                                            <div className="px-3 py-2 border-b border-white/5 bg-white/[0.02]">
+                                                <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">Mails Traités</span>
+                                            </div>
+                                            <div className="max-h-64 overflow-y-auto custom-scrollbar divide-y divide-white/5">
+                                                {testDetails.processed?.map((item: any, i: number) => {
+                                                    const cat = item.analysis.categorie || '';
+                                                    let dotColor = 'bg-white/20';
+                                                    if (cat.includes('Urgent')) dotColor = 'bg-[var(--color-error)] shadow-[0_0_8px_var(--color-error)]';
+                                                    else if (cat.includes('faire')) dotColor = 'bg-[var(--color-warning)]';
+                                                    else if (cat.includes('simple')) dotColor = 'bg-[var(--color-indigo)]';
+
+                                                    return (
+                                                        <div key={i} className="p-3 hover:bg-white/[0.02] transition-colors">
+                                                            <div className="flex items-start gap-3">
+                                                                <div className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${dotColor}`} />
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="flex items-center justify-between mb-0.5">
+                                                                        <span className="text-xs font-medium text-white/90 truncate pr-2">
+                                                                            {item.original.sender}
+                                                                        </span>
+                                                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/40 border border-white/10 whitespace-nowrap">
+                                                                            {item.analysis.action_suggeree}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="text-xs text-white/60 truncate mb-1.5">
+                                                                        {item.original.subject}
+                                                                    </div>
+                                                                    {item.analysis.draft_genere && (
+                                                                        <div className="mt-2 bg-black/40 border border-white/5 rounded p-2 relative group">
+                                                                            <p className="text-[11px] text-white/50 italic leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all">
+                                                                                <span className="text-[var(--color-indigo)] font-bold non-italic">↳ Draft : </span>
+                                                                                "{item.analysis.draft_genere}"
+                                                                            </p>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Compta Export Auto */}
+                                {agent.id === 'compta-export' && testDetails.factures && (
+                                    <div className="flex flex-col gap-4">
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <div className="bg-white/5 border border-[var(--color-success)]/20 rounded-lg p-3 text-center">
+                                                <div className="text-xl font-bold text-[var(--color-success)] mb-0.5">{testDetails.factures.length}</div>
+                                                <div className="text-[9px] uppercase font-bold text-white/40">Factures Période</div>
+                                            </div>
+                                            <div className="bg-white/5 border border-[var(--color-primary)]/20 rounded-lg p-3 text-center">
+                                                <div className="text-xl font-bold text-[var(--color-primary)] mb-0.5">{testDetails.total_ht} €</div>
+                                                <div className="text-[9px] uppercase font-bold text-white/40">CA Total HT</div>
+                                            </div>
+                                            <div className="bg-white/5 border border-[var(--color-indigo)]/20 rounded-lg p-3 text-center">
+                                                <div className="text-xl font-bold text-[var(--color-indigo)] mb-0.5">{testDetails.total_tva} €</div>
+                                                <div className="text-[9px] uppercase font-bold text-white/40">TVA Collectée</div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-black/20 rounded-lg border border-white/5 overflow-hidden">
+                                            <div className="px-3 py-2 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
+                                                <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">Aperçu CSV ({testDetails.format || 'Standard'})</span>
+                                                <span className="text-[10px] text-[var(--color-primary)] font-medium">~/Desktop/Compta_Export</span>
+                                            </div>
+                                            <div className="max-h-64 overflow-x-auto overflow-y-auto custom-scrollbar">
+                                                <table className="w-full text-left text-xs whitespace-nowrap">
+                                                    <thead className="bg-white/5 text-white/40 uppercase text-[9px] sticky top-0 backdrop-blur-md">
+                                                        <tr>
+                                                            <th className="px-3 py-2 font-medium">N° Facture</th>
+                                                            <th className="px-3 py-2 font-medium">Client</th>
+                                                            <th className="px-3 py-2 font-medium">Date</th>
+                                                            <th className="px-3 py-2 font-medium text-right">HT</th>
+                                                            <th className="px-3 py-2 font-medium text-right">TVA</th>
+                                                            <th className="px-3 py-2 font-medium text-right">TTC</th>
+                                                            <th className="px-3 py-2 font-medium">Statut</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-white/5 text-white/70">
+                                                        {testDetails.factures.map((f: any, i: number) => (
+                                                            <tr key={i} className="hover:bg-white/[0.02] transition-colors">
+                                                                <td className="px-3 py-2 font-mono text-[10px] text-white/50">{f.num}</td>
+                                                                <td className="px-3 py-2 font-medium text-white/90">{f.client}</td>
+                                                                <td className="px-3 py-2">{f.date}</td>
+                                                                <td className="px-3 py-2 text-right">{f.ht} €</td>
+                                                                <td className="px-3 py-2 text-right text-white/40">{f.tva} €</td>
+                                                                <td className="px-3 py-2 text-right text-[var(--color-success)] font-bold">{f.ttc} €</td>
+                                                                <td className="px-3 py-2">
+                                                                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${f.statut?.toLowerCase().includes('pay') ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-orange-500/10 text-orange-400 border border-orange-500/20'}`}>
+                                                                        {f.statut}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Content LinkedIn Auto */}
+                                {agent.id === 'content-linkedin' && testDetails.posts && (
+                                    <div className="flex flex-col gap-4">
+                                        <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                                            <div className="text-sm font-medium text-white/90">
+                                                5 variations générées
+                                            </div>
+                                            <div className="text-[10px] text-white/40 font-mono flex items-center gap-1.5">
+                                                <FolderOpen className="w-3 h-3" />
+                                                ~/Desktop/LinkedIn_Content
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2 pb-2">
+                                            {testDetails.posts.map((post: any, i: number) => {
+                                                const typeColors: Record<string, string> = {
+                                                    'question': 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+                                                    'liste': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+                                                    'hottake': 'text-rose-400 bg-rose-500/10 border-rose-500/20',
+                                                    'story': 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+                                                    'data': 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+                                                };
+
+                                                const tColor = typeColors[post.type?.toLowerCase()] || 'text-white/60 bg-white/5 border-white/10';
+
+                                                return (
+                                                    <div key={i} className="group relative bg-black/40 border border-white/5 rounded-xl p-3 hover:border-white/20 transition-all overflow-hidden flex flex-col items-start gap-2 h-[200px]">
+                                                        <div className="flex items-center justify-between w-full">
+                                                            <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full border ${tColor}`}>
+                                                                {post.type}
+                                                            </span>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    navigator.clipboard.writeText(`${post.title}\n\n${post.content}\n\n${post.hashtags}`);
+                                                                    // Flash effect would be nice here, but simple alert for the demo
+                                                                }}
+                                                                className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-all active:scale-95"
+                                                                title="Copier le post complet"
+                                                            >
+                                                                <Copy className="w-3.5 h-3.5" />
+                                                            </button>
+                                                        </div>
+
+                                                        <div className="text-xs font-bold text-white/90 line-clamp-2 mt-1">
+                                                            {post.title}
+                                                        </div>
+
+                                                        <div className="text-[11px] text-white/60 line-clamp-4 flex-1 whitespace-pre-wrap font-mono leading-relaxed mt-1">
+                                                            {post.content}
+                                                        </div>
+
+                                                        <div className="text-[10px] text-[var(--color-primary)] font-medium mt-auto w-full truncate">
+                                                            {post.hashtags}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 )}
@@ -568,7 +987,7 @@ export default function AgentDetail({ agent, onBack }: AgentDetailProps) {
                         </AnimatePresence>
                     )}
                 </div>
-            </motion.div>
-        </motion.div>
+            </motion.div >
+        </motion.div >
     );
 }
