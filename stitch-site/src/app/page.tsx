@@ -97,6 +97,7 @@ function StickyBanner({ onCTA, places }: { onCTA: () => void; places: number }) 
 
 export default function LandingPage() {
   const [selectedSkill, setSelectedSkill] = useState<any>(null)
+  const [isToggled, setIsToggled] = useState(true)
   const [modal, setModal] = useState(false)
   const [modalPlan, setModalPlan] = useState("solo")
   const openModal = (p: string = "solo") => { setModalPlan(p); setModal(true) }
@@ -117,10 +118,21 @@ export default function LandingPage() {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="flex flex-col items-center">
                 <p className="text-sm sm:text-base text-slate-400 font-medium mb-6 tracking-wide">Tu passes encore des heures sur tes factures, tes prospects et tes emails ?</p>
                 <h1 className="text-4xl sm:text-5xl md:text-[5.5rem] lg:text-[6.5rem] font-semibold tracking-tight mb-6 text-slate-800 leading-[1.1]">
-                  L'app Mac qui tourne
+                  L'app Mac
+                  <span className="inline-flex items-center mx-3 md:mx-4 align-middle translate-y-[-4px]">
+                    <button
+                      onClick={() => setIsToggled(!isToggled)}
+                      className={`relative flex items-center w-16 h-8 sm:w-20 sm:h-10 md:w-28 md:h-14 rounded-full p-1.5 transition-colors duration-300 toggle-track-gradient shadow-inner ${isToggled ? 'bg-primary' : 'bg-slate-300'}`}
+                      aria-label="Toggle capability"
+                    >
+                      <div
+                        className={`w-5 h-5 sm:w-7 sm:h-7 md:w-11 md:h-11 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.2)] transform transition-transform duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] ${isToggled ? 'translate-x-[calc(100%+0.5rem)] sm:translate-x-[calc(100%+0.75rem)] md:translate-x-[calc(100%+1.25rem)]' : 'translate-x-0'}`}
+                      />
+                    </button>
+                  </span>
                   <br className="hidden md:block" />
-                  <span className="text-slate-400 font-medium tracking-tight">ta structure pendant </span>
-                  <span className="text-slate-800 font-bold tracking-tighter">que tu dors.</span>
+                  <span className="text-slate-400 font-medium tracking-tight">qui tourne ta structure </span>
+                  <span className="text-slate-800 font-bold tracking-tighter">pendant que tu dors.</span>
                 </h1>
                 <p className="text-base md:text-lg text-slate-500 font-medium max-w-xl mx-auto mb-8 tracking-wide leading-relaxed">
                   10 agents IA coordonnés s'occupent de tes factures, tes prospects, ton LinkedIn et tes emails. Tout automatisé. Tout local sur ton Mac. Tu reprends juste les décisions.
