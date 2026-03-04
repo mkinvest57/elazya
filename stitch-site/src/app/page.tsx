@@ -74,8 +74,8 @@ function EmailModal({ open, onClose, plan = "solo" }: { open: boolean; onClose: 
 function StickyBanner({ onCTA, places }: { onCTA: () => void; places: number }) {
   const c = useCountdown()
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] bg-white/80 backdrop-blur-2xl border-b border-slate-200/50">
-      <div className="container mx-auto px-4 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+    <div className="fixed top-[60px] sm:top-[64px] left-0 right-0 z-[40] bg-white/80 backdrop-blur-2xl border-b border-slate-200/50">
+      <div className="container mx-auto px-4 py-2 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
         <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
           <span className="text-sm font-bold text-slate-800 flex items-center gap-1.5"><span>🚀</span><span className="hidden sm:inline">Accès Anticipé</span></span>
           <span className="text-xs font-bold text-primary px-3 py-1 rounded-full bg-primary/5 border border-primary/15">{places}/47 places restantes</span>
@@ -110,10 +110,10 @@ export default function LandingPage() {
       <main className="min-h-screen bg-background text-slate-800 font-sans selection:bg-primary/20 selection:text-slate-900 overflow-hidden">
 
         {/* ─── HERO ─── */}
-        <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-background">
+        <section className="relative min-h-screen flex items-center justify-center pt-32 sm:pt-36 overflow-hidden bg-background">
           <GlassBackground />
           <div className="container relative z-10 px-6 mx-auto">
-            <div className="max-w-5xl mx-auto text-center mt-[-2vh]">
+            <div className="max-w-5xl mx-auto text-center mt-[-8vh]">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="flex flex-col items-center">
                 <p className="text-sm sm:text-base text-slate-400 font-medium mb-6 tracking-wide">Tu passes encore des heures sur tes factures, tes prospects et tes emails ?</p>
                 <h1 className="text-4xl sm:text-5xl md:text-[5.5rem] lg:text-[6.5rem] font-semibold tracking-tight mb-6 text-slate-800 leading-[1.1]">
@@ -127,14 +127,6 @@ export default function LandingPage() {
                 </p>
                 <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-6 py-3 md:px-8 md:py-3.5 rounded-full font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place — 9€</motion.button>
                 <p className="text-xs font-medium text-slate-400 mt-3">47 places · Lancement le 5 avril · -50% · 9€ déduits du prix final</p>
-                <div className="max-w-2xl w-full mx-auto mt-12">
-                  <div className="aspect-video rounded-2xl bg-slate-800 border border-slate-700/50 flex items-center justify-center p-6">
-                    <p className="text-xs text-slate-400 text-center italic leading-relaxed max-w-md">
-                      VIDÉO 1 — Sera ajoutée ici<br />
-                      <span className="text-slate-500 text-[11px]">Mission Control s'ouvre, 2 agents actifs point vert, notification Telegram avec brief du matin, utilisateur tape /status, réponse instantanée. Durée : 25-30s. Pas de paroles, musique douce.</span>
-                    </p>
-                  </div>
-                </div>
               </motion.div>
             </div>
           </div>
