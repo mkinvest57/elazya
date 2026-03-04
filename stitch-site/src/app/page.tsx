@@ -75,13 +75,12 @@ function StickyBanner({ onCTA, places }: { onCTA: () => void; places: number }) 
   const c = useCountdown()
   return (
     <div className="fixed top-[60px] sm:top-[64px] left-0 right-0 z-[40] bg-white/80 backdrop-blur-2xl border-b border-slate-200/50">
-      <div className="container mx-auto px-4 py-2 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
-        <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
-          <span className="text-sm font-bold text-slate-800 flex items-center gap-1.5"><span>🚀</span><span className="hidden sm:inline">Accès Anticipé</span></span>
-          <span className="text-xs font-bold text-primary px-3 py-1 rounded-full bg-primary/5 border border-primary/15">{places}/47 places restantes</span>
-          <span className="text-xs font-medium text-slate-400">Lancement le 5 avril</span>
-        </div>
+      <div className="container mx-auto px-3 py-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
+          <span className="hidden sm:flex text-sm font-bold text-slate-800 items-center gap-1.5"><span>🚀</span><span>Accès Anticipé</span></span>
+          <span className="text-[11px] sm:text-xs font-bold text-primary px-2.5 py-1 rounded-full bg-primary/5 border border-primary/15 whitespace-nowrap">{places}/47 places</span>
+        </div>
+        <div className="hidden md:flex items-center gap-2">
           {[{ v: c.days, l: "j" }, { v: c.hours, l: "h" }, { v: c.minutes, l: "m" }, { v: c.seconds, l: "s" }].map((u, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className="flex flex-col items-center"><span className="font-mono text-base font-bold tabular-nums text-slate-800">{String(u.v).padStart(2, "0")}</span><span className="text-[9px] uppercase tracking-widest text-slate-400 font-semibold">{u.l}</span></div>
@@ -89,7 +88,7 @@ function StickyBanner({ onCTA, places }: { onCTA: () => void; places: number }) 
             </div>
           ))}
         </div>
-        <motion.button whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }} onClick={onCTA} className="text-xs px-5 py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white font-bold rounded-full shadow-[0_8px_16px_rgb(15,23,42,0.25)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
+        <motion.button whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }} onClick={onCTA} className="text-[11px] sm:text-xs px-4 py-2 sm:px-5 sm:py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white font-bold rounded-full shadow-[0_8px_16px_rgb(15,23,42,0.25)] transition-all ring-1 ring-slate-800/20 whitespace-nowrap">Sécuriser ma place</motion.button>
       </div>
     </div>
   )
@@ -111,35 +110,35 @@ export default function LandingPage() {
       <main className="min-h-screen bg-background text-slate-800 font-sans selection:bg-primary/20 selection:text-slate-900 overflow-hidden">
 
         {/* ─── HERO ─── */}
-        <section className="relative min-h-screen flex items-center justify-center pt-32 sm:pt-36 overflow-hidden bg-background">
+        <section className="relative min-h-screen flex items-center justify-center pt-32 pb-16 overflow-hidden bg-background">
           <GlassBackground />
-          <div className="container relative z-10 px-6 mx-auto">
-            <div className="max-w-5xl mx-auto text-center mt-[-8vh]">
+          <div className="container relative z-10 px-4 sm:px-6 mx-auto">
+            <div className="max-w-5xl mx-auto text-center mt-[-4vh] sm:mt-[-8vh]">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="flex flex-col items-center">
-                <p className="text-sm sm:text-base text-slate-400 font-medium mb-6 tracking-wide">Tu passes encore des heures sur tes factures, tes prospects et tes emails ?</p>
-                <h1 className="text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5.5rem] font-semibold tracking-tight mb-6 text-slate-800 leading-[1.1]">
+                <p className="text-xs sm:text-base text-slate-400 font-medium mb-4 sm:mb-6 tracking-wide px-2">Tu passes encore des heures sur tes factures, tes prospects et tes emails ?</p>
+                <h1 className="text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5.5rem] font-semibold tracking-tight mb-6 text-slate-800 leading-[1.15] sm:leading-[1.1]">
                   L'app Mac
-                  <span className="inline-flex items-center mx-3 md:mx-4 align-middle translate-y-[-4px]">
+                  <span className="inline-flex items-center mx-2 sm:mx-3 md:mx-4 align-middle translate-y-[-2px] sm:translate-y-[-4px]">
                     <button
                       onClick={() => setIsToggled(!isToggled)}
-                      className={`relative flex items-center w-16 h-8 sm:w-20 sm:h-10 md:w-28 md:h-14 rounded-full p-1.5 transition-colors duration-300 toggle-track-gradient shadow-inner ${isToggled ? 'bg-primary' : 'bg-slate-300'}`}
+                      className={`relative flex items-center w-14 h-7 sm:w-16 sm:h-8 md:w-28 md:h-14 rounded-full p-1 transition-colors duration-300 toggle-track-gradient shadow-inner ${isToggled ? 'bg-primary' : 'bg-slate-300'}`}
                       aria-label="Toggle capability"
                     >
                       <div
-                        className={`w-5 h-5 sm:w-7 sm:h-7 md:w-11 md:h-11 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.2)] transform transition-transform duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] ${isToggled ? 'translate-x-[calc(100%+0.5rem)] sm:translate-x-[calc(100%+0.75rem)] md:translate-x-[calc(100%+1.25rem)]' : 'translate-x-0'}`}
+                        className={`w-5 h-5 sm:w-6 sm:h-6 md:w-11 md:h-11 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.2)] transform transition-transform duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] ${isToggled ? 'translate-x-[calc(100%+0.25rem)] sm:translate-x-[calc(100%+0.5rem)] md:translate-x-[calc(100%+1.5rem)]' : 'translate-x-0'}`}
                       />
                     </button>
                   </span>
-                  <br className="hidden md:block" />
+                  <br />
                   <span className="text-slate-400 font-medium tracking-tight">qui tourne ta structure </span>
-                  <br className="hidden md:block" />
+                  <br />
                   <span className="text-slate-800 font-bold tracking-tighter">pendant que tu dors.</span>
                 </h1>
-                <p className="text-base md:text-lg text-slate-500 font-medium max-w-xl mx-auto mb-8 tracking-wide leading-relaxed">
+                <p className="text-sm md:text-lg text-slate-500 font-medium max-w-xl mx-auto mb-8 tracking-wide leading-relaxed px-4">
                   10 agents IA coordonnés s'occupent de tes factures, tes prospects, ton LinkedIn et tes emails. Tout automatisé. Tout local sur ton Mac. Tu reprends juste les décisions.
                 </p>
-                <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-6 py-3 md:px-8 md:py-3.5 rounded-full font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
-                <p className="text-xs font-medium text-slate-400 mt-3">47 places · Lancement le 5 avril · -50% · 9€ déduits du prix final</p>
+                <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-6 py-3.5 sm:px-8 sm:py-3.5 rounded-full font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-400 mt-4 px-4">47 places · Lancement le 5 avril · -50% · 9€ déduits du prix final</p>
               </motion.div>
             </div>
           </div>
