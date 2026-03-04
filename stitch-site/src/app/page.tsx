@@ -117,7 +117,7 @@ export default function LandingPage() {
             <div className="max-w-5xl mx-auto text-center mt-[-8vh]">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="flex flex-col items-center">
                 <p className="text-sm sm:text-base text-slate-400 font-medium mb-6 tracking-wide">Tu passes encore des heures sur tes factures, tes prospects et tes emails ?</p>
-                <h1 className="text-4xl sm:text-5xl md:text-[5.5rem] lg:text-[6.5rem] font-semibold tracking-tight mb-6 text-slate-800 leading-[1.1]">
+                <h1 className="text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5.5rem] font-semibold tracking-tight mb-6 text-slate-800 leading-[1.1]">
                   L'app Mac
                   <span className="inline-flex items-center mx-3 md:mx-4 align-middle translate-y-[-4px]">
                     <button
@@ -132,6 +132,7 @@ export default function LandingPage() {
                   </span>
                   <br className="hidden md:block" />
                   <span className="text-slate-400 font-medium tracking-tight">qui tourne ta structure </span>
+                  <br className="hidden md:block" />
                   <span className="text-slate-800 font-bold tracking-tighter">pendant que tu dors.</span>
                 </h1>
                 <p className="text-base md:text-lg text-slate-500 font-medium max-w-xl mx-auto mb-8 tracking-wide leading-relaxed">
