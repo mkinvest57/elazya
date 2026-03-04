@@ -110,8 +110,8 @@ function ReservationContent() {
                                         key={plan.id}
                                         onClick={() => setSelected(plan.id)}
                                         className={`relative p-5 rounded-xl border-2 text-left transition-all ${isSelected
-                                                ? "border-primary bg-primary/5 shadow-sm"
-                                                : "border-slate-200 bg-white hover:border-slate-300"
+                                            ? "border-primary bg-primary/5 shadow-sm"
+                                            : "border-slate-200 bg-white hover:border-slate-300"
                                             }`}
                                     >
                                         {isPreselected && (
@@ -151,7 +151,7 @@ function ReservationContent() {
                             disabled={loading}
                             className="w-full py-4 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white font-bold text-base shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20 disabled:opacity-50 flex items-center justify-center gap-2"
                         >
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Réserver ma place — 9€"}
+                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Réserver ma place"}
                         </motion.button>
                     </motion.div>
 

@@ -89,7 +89,7 @@ function StickyBanner({ onCTA, places }: { onCTA: () => void; places: number }) 
             </div>
           ))}
         </div>
-        <motion.button whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }} onClick={onCTA} className="text-xs px-5 py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white font-bold rounded-full shadow-[0_8px_16px_rgb(15,23,42,0.25)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place — 9€</motion.button>
+        <motion.button whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }} onClick={onCTA} className="text-xs px-5 py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white font-bold rounded-full shadow-[0_8px_16px_rgb(15,23,42,0.25)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
       </div>
     </div>
   )
@@ -138,7 +138,7 @@ export default function LandingPage() {
                 <p className="text-base md:text-lg text-slate-500 font-medium max-w-xl mx-auto mb-8 tracking-wide leading-relaxed">
                   10 agents IA coordonnés s'occupent de tes factures, tes prospects, ton LinkedIn et tes emails. Tout automatisé. Tout local sur ton Mac. Tu reprends juste les décisions.
                 </p>
-                <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-6 py-3 md:px-8 md:py-3.5 rounded-full font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place — 9€</motion.button>
+                <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-6 py-3 md:px-8 md:py-3.5 rounded-full font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
                 <p className="text-xs font-medium text-slate-400 mt-3">47 places · Lancement le 5 avril · -50% · 9€ déduits du prix final</p>
               </motion.div>
             </div>
@@ -247,7 +247,7 @@ export default function LandingPage() {
 
             {/* 2nd CTA */}
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-20 sm:mt-24">
-              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 rounded-full font-bold text-base shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place — 9€</motion.button>
+              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 rounded-full font-bold text-base shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
               <p className="text-xs font-medium text-slate-400 mt-3">9€ maintenant · -50% le 5 avril · Remboursé si l'app ne sort pas</p>
             </motion.div>
           </div>
@@ -680,7 +680,7 @@ export default function LandingPage() {
                 <div className="border-t border-slate-100 pt-5">
                   <p className="text-sm font-bold text-slate-800">9€ aujourd'hui · <span className="text-primary">88€</span> le 5 avril <span className="line-through text-slate-400">197€</span></p>
                   <p className="text-xs text-emerald-600 font-semibold mt-1">Tu économises 109€</p>
-                  <button onClick={() => openModal("solo")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors">→ Sécuriser ma place pour 9€</button>
+                  <button onClick={() => openModal("solo")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors">→ Sécuriser ma place</button>
                 </div>
               </motion.div>
 
@@ -697,7 +697,7 @@ export default function LandingPage() {
                 <div className="border-t border-slate-100 pt-5">
                   <p className="text-sm font-bold text-slate-800">9€ aujourd'hui · <span className="text-primary">238€</span> le 5 avril <span className="line-through text-slate-400">497€</span></p>
                   <p className="text-xs text-emerald-600 font-semibold mt-1">Tu économises 259€</p>
-                  <button onClick={() => openModal("pro")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors">→ Sécuriser ma place pour 9€</button>
+                  <button onClick={() => openModal("pro")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors">→ Sécuriser ma place</button>
                 </div>
               </motion.div>
 
@@ -713,7 +713,7 @@ export default function LandingPage() {
                 <div className="border-t border-slate-100 pt-5">
                   <p className="text-sm font-bold text-slate-800">9€ aujourd'hui · <span className="text-primary">488€</span> le 5 avril <span className="line-through text-slate-400">997€</span></p>
                   <p className="text-xs text-emerald-600 font-semibold mt-1">Tu économises 509€</p>
-                  <button onClick={() => openModal("studio")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors">→ Sécuriser ma place pour 9€</button>
+                  <button onClick={() => openModal("studio")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors">→ Sécuriser ma place</button>
                 </div>
               </motion.div>
             </div>
@@ -780,7 +780,7 @@ export default function LandingPage() {
               {/* Countdown */}
               <CountdownDisplay />
 
-              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="mt-8 bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 lg:px-12 lg:py-4 rounded-full font-bold text-base lg:text-lg shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place — 9€</motion.button>
+              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="mt-8 bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 lg:px-12 lg:py-4 rounded-full font-bold text-base lg:text-lg shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
               <p className="text-xs font-medium text-slate-400 mt-4 max-w-md">Paiement sécurisé via Stripe · Remboursé si l'app ne sort pas · 9€ déduits du prix final</p>
             </motion.div>
           </div>
