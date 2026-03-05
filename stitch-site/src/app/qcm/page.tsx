@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Check, ArrowRight, Loader2 } from "lucide-react"
@@ -45,7 +45,7 @@ const questions = [
     }
 ]
 
-export default function QCMPage() {
+function QCMContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const [email, setEmail] = useState<string | null>(null)
@@ -157,8 +157,8 @@ export default function QCMPage() {
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: idx * 0.1 }}
                                             className={`w-full text-left p-5 rounded-2xl border transition-all duration-200 flex items-center justify-between ${isSelected
-                                                    ? "bg-white/10 border-white text-white shadow-[0_0_30px_rgba(255,255,255,0.1)]"
-                                                    : "bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.06] hover:text-white"
+                                                ? "bg-white/10 border-white text-white shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+                                                : "bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.06] hover:text-white"
                                                 }`}
                                         >
                                             <span className="text-lg font-medium">{option.label}</span>
@@ -199,5 +199,17 @@ export default function QCMPage() {
                 )}
             </div>
         </main>
+    )
+}
+
+export default function QCMPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 text-center">
+                <Loader2 className="w-8 h-8 animate-spin text-white/40 mx-auto" />
+            </div>
+        }>
+            <QCMContent />
+        </Suspense>
     )
 }
