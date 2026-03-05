@@ -20,9 +20,9 @@ function useCountdown() {
 
 /* ─── PLANS DATA ─── */
 const PLANS = [
-    { id: "solo", name: "SOLO", pitch: "Ton Mac qui travaille pour toi, 24/7.", now: "9€", after: "88€", full: "197€" },
-    { id: "pro", name: "PRO", pitch: "Tes agents forment une vraie équipe.", now: "9€", after: "238€", full: "497€" },
-    { id: "studio", name: "STUDIO", pitch: "Tu diriges une équipe IA, pas une app.", now: "9€", after: "488€", full: "997€" },
+    { id: "solo", name: "SOLO", pitch: "Tu ouvres Elazya le matin. Tout est déjà fait.", now: "9€", after: "88€", full: "197€" },
+    { id: "pro", name: "PRO", pitch: "Tes agents travaillent ensemble, pas juste chacun de leur côté.", now: "9€", after: "238€", full: "497€" },
+    { id: "studio", name: "STUDIO", pitch: "Elazya tourne ta structure pendant que tu dors.", now: "9€", after: "488€", full: "997€" },
 ]
 
 function ReservationContent() {

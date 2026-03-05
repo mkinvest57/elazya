@@ -355,74 +355,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="py-28 relative overflow-hidden bg-white/30 backdrop-blur-3xl">
-          <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-accent/5 blur-[140px] rounded-full pointer-events-none" />
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="text-center mb-20">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-              >
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-5">
-                  <span className="text-slate-800">Un logiciel IA qui agit</span>
-                  {' '}
-                  <span className="text-gradient-primary">vraiment sur votre Mac.</span>
-                </h2>
-                <p className="text-lg text-slate-500 max-w-2xl mx-auto font-medium">
-                  Elazya ne se contente pas de répondre à vos questions dans une fenêtre de chat. Il ouvre vos dossiers, lit vos PDF, et prépare des brouillons directement dans Apple Mail.
-                </p>
-              </motion.div>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {[
-                {
-                  icon: Terminal,
-                  title: "Il agit dans vos applications",
-                  desc: "Elazya manipule vos fichiers, rédige vos mails et gère vos rendez-vous. Il ne discute pas du travail — il le fait pour de vrai.",
-                  gradient: "from-primary/5 to-transparent",
-                  color: "text-primary"
-                },
-                {
-                  icon: ShieldCheck,
-                  title: "Souveraineté totale",
-                  desc: "Le cerveau reste chez vous. Aucun serveur cloud ne stocke votre contexte. Pas de tracking, pas de collecte.",
-                  gradient: "from-accent/5 to-transparent",
-                  color: "text-accent"
-                },
-                {
-                  icon: Zap,
-                  title: "44 compétences",
-                  desc: "Email, calendrier, terminal, recherche web, Notion, Spotify... Elazya enchaîne les outils pour résoudre des problèmes complexes.",
-                  gradient: "from-emerald-500/5 to-transparent",
-                  color: "text-emerald-500"
-                }
-              ].map((feat, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="relative p-6 md:p-8 rounded-3xl bg-white/80 backdrop-blur-md border border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group overflow-hidden"
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-b ${feat.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
-                  <div className="relative z-10">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-6 shadow-sm">
-                      <feat.icon className={`w-6 h-6 ${feat.color}`} />
-                    </div>
-                    <h3 className="text-xl font-bold mb-3 text-slate-800 tracking-tight">{feat.title}</h3>
-                    <p className="text-slate-500 leading-relaxed font-medium">{feat.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Product Showcase — Bento Grid */}
+                {/* Product Showcase — Bento Grid */}
         <section className="py-28 relative border-t border-slate-200/50 bg-[#f8fbff]/50">
           <div className="absolute inset-0 bg-primary/[0.02] grain-light pointer-events-none" />
           <div className="container mx-auto px-6 relative z-10">
@@ -535,73 +468,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Skills Arsenal */}
-        <section id="arsenal" className="py-28 relative overflow-hidden border-t border-slate-200/50 bg-white">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-5">
-                <span className="text-slate-800">44 applications connectées.</span>
-                {' '}
-                <span className="text-gradient-primary">Zéro plugin nécessaire.</span>
-              </h2>
-              <p className="text-lg text-slate-500 font-medium max-w-2xl mx-auto">
-                Elazya comprend et pilote nativement vos outils locaux via des permissions d'accessibilité sécurisées.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
-              {[
-                { name: "Email Pro", icon: Mail, desc: "Gmail, Outlook, Mail.app" },
-                { name: "Calendrier", icon: Calendar, desc: "Gestion de planning" },
-                { name: "Recherche Web", icon: Search, desc: "Recherche anonyme" },
-                { name: "Notes", icon: PenTool, desc: "Notes & idées" },
-                { name: "Finder", icon: Folder, desc: "Organisation fichiers" },
-                { name: "Terminal", icon: Terminal, desc: "Scripts & serveurs" },
-                { name: "Slack / Discord", icon: MessageSquare, desc: "Communication" },
-                { name: "Santé / RDV", icon: Activity, desc: "Doctolib & soins" },
-                { name: "Rappels", icon: Bell, desc: "To-do local" },
-                { name: "Notion", icon: FileText, desc: "Knowledge base" },
-                { name: "Python", icon: Cpu, desc: "Calculs & data" },
-                { name: "Spotify", icon: Music, desc: "Contrôle musical" },
-                { name: "Focus Mode", icon: Moon, desc: "Concentration" },
-                { name: "Sécurité", icon: Lock, desc: "Mots de passe" },
-                { name: "Météo", icon: Cloud, desc: "Prévisions" },
-                { name: "Traduction", icon: Book, desc: "Langues & style" },
-                { name: "Système", icon: ShieldCheck, desc: "Santé du Mac" },
-                { name: "Shopping", icon: ShoppingCart, desc: "Suivi colis" },
-                { name: "Maps", icon: Globe, desc: "Lieux & trajets" },
-                { name: "Sparkles", icon: Sparkles, desc: "Et bien plus..." },
-              ].map((skill, i) => {
-                const Icon = skill.icon;
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: (i % 10) * 0.03 }}
-                    className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-primary/30 hover:shadow-[0_8px_30px_-4px_rgba(99,102,241,0.1)] transition-all duration-300 group cursor-default text-center flex flex-col items-center"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-3 group-hover:bg-primary/5 group-hover:border-primary/20 transition-colors">
-                      <Icon className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
-                    </div>
-                    <div className="text-[13px] font-bold text-slate-700 mb-1">{skill.name}</div>
-                    <div className="text-[11px] font-medium text-slate-500">{skill.desc}</div>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            <div className="text-center mt-12">
-              <span className="px-6 py-2.5 rounded-full bg-slate-100 border border-slate-200 text-sm font-bold text-slate-500 shadow-sm">
-                + 24 autres compétences incluses
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* Comparison Section */}
+                {/* Comparison Section */}
         <section className="py-28 relative border-t border-slate-200/50 bg-[#f8fbff]/50">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
@@ -670,56 +537,82 @@ export default function LandingPage() {
               {/* SOLO */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0 }} className="rounded-2xl border border-slate-200 bg-white p-7 flex flex-col">
                 <h3 className="text-xl font-bold text-slate-800 mb-1">SOLO</h3>
-                <p className="text-sm text-slate-500 font-medium mb-5">Ton Mac qui travaille pour toi, 24/7.</p>
+                <p className="text-sm text-slate-500 font-medium mb-5">Tu ouvres Elazya le matin. Tout est déjà fait.</p>
                 <ul className="space-y-2.5 mb-6 flex-1">
-                  {["Brief Telegram chaque matin, tout résumé", "Factures classées automatiquement", "Prospects qualifiés, fiches créées", "Posts LinkedIn générés chaque jour", "Zéro abonnement. Tout local sur ton Mac."].map((b, i) => (
-                    <li key={i} className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />{b}</li>
-                  ))}
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />10 agents Core actifs sur ton Mac</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />WhatsApp ou Telegram inclus — contrôle tout depuis ton téléphone</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Morning briefing automatique chaque matin</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Zéro configuration technique : tout en français depuis l'UI Mac</li>
                 </ul>
-                <div className="border-t border-slate-100 pt-5">
-                  <p className="text-sm font-bold text-slate-800">9€ aujourd'hui · <span className="text-primary">88€</span> le 5 avril <span className="line-through text-slate-400">197€</span></p>
-                  <p className="text-xs text-emerald-600 font-semibold mt-1">Tu économises 109€</p>
-                  <button onClick={() => openModal("solo")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors">→ Sécuriser ma place</button>
+                <div className="mb-5 p-3 rounded-lg bg-[#f8fbff] border border-slate-100 italic text-xs text-slate-500 font-medium shadow-sm">
+                  "Un assistant virtuel à 197€ une fois, au lieu de 1 500€/mois pour un humain."
+                </div>
+                <div className="border-t border-slate-100 pt-5 text-center sm:text-left">
+                  <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1">
+                    <span>9€ aujourd'hui</span>
+                    <span className="hidden sm:inline"> · </span>
+                    <span><span className="text-primary">88€</span> le 5 avril <span className="line-through text-slate-400">197€</span></span>
+                  </p>
+                  <p className="text-xs text-emerald-600 font-semibold mt-1">tu économises 109€</p>
+                  <button onClick={() => openModal("solo")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors w-full sm:w-auto text-left">→ Sécuriser ma place pour 9€</button>
                 </div>
               </motion.div>
 
               {/* PRO */}
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="rounded-2xl border-2 border-primary bg-white p-7 flex flex-col relative">
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold text-white bg-primary px-4 py-1 rounded-full">Le plus populaire</span>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="rounded-2xl border-2 border-primary bg-white p-7 flex flex-col relative scale-[1.02] shadow-xl">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold text-white bg-primary px-4 py-1.5 rounded-full whitespace-nowrap shadow-sm">Le plus populaire</span>
                 <h3 className="text-xl font-bold text-slate-800 mb-1">PRO</h3>
-                <p className="text-sm text-slate-500 font-medium mb-5">Tes agents forment une vraie équipe.</p>
+                <p className="text-sm text-slate-500 font-medium mb-5">Tes agents travaillent ensemble, pas juste chacun de leur côté.</p>
                 <ul className="space-y-2.5 mb-6 flex-1">
-                  {["Tout le Solo +", "Agents enchaînés automatiquement (prospect → CRM → réponse)", "LinkedIn publie directement sur ton compte", "Brief de recherche complet en 3 min sur demande", "Devis PDF envoyable en 20 min", "CRM mis à jour avec tes notes vocales"].map((b, i) => (
-                    <li key={i} className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />{b}</li>
-                  ))}
+                  <li className="text-sm text-slate-800 font-bold flex items-start gap-2">Tout le Solo +</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Multi-agents coordonnés : Qualification → CRM → Onboarding, automatique</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />LinkedIn publie vraiment sur ton compte (pas juste du texte à copier)</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Research agent : un sujet → brief 2 000 mots + 15 sources en 3 min</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Proposal agent : décris un client → devis PDF envoyable directement</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />CRM post-appel : transcription → Notion mis à jour, tu valides en 1 clic</li>
                 </ul>
-                <div className="border-t border-slate-100 pt-5">
-                  <p className="text-sm font-bold text-slate-800">9€ aujourd'hui · <span className="text-primary">238€</span> le 5 avril <span className="line-through text-slate-400">497€</span></p>
-                  <p className="text-xs text-emerald-600 font-semibold mt-1">Tu économises 259€</p>
-                  <button onClick={() => openModal("pro")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors">→ Sécuriser ma place</button>
+                <div className="mb-5 p-3 rounded-lg bg-primary/5 border border-primary/10 italic text-xs text-slate-600 font-medium shadow-sm">
+                  "Tes agents ne sont plus des îles. Ils forment une équipe."
+                </div>
+                <div className="border-t border-slate-100 pt-5 text-center sm:text-left">
+                  <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1">
+                    <span>9€ aujourd'hui</span>
+                    <span className="hidden sm:inline"> · </span>
+                    <span><span className="text-primary">238€</span> le 5 avril <span className="line-through text-slate-400">497€</span></span>
+                  </p>
+                  <p className="text-xs text-emerald-600 font-semibold mt-1">tu économises 259€</p>
+                  <button onClick={() => openModal("pro")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors w-full sm:w-auto text-left">→ Sécuriser ma place pour 9€</button>
                 </div>
               </motion.div>
 
               {/* STUDIO */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="rounded-2xl border border-slate-200 bg-white p-7 flex flex-col">
                 <h3 className="text-xl font-bold text-slate-800 mb-1">STUDIO</h3>
-                <p className="text-sm text-slate-500 font-medium mb-5">Tu diriges une équipe IA, pas une app.</p>
+                <p className="text-sm text-slate-500 font-medium mb-5">Elazya tourne ta structure pendant que tu dors.</p>
                 <ul className="space-y-2.5 mb-6 flex-1">
-                  {["Tout le Pro +", "4 agents coordonnés (Strategy, Marketing, Business, Client)", "Rapport business complet chaque lundi", "Crée tes propres agents en décrivant ce que tu veux", "Jusqu'à 5 utilisateurs sur le même compte", "1 agent personnalisé créé pour toi par an", "Setup guidé 1-to-1"].map((b, i) => (
-                    <li key={i} className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />{b}</li>
-                  ))}
+                  <li className="text-sm text-slate-800 font-bold flex items-start gap-2">Tout le Pro +</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />4 agents coordonnés avec rôles définis : Strategy · Marketing · Business · Client. Ils s'escaladent entre eux automatiquement</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Créateur d'agents : décris en français → Elazya crée le skill</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Multi-Mac : 2 à 5 collaborateurs sur la même instance</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Health monitoring hebdomadaire : pipeline, factures, tâches, opportunités → rapport automatique chaque semaine</li>
                 </ul>
-                <div className="border-t border-slate-100 pt-5">
-                  <p className="text-sm font-bold text-slate-800">9€ aujourd'hui · <span className="text-primary">488€</span> le 5 avril <span className="line-through text-slate-400">997€</span></p>
-                  <p className="text-xs text-emerald-600 font-semibold mt-1">Tu économises 509€</p>
-                  <button onClick={() => openModal("studio")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors">→ Sécuriser ma place</button>
+                <div className="mb-5 p-3 rounded-lg bg-[#f8fbff] border border-slate-100 italic text-xs text-slate-500 font-medium shadow-sm">
+                  "Tu ne gères plus une app. Tu gères une équipe IA."
+                </div>
+                <div className="border-t border-slate-100 pt-5 text-center sm:text-left">
+                  <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1">
+                    <span>9€ aujourd'hui</span>
+                    <span className="hidden sm:inline"> · </span>
+                    <span><span className="text-primary">488€</span> le 5 avril <span className="line-through text-slate-400">997€</span></span>
+                  </p>
+                  <p className="text-xs text-emerald-600 font-semibold mt-1">tu économises 509€</p>
+                  <button onClick={() => openModal("studio")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors w-full sm:w-auto text-left">→ Sécuriser ma place pour 9€</button>
                 </div>
               </motion.div>
             </div>
           </div>
         </section>
-
-        {/* ─── FAQ ─── */}
+\n                {/* ─── FAQ ─── */}
         <section className="py-28 border-t border-slate-200/50 bg-white">
           <div className="container mx-auto px-6">
             <div className="max-w-3xl mx-auto">
