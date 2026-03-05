@@ -22,7 +22,6 @@ export function Header() {
     }, [])
 
     const navLinks = [
-        { href: "/", label: "Accueil" },
         { href: "/agents", label: "Agents IA" },
     ]
 

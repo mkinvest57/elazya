@@ -115,27 +115,15 @@ export default function LandingPage() {
           <div className="container relative z-10 px-4 sm:px-6 mx-auto">
             <div className="max-w-5xl mx-auto text-center mt-[-4vh] sm:mt-[-8vh]">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="flex flex-col items-center">
-                <p className="text-xs sm:text-base text-slate-400 font-medium mb-4 sm:mb-6 tracking-wide px-2">Tu passes encore des heures sur tes factures, tes prospects et tes emails ?</p>
+                <p className="text-xs sm:text-base text-slate-400 font-medium mb-4 sm:mb-6 tracking-wide px-2">Tu passes encore des heures sur tes factures,<br className="hidden sm:block" />tes prospects et tes emails ?</p>
                 <h1 className="text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5.5rem] font-semibold tracking-tight mb-6 text-slate-800 leading-[1.15] sm:leading-[1.1]">
-                  L'app Mac
-                  <span className="inline-flex items-center mx-2 sm:mx-3 md:mx-4 align-middle translate-y-[-2px] sm:translate-y-[-4px]">
-                    <button
-                      onClick={() => setIsToggled(!isToggled)}
-                      className={`relative flex items-center w-14 h-7 sm:w-16 sm:h-8 md:w-28 md:h-14 rounded-full p-1 transition-colors duration-300 toggle-track-gradient shadow-inner ${isToggled ? 'bg-primary' : 'bg-slate-300'}`}
-                      aria-label="Toggle capability"
-                    >
-                      <div
-                        className={`w-5 h-5 sm:w-6 sm:h-6 md:w-11 md:h-11 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.2)] transform transition-transform duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] ${isToggled ? 'translate-x-[calc(100%+0.25rem)] sm:translate-x-[calc(100%+0.5rem)] md:translate-x-[calc(100%+1.5rem)]' : 'translate-x-0'}`}
-                      />
-                    </button>
-                  </span>
-                  <br />
-                  <span className="text-slate-400 font-medium tracking-tight">qui tourne ta structure </span>
-                  <br />
-                  <span className="text-slate-800 font-bold tracking-tighter">pendant que tu dors.</span>
+                  L'app Mac<br />qui tourne ta structure<br />pendant que tu dors.
                 </h1>
                 <p className="text-sm md:text-lg text-slate-500 font-medium max-w-xl mx-auto mb-8 tracking-wide leading-relaxed px-4">
-                  10 agents IA coordonnés s'occupent de tes factures, tes prospects, ton LinkedIn et tes emails. Tout automatisé. Tout local sur ton Mac. Tu reprends juste les décisions.
+                  10 agents IA coordonnés s'occupent de tes factures,<br className="hidden sm:block" />
+                  tes prospects, ton LinkedIn et tes emails.<br className="hidden sm:block" />
+                  Tout automatisé. Tout local sur ton Mac.<br className="hidden sm:block" />
+                  Tu reprends juste les décisions.
                 </p>
                 <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-6 py-3.5 sm:px-8 sm:py-3.5 rounded-full font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
                 <p className="text-[11px] sm:text-xs font-medium text-slate-400 mt-4 px-4">47 places · Lancement le 5 avril · -50% · 9€ déduits du prix final</p>
@@ -355,7 +343,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-                {/* Product Showcase — Bento Grid */}
+        {/* Product Showcase — Bento Grid */}
         <section className="py-28 relative border-t border-slate-200/50 bg-[#f8fbff]/50">
           <div className="absolute inset-0 bg-primary/[0.02] grain-light pointer-events-none" />
           <div className="container mx-auto px-6 relative z-10">
@@ -468,7 +456,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-                {/* Comparison Section */}
+        {/* Comparison Section */}
         <section className="py-28 relative border-t border-slate-200/50 bg-[#f8fbff]/50">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
@@ -544,17 +532,17 @@ export default function LandingPage() {
                   <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Morning briefing automatique chaque matin</li>
                   <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Zéro configuration technique : tout en français depuis l'UI Mac</li>
                 </ul>
-                <div className="mb-5 p-3 rounded-lg bg-[#f8fbff] border border-slate-100 italic text-xs text-slate-500 font-medium shadow-sm">
-                  "Un assistant virtuel à 197€ une fois, au lieu de 1 500€/mois pour un humain."
-                </div>
                 <div className="border-t border-slate-100 pt-5 text-center sm:text-left">
-                  <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1">
-                    <span>9€ aujourd'hui</span>
+                  <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1 mb-2">
+                    <span className="line-through text-slate-400">197€</span>
                     <span className="hidden sm:inline"> · </span>
-                    <span><span className="text-primary">88€</span> le 5 avril <span className="line-through text-slate-400">197€</span></span>
+                    <span className="text-primary">88€</span> le 5 avril
                   </p>
-                  <p className="text-xs text-emerald-600 font-semibold mt-1">tu économises 109€</p>
-                  <button onClick={() => openModal("solo")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors w-full sm:w-auto text-left">→ Sécuriser ma place pour 9€</button>
+                  <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                    Un assistant virtuel à 197€ une fois,<br />
+                    au lieu de 1 500€/mois pour un humain.
+                  </p>
+                  <button onClick={() => openModal("solo")} className="w-full bg-[#0f172a] hover:bg-slate-800 text-white py-3 rounded-full font-bold text-sm transition-colors text-center">Sécuriser ma place</button>
                 </div>
               </motion.div>
 
@@ -562,26 +550,26 @@ export default function LandingPage() {
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="rounded-2xl border-2 border-primary bg-white p-7 flex flex-col relative scale-[1.02] shadow-xl">
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold text-white bg-primary px-4 py-1.5 rounded-full whitespace-nowrap shadow-sm">Le plus populaire</span>
                 <h3 className="text-xl font-bold text-slate-800 mb-1">PRO</h3>
-                <p className="text-sm text-slate-500 font-medium mb-5">Tes agents travaillent ensemble, pas juste chacun de leur côté.</p>
+                <p className="text-sm text-slate-500 font-medium mb-5">Tes agents travaillent ensemble,<br />pas juste chacun de leur côté.</p>
                 <ul className="space-y-2.5 mb-6 flex-1">
                   <li className="text-sm text-slate-800 font-bold flex items-start gap-2">Tout le Solo +</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Multi-agents coordonnés : Qualification → CRM → Onboarding, automatique</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />LinkedIn publie vraiment sur ton compte (pas juste du texte à copier)</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Research agent : un sujet → brief 2 000 mots + 15 sources en 3 min</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Proposal agent : décris un client → devis PDF envoyable directement</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />CRM post-appel : transcription → Notion mis à jour, tu valides en 1 clic</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Multi-agents coordonnés : Qualification → CRM → Onboarding</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />LinkedIn publie directement sur ton compte</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Research agent : un sujet → brief complet en 3 min</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Proposal agent : décris un client → devis PDF prêt</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />CRM post-appel : transcription → Notion mis à jour en 1 clic</li>
                 </ul>
-                <div className="mb-5 p-3 rounded-lg bg-primary/5 border border-primary/10 italic text-xs text-slate-600 font-medium shadow-sm">
-                  "Tes agents ne sont plus des îles. Ils forment une équipe."
-                </div>
                 <div className="border-t border-slate-100 pt-5 text-center sm:text-left">
-                  <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1">
-                    <span>9€ aujourd'hui</span>
+                  <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1 mb-2">
+                    <span className="line-through text-slate-400">497€</span>
                     <span className="hidden sm:inline"> · </span>
-                    <span><span className="text-primary">238€</span> le 5 avril <span className="line-through text-slate-400">497€</span></span>
+                    <span className="text-primary">238€</span> le 5 avril
                   </p>
-                  <p className="text-xs text-emerald-600 font-semibold mt-1">tu économises 259€</p>
-                  <button onClick={() => openModal("pro")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors w-full sm:w-auto text-left">→ Sécuriser ma place pour 9€</button>
+                  <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                    Tes agents ne sont plus des îles.<br />
+                    Ils forment une équipe.
+                  </p>
+                  <button onClick={() => openModal("pro")} className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-full font-bold text-sm transition-colors text-center">Sécuriser ma place</button>
                 </div>
               </motion.div>
 
@@ -591,28 +579,28 @@ export default function LandingPage() {
                 <p className="text-sm text-slate-500 font-medium mb-5">Elazya tourne ta structure pendant que tu dors.</p>
                 <ul className="space-y-2.5 mb-6 flex-1">
                   <li className="text-sm text-slate-800 font-bold flex items-start gap-2">Tout le Pro +</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />4 agents coordonnés avec rôles définis : Strategy · Marketing · Business · Client. Ils s'escaladent entre eux automatiquement</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />4 agents coordonnés : Strategy · Marketing · Business · Client</li>
                   <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Créateur d'agents : décris en français → Elazya crée le skill</li>
                   <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Multi-Mac : 2 à 5 collaborateurs sur la même instance</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Health monitoring hebdomadaire : pipeline, factures, tâches, opportunités → rapport automatique chaque semaine</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Health monitoring : rapport business automatique chaque semaine</li>
                 </ul>
-                <div className="mb-5 p-3 rounded-lg bg-[#f8fbff] border border-slate-100 italic text-xs text-slate-500 font-medium shadow-sm">
-                  "Tu ne gères plus une app. Tu gères une équipe IA."
-                </div>
                 <div className="border-t border-slate-100 pt-5 text-center sm:text-left">
-                  <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1">
-                    <span>9€ aujourd'hui</span>
+                  <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1 mb-2">
+                    <span className="line-through text-slate-400">997€</span>
                     <span className="hidden sm:inline"> · </span>
-                    <span><span className="text-primary">488€</span> le 5 avril <span className="line-through text-slate-400">997€</span></span>
+                    <span className="text-primary">488€</span> le 5 avril
                   </p>
-                  <p className="text-xs text-emerald-600 font-semibold mt-1">tu économises 509€</p>
-                  <button onClick={() => openModal("studio")} className="mt-4 text-sm font-bold text-primary hover:text-primary-hover transition-colors w-full sm:w-auto text-left">→ Sécuriser ma place pour 9€</button>
+                  <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                    Tu ne gères plus une app.<br />
+                    Tu gères une équipe IA.
+                  </p>
+                  <button onClick={() => openModal("studio")} className="w-full bg-[#0f172a] hover:bg-slate-800 text-white py-3 rounded-full font-bold text-sm transition-colors text-center">Sécuriser ma place</button>
                 </div>
               </motion.div>
             </div>
           </div>
         </section>
-\n                {/* ─── FAQ ─── */}
+        \n                {/* ─── FAQ ─── */}
         <section className="py-28 border-t border-slate-200/50 bg-white">
           <div className="container mx-auto px-6">
             <div className="max-w-3xl mx-auto">
