@@ -210,7 +210,7 @@ export default function AgentsPage() {
                 <div className="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-blue-400 blur-[150px] rounded-full"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-purple-400 blur-[150px] rounded-full"></div>
             </div>
-            
+
             <div className="fixed inset-0 bg-primary/[0.02] grain-light pointer-events-none z-0" />
 
             <div className="relative z-10 pt-32 pb-24 px-6 mt-10">
@@ -224,26 +224,26 @@ export default function AgentsPage() {
                     >
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold uppercase tracking-widest mb-8 shadow-sm">
                             <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                            10 Agents Métiers Souverains
+                            Ton équipe IA. Locale et souveraine.
                         </div>
                         <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-8 tracking-tight leading-[1.05]">
-                            <span className="text-slate-800">Que peut faire</span><br />
-                            <span className="text-gradient-primary">l'application Elazya ?</span>
+                            <span className="text-slate-800">Voici de quoi est capable</span><br />
+                            <span className="text-gradient-primary">ton nouveau staff.</span>
                         </h1>
                         <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto font-medium leading-relaxed">
-                            Découvrez les scripts automatisés de niveau macOS fournis avec votre licence. Ils contrôlent vos applications locales pour exécuter vos tâches à votre place.
+                            Découvre les membres de ton équipe virtuelle. Tous s'exécutent en local sur ton Mac, sans cloud ni abonnement. Tu ne gères plus des tâches, tu gères des résultats.
                         </p>
 
                         {/* Social proof */}
-                        <div className="flex flex-wrap items-center justify-center gap-6 text-sm font-medium">
+                        <div className="flex flex-wrap items-center justify-center gap-6 text-sm font-medium mt-10">
                             <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 border border-slate-200 text-slate-600 shadow-sm backdrop-blur-md">
-                                <Zap className="w-4 h-4 text-emerald-500" /> Setup en 2 minutes
+                                <Zap className="w-4 h-4 text-emerald-500" /> Sans configuration technique
                             </span>
                             <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 border border-slate-200 text-slate-600 shadow-sm backdrop-blur-md">
-                                <Sparkles className="w-4 h-4 text-primary" /> 2-10h/semaine sauvées
+                                <Sparkles className="w-4 h-4 text-primary" /> Multi-agents coordonnés
                             </span>
                             <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 border border-slate-200 text-slate-600 shadow-sm backdrop-blur-md">
-                                🇫🇷 100% local, souverain
+                                🇫🇷 100% privé sur ton Mac
                             </span>
                         </div>
                     </motion.div>
@@ -257,14 +257,9 @@ export default function AgentsPage() {
                                 <Zap className="w-6 h-6" />
                             </div>
                             <div>
-                                <h2 className="text-3xl font-bold tracking-tight text-slate-800">Agents Core</h2>
-                                <p className="text-slate-500 font-medium">Inclus dans Solo, Pro et Business</p>
+                                <h2 className="text-3xl font-bold tracking-tight text-slate-800">Ton équipe de base</h2>
+                                <p className="text-slate-500 font-medium">L'essentiel pour automatiser le quotidien</p>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-2 mb-12">
-                            <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 text-[11px] font-bold uppercase tracking-wider">Solo</span>
-                            <span className="px-3 py-1 rounded-full bg-primary/5 border border-primary/10 text-primary text-[11px] font-bold uppercase tracking-wider">Pro</span>
-                            <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-[11px] font-bold uppercase tracking-wider">Business</span>
                         </div>
                     </motion.div>
 
@@ -284,7 +279,7 @@ export default function AgentsPage() {
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-bold text-slate-800 tracking-tight">{agent.name}</h3>
-                                        <span className="text-xs text-emerald-600 font-bold uppercase tracking-wider">Core</span>
+                                        <span className="text-xs text-emerald-600 font-bold uppercase tracking-wider">Automatisé</span>
                                     </div>
                                 </div>
 
@@ -336,13 +331,9 @@ export default function AgentsPage() {
                                 <Lock className="w-6 h-6" />
                             </div>
                             <div>
-                                <h2 className="text-3xl font-bold tracking-tight text-slate-800">Agents Pro</h2>
-                                <p className="text-slate-500 font-medium">Inclus avec Pro et Business</p>
+                                <h2 className="text-3xl font-bold tracking-tight text-slate-800">Le pôle Avancé</h2>
+                                <p className="text-slate-500 font-medium">Pour accélérer la génération de revenus</p>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-2 mb-12">
-                            <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-bold uppercase tracking-wider">Pro</span>
-                            <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-[11px] font-bold uppercase tracking-wider">Business</span>
                         </div>
                     </motion.div>
 
@@ -356,19 +347,13 @@ export default function AgentsPage() {
                                 transition={{ duration: 0.5, delay: i * 0.1 }}
                                 className="bg-white/90 backdrop-blur-xl p-6 md:p-8 rounded-3xl group hover:scale-[1.02] transition-all flex flex-col relative overflow-hidden border border-primary/20 shadow-[0_4px_20px_-4px_rgba(99,102,241,0.15)]"
                             >
-                                {/* Pro badge */}
-                                <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-                                    <Lock className="w-3 h-3 text-primary" />
-                                    <span className="text-[10px] font-bold text-primary uppercase tracking-wider">PRO</span>
-                                </div>
-
                                 <div className="flex items-center gap-4 mb-4">
                                     <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
                                         <agent.icon className="w-7 h-7 text-white" />
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-bold text-slate-800 tracking-tight">{agent.name}</h3>
-                                        <span className="text-xs text-primary font-bold uppercase tracking-wider">Pro</span>
+                                        <span className="text-xs text-primary font-bold uppercase tracking-wider">Intelligent</span>
                                     </div>
                                 </div>
 
@@ -383,7 +368,7 @@ export default function AgentsPage() {
                                     ))}
                                 </ul>
 
-                                <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 mb-4">
+                                <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
                                     <div className="flex items-center gap-2 text-sm">
                                         <Sparkles className="w-4 h-4 text-primary" />
                                         <span className="text-primary font-bold">{agent.savings}</span>
@@ -393,12 +378,6 @@ export default function AgentsPage() {
                                         <span className="text-slate-500 font-semibold">{agent.setup}</span>
                                     </div>
                                 </div>
-
-                                <Link href="/pricing">
-                                    <button className="w-full py-3 rounded-xl border border-primary/30 text-primary font-bold text-sm hover:bg-primary/5 transition-colors shadow-sm">
-                                        Passer à Pro → 497€
-                                    </button>
-                                </Link>
                             </motion.div>
                         ))}
                     </div>
@@ -412,12 +391,9 @@ export default function AgentsPage() {
                                 <Building2 className="w-6 h-6" />
                             </div>
                             <div>
-                                <h2 className="text-3xl font-bold tracking-tight text-slate-800">Agents Business</h2>
-                                <p className="text-slate-500 font-medium">Business uniquement</p>
+                                <h2 className="text-3xl font-bold tracking-tight text-slate-800">Le pôle Stratégie</h2>
+                                <p className="text-slate-500 font-medium">Pour prendre du recul sur son activité</p>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-2 mb-12">
-                            <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold uppercase tracking-wider">Business</span>
                         </div>
                     </motion.div>
 
@@ -431,19 +407,13 @@ export default function AgentsPage() {
                                 transition={{ duration: 0.5, delay: i * 0.1 }}
                                 className="bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-sm hover:shadow-md rounded-3xl p-6 md:p-8 group hover:scale-[1.02] transition-all flex flex-col relative overflow-hidden"
                             >
-                                {/* Business badge */}
-                                <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
-                                    <Lock className="w-3 h-3 text-slate-500" />
-                                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">BUSINESS</span>
-                                </div>
-
                                 <div className="flex items-center gap-4 mb-4">
                                     <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
                                         <agent.icon className="w-7 h-7 text-white" />
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-bold text-slate-800 tracking-tight">{agent.name}</h3>
-                                        <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Business</span>
+                                        <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Stratégique</span>
                                     </div>
                                 </div>
 
@@ -458,7 +428,7 @@ export default function AgentsPage() {
                                     ))}
                                 </ul>
 
-                                <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 mb-4">
+                                <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
                                     <div className="flex items-center gap-2 text-sm">
                                         <Sparkles className="w-4 h-4 text-slate-600" />
                                         <span className="text-slate-700 font-bold">{agent.savings}</span>
@@ -468,64 +438,49 @@ export default function AgentsPage() {
                                         <span className="text-slate-500 font-semibold">{agent.setup}</span>
                                     </div>
                                 </div>
-
-                                <Link href="/pricing">
-                                    <button className="w-full py-3 rounded-xl border border-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-colors shadow-sm">
-                                        Passer à Business → 997€
-                                    </button>
-                                </Link>
                             </motion.div>
                         ))}
                     </div>
                 </section>
 
-                {/* ── TOTAL VALUE ──────────────────────────────────── */}
-                <section className="max-w-4xl mx-auto mb-32">
-                    <motion.div {...fadeUp}>
-                        <div className="bg-white/80 backdrop-blur-xl border border-slate-200/80 p-6 md:p-10 rounded-3xl relative overflow-hidden shadow-sm">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full"></div>
-                            <div className="relative z-10 text-center">
-                                <h3 className="text-2xl font-bold tracking-tight text-slate-800 mb-3">
-                                    10 agents. <span className="text-gradient-primary">Un seul achat.</span>
-                                </h3>
-                                <p className="text-slate-500 font-medium mb-8 max-w-xl mx-auto">
-                                    Chaque agent est configurable en moins de 4 minutes.
-                                    Ensemble, ils récupèrent plus de 10 heures par semaine.
-                                </p>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
-                                    <div className="text-center p-4 rounded-2xl bg-emerald-50 border border-emerald-100 shadow-sm">
-                                        <div className="text-3xl font-black text-emerald-600">5</div>
-                                        <div className="text-xs font-bold text-emerald-600/70 uppercase tracking-widest mt-1">Agents Core</div>
-                                    </div>
-                                    <div className="text-center p-4 rounded-2xl bg-primary/5 border border-primary/10 shadow-sm">
-                                        <div className="text-3xl font-black text-primary">+3</div>
-                                        <div className="text-xs font-bold text-primary/70 uppercase tracking-widest mt-1">Agents Pro</div>
-                                    </div>
-                                    <div className="text-center p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
-                                        <div className="text-3xl font-black text-slate-700">+2</div>
-                                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Agents Business</div>
-                                    </div>
-                                </div>
-                            </div>
+                {/* ── ADVANTAGES ──────────────────────────────────── */}
+                <section className="max-w-6xl mx-auto mb-32 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <motion.div {...fadeUp} className="bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-sm p-8 rounded-3xl flex flex-col items-start text-left group hover:scale-[1.02] transition-all">
+                        <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6">
+                            <Lock className="w-6 h-6 text-indigo-600" />
                         </div>
+                        <h3 className="text-xl font-bold text-slate-800 mb-3 leading-tight">100% Privé, 100% sur ton Mac</h3>
+                        <p className="text-slate-500 font-medium text-sm leading-relaxed">
+                            Contrairement aux SaaS classiques qui engloutissent tes données sur leurs serveurs, ton équipe IA tourne en local. Tes factures, tes emails, tes contacts : tout reste sur ton disque dur.
+                        </p>
+                    </motion.div>
+
+                    <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-sm p-8 rounded-3xl flex flex-col items-start text-left group hover:scale-[1.02] transition-all">
+                        <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-6">
+                            <Receipt className="w-6 h-6 text-emerald-600" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-800 mb-3 leading-tight">Aucun abonnement mensuel</h3>
+                        <p className="text-slate-500 font-medium text-sm leading-relaxed">
+                            Tu paies l'application une seule fois. Pas de récurrence, pas de surprise sur ta carte chaque mois. Tu es propriétaire de ton outil pour toujours.
+                        </p>
                     </motion.div>
                 </section>
 
                 {/* ── CTA ──────────────────────────────────────────── */}
                 <section className="text-center pb-16">
                     <motion.div {...fadeUp}>
-                        <h2 className="text-3xl font-bold tracking-tight text-slate-800 mb-6">Prêt à déléguer ?</h2>
+                        <h2 className="text-3xl font-bold tracking-tight text-slate-800 mb-6">Prêt à embaucher ton équipe ?</h2>
                         <p className="text-slate-500 font-medium mb-10 max-w-xl mx-auto">
-                            Choisissez votre plan et laissez les agents travailler pour vous dès les premières minutes.
+                            Découvre nos formules à paiement unique et commence à déléguer tes tâches dès aujourd'hui.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <Link href="/pricing" className="w-full sm:w-auto">
+                            <Link href="/#pricing" className="w-full sm:w-auto">
                                 <motion.button
                                     whileHover={{ scale: 1.02, y: -2 }}
                                     whileTap={{ scale: 0.98 }}
                                     className="px-6 md:px-10 py-4 w-full sm:w-auto justify-center bg-[#0f172a] text-white font-medium rounded-full shadow-[0_12px_24px_rgb(15,23,42,0.3)] flex items-center gap-2 hover:bg-slate-800 transition-all ring-1 ring-slate-800/20"
                                 >
-                                    Voir les tarifs
+                                    Voir les offres
                                     <ArrowRight className="w-5 h-5" />
                                 </motion.button>
                             </Link>
