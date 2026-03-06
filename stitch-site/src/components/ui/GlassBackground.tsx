@@ -28,7 +28,7 @@ export function GlassBackground() {
   ];
 
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#f8fbff] grain-light">
+    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#f8fbff] grain-light">
       {/* 1. Underlying Color Blobs */}
       <div className="absolute inset-0 flex items-center justify-center opacity-70">
         <motion.div 

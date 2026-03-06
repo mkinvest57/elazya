@@ -107,11 +107,11 @@ export default function LandingPage() {
     <>
       <StickyBanner onCTA={() => openModal()} places={places} />
       <EmailModal open={modal} onClose={() => setModal(false)} plan={modalPlan} />
-      <main className="min-h-screen bg-background text-slate-800 font-sans selection:bg-primary/20 selection:text-slate-900 overflow-hidden">
+      <main className="min-h-screen text-slate-800 font-sans selection:bg-primary/20 selection:text-slate-900 overflow-hidden">
+          <GlassBackground />
 
         {/* ─── HERO ─── */}
-        <section className="relative min-h-screen flex items-center justify-center pt-32 pb-16 overflow-hidden bg-background">
-          <GlassBackground />
+        <section className="relative min-h-screen flex items-center justify-center pt-32 pb-16 overflow-hidden bg-transparent">
           <div className="container relative z-10 px-4 sm:px-6 mx-auto">
             <div className="max-w-5xl mx-auto text-center mt-[-4vh] sm:mt-[-8vh]">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="flex flex-col items-center">
@@ -134,7 +134,7 @@ export default function LandingPage() {
         </section>
 
         {/* ─── SECTION SCÉNARIOS ─── */}
-        <section className="py-24 sm:py-32 bg-background border-b border-slate-200/50">
+        <section className="py-24 sm:py-32 bg-transparent border-b border-slate-200/50 relative z-10">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 sm:mb-20">
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
@@ -244,7 +244,7 @@ export default function LandingPage() {
         </section>
 
         {/* Social Proof / Logos */}
-        <section className="py-16 border-y border-slate-200/50 bg-background relative z-10">
+        <section className="py-16 border-y border-slate-200/50 bg-transparent relative z-10">
           <div className="container mx-auto px-6">
             <p className="text-center text-xs font-medium text-slate-400 uppercase tracking-widest mb-8">
               Propulsé par les meilleurs modèles d'IA au monde
@@ -515,7 +515,7 @@ export default function LandingPage() {
         </section>
 
         {/* ─── LES 3 PLANS ─── */}
-        <section className="py-24 sm:py-32 border-t border-slate-200/50 bg-background">
+        <section className="py-24 sm:py-32 border-t border-slate-200/50 bg-transparent">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
