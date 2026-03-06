@@ -114,7 +114,7 @@ export default function LandingPage() {
         <section className="relative min-h-screen flex items-center justify-center pt-32 pb-16 overflow-hidden bg-transparent">
           <div className="container relative z-10 px-4 sm:px-6 mx-auto">
             <div className="max-w-5xl mx-auto text-center mt-[-4vh] sm:mt-[-8vh]">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="flex flex-col items-center">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }} className="flex flex-col items-center">
                 <p className="text-xs sm:text-base text-slate-400 font-medium mb-4 sm:mb-6 tracking-wide px-2">Et si tu arrêtais enfin de tout faire toi-même ?</p>
                 <h1 className="text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5.5rem] font-semibold tracking-tight mb-6 text-slate-800 leading-[1.15] sm:leading-[1.1]">
                   Tu as une équipe<br />maintenant.
@@ -137,7 +137,7 @@ export default function LandingPage() {
         <section className="py-24 sm:py-32 bg-transparent border-b border-slate-200/50 relative z-10">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 sm:mb-20">
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }}>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 mb-6 leading-[1.1] max-w-3xl mx-auto">
                   Tu bosses trop.<br />Pas parce que tu manques de talent.<br />Parce que tu passes tes journées à recoller des morceaux.
                 </h2>
@@ -150,7 +150,7 @@ export default function LandingPage() {
             <div className="max-w-3xl mx-auto space-y-20 sm:space-y-28">
 
               {/* SCÉNARIO 1 — 8h00 */}
-              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }} transition={{ duration: 0.4 }}>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/15">8h00</span>
                   <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Tu te réveilles</h3>
@@ -173,7 +173,7 @@ export default function LandingPage() {
               </motion.div>
 
               {/* SCÉNARIO 2 — Un prospect */}
-              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }} transition={{ duration: 0.4 }}>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/15">14h00</span>
                   <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Un prospect t'écrit</h3>
@@ -195,7 +195,7 @@ export default function LandingPage() {
               </motion.div>
 
               {/* SCÉNARIO 3 — Facture */}
-              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }} transition={{ duration: 0.4 }}>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/15">16h30</span>
                   <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Une facture arrive dans ton dossier</h3>
@@ -215,7 +215,7 @@ export default function LandingPage() {
               </motion.div>
 
               {/* SCÉNARIO 4 — Appel client */}
-              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }} transition={{ duration: 0.4 }}>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/15">18h00</span>
                   <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Après un appel client</h3>
@@ -236,7 +236,7 @@ export default function LandingPage() {
             </div>
 
             {/* 2nd CTA */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-20 sm:mt-24">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }} className="text-center mt-20 sm:mt-24">
               <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 rounded-full font-bold text-base shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
               <p className="text-xs font-medium text-slate-400 mt-3">9€ maintenant · -50% le 5 avril · Remboursé si l'app ne sort pas</p>
             </motion.div>
@@ -265,7 +265,7 @@ export default function LandingPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, margin: "50px" }}
               >
                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-5">
                   <span className="text-slate-800">Des agents IA qui</span>
@@ -312,7 +312,7 @@ export default function LandingPage() {
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: true, margin: "50px" }}
                   transition={{ delay: i * 0.1 }}
                   className={`relative p-6 md:p-8 rounded-3xl bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] ${agent.borderColor} transition-all duration-300 group hover:-translate-y-1`}
                 >
@@ -354,7 +354,7 @@ export default function LandingPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, margin: "50px" }}
               >
                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-5">
                   <span className="text-slate-800">Intégré au cœur</span>
@@ -372,7 +372,7 @@ export default function LandingPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, margin: "50px" }}
                 className="lg:col-span-2 p-6 md:p-10 rounded-3xl bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300"
               >
                 <div className="flex items-center gap-3 mb-6">
@@ -398,7 +398,7 @@ export default function LandingPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, margin: "50px" }}
                 transition={{ delay: 0.1 }}
                 className="p-6 md:p-8 rounded-3xl bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300"
               >
@@ -415,7 +415,7 @@ export default function LandingPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, margin: "50px" }}
                 transition={{ delay: 0.15 }}
                 className="p-6 md:p-8 rounded-3xl bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300"
               >
@@ -431,7 +431,7 @@ export default function LandingPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, margin: "50px" }}
                 transition={{ delay: 0.2 }}
                 className="lg:col-span-2 p-6 md:p-10 rounded-3xl bg-gradient-to-r from-primary/5 to-accent/5 backdrop-blur-xl border border-primary/20 shadow-sm hover:shadow-md transition-all duration-300"
               >
@@ -518,7 +518,7 @@ export default function LandingPage() {
         <section className="py-24 sm:py-32 border-t border-slate-200/50 bg-transparent">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }}>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 mb-4 leading-[1.1]">Choisis ton niveau d'automatisation.</h2>
                 <p className="text-base sm:text-lg text-slate-500 font-medium">9€ maintenant pour sécuriser ta place. Le reste le 5 avril à -50%.</p>
               </motion.div>
@@ -526,7 +526,7 @@ export default function LandingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {/* SOLO */}
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0 }} className="rounded-3xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-7 flex flex-col shadow-sm">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }} transition={{ delay: 0 }} className="rounded-3xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-7 flex flex-col shadow-sm">
                 <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight">Tu n'es plus seul à tout gérer.</h3>
                 <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed">
                   Tu ouvres ton Mac le matin.<br />
@@ -557,7 +557,7 @@ export default function LandingPage() {
               </motion.div>
 
               {/* PRO */}
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="rounded-3xl border-2 border-primary/50 bg-white/90 backdrop-blur-xl p-7 flex flex-col relative scale-[1.02] shadow-xl">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }} transition={{ delay: 0.1 }} className="rounded-3xl border-2 border-primary/50 bg-white/90 backdrop-blur-xl p-7 flex flex-col relative scale-[1.02] shadow-xl">
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold text-white bg-primary px-4 py-1.5 rounded-full whitespace-nowrap shadow-sm">Le plus populaire</span>
                 <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight">Un prospect intéressé devient un client signé sans que tu aies rien fait entre les deux.</h3>
                 <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed">
@@ -588,7 +588,7 @@ export default function LandingPage() {
               </motion.div>
 
               {/* STUDIO */}
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="rounded-3xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-7 flex flex-col shadow-sm">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }} transition={{ delay: 0.2 }} className="rounded-3xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-7 flex flex-col shadow-sm">
                 <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight">Tu ne gères plus une app. Tu diriges une équipe.</h3>
                 <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed">
                   Tu deviens CEO de ta propre structure à 1 personne.<br />
@@ -636,7 +636,7 @@ export default function LandingPage() {
                   { q: "Pourquoi seulement 47 places ?", a: "Pour garantir un support de qualité à chaque utilisateur au lancement. Les places suivantes seront au prix normal." },
                   { q: "C'est quoi OpenClaw ?", a: "Le moteur IA qui coordonne les agents d'Elazya sur ton Mac. Il tourne en local. Tu n'as pas besoin de comprendre comment ça marche." },
                 ].map((faq, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
+                  <motion.div key={i} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }} transition={{ delay: i * 0.05 }}>
                     <details className="group p-6 rounded-2xl bg-[#f8fbff] border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all cursor-pointer">
                       <summary className="flex justify-between items-center font-bold text-slate-800 list-none">
                         <span>{faq.q}</span>
@@ -657,7 +657,7 @@ export default function LandingPage() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[140px] rounded-full pointer-events-none" />
           </div>
           <div className="container mx-auto px-6 relative z-10 text-center">
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex flex-col items-center">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "50px" }} className="flex flex-col items-center">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 mb-6 leading-[1.1]">
                 Ce n'est pas une app de plus.<br />
                 C'est la dernière dont tu auras besoin.
