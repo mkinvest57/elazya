@@ -207,6 +207,112 @@ const businessAgents = [
     },
 ]
 
+
+const otherFaculties = [
+    {
+        id: "multi-agent",
+        name: "Multi-agents coordonnés",
+        emoji: "🤝",
+        icon: Users,
+        color: "from-indigo-400 to-violet-600",
+        tagline: "Un vrai travail d'équipe",
+        features: [
+            "Les agents se parlent",
+            "Passage de relais auto",
+            "Maintien du contexte",
+            "Résolution complexe",
+        ],
+        example: "L'agent Qualification alimente automatiquement ton CRM avec un nouveau lead chaud. L'agent CRM le voit immédiatement et déclenche l'Onboarding Client pour lui envoyer un devis. Tout s'enchaîne de manière fluide et transparente.",
+        savings: "Zéro friction",
+        setup: "Natif",
+    },
+    {
+        id: "browser-automation",
+        name: "Browser Automation",
+        emoji: "🌐",
+        icon: Target,
+        color: "from-teal-400 to-emerald-600",
+        tagline: "Navigation humaine authentique",
+        features: [
+            "Contrôle Safari/Chrome",
+            "Clics et saisies naturels",
+            "Contourne les API limitées",
+            "Publication directe",
+        ],
+        example: "Contrairement aux outils SaaS qui utilisent l'API LinkedIn (souvent restreinte), l'agent Elazya ouvre vraiment ton navigateur sur ton Mac, tape le post que tu as validé, et clique sur 'Publier', exactement comme tu le ferais.",
+        savings: "100% natif",
+        setup: "Natif",
+    },
+    {
+        id: "research-agent",
+        name: "Research Agent Profond",
+        emoji: "🔎",
+        icon: Brain,
+        color: "from-blue-400 to-sky-600",
+        tagline: "L'analyste de l'équipe",
+        features: [
+            "Exploration web profonde",
+            "Analyses multi-sources",
+            "Synthèse de >2 000 mots",
+            "Sourcing académique",
+        ],
+        example: "Tu lui donnes un sujet technique ou un concurrent à analyser. Il explore 15 sources sur le web pendant 3 minutes et te rédige un brief détaillé de 2 000 mots avec toutes ses sources citées.",
+        savings: "5h de tracas",
+        setup: "Natif",
+    },
+    {
+        id: "visual-creator",
+        name: "Créateur d'agents visuel",
+        emoji: "🏗️",
+        icon: PenTool,
+        color: "from-fuchsia-400 to-pink-600",
+        tagline: "Crée tes propres agents",
+        features: [
+            "Aucun code requis",
+            "Description en français",
+            "Scripts générés par l'IA",
+            "Personnalisation totale",
+        ],
+        example: "Tu a besoin d'un agent 'Extracteur de factures AWS' ? Décris-lui ce qu'il doit faire en langage naturel : 'Connecte-toi à mon espace, récupère les PDF de facturation.' Elazya crée la compétence (skill) correspondante pour toi.",
+        savings: "Zéro dev",
+        setup: "Natif",
+    },
+    {
+        id: "multi-mac",
+        name: "Multi-Utilisateur",
+        emoji: "💻",
+        icon: Building2,
+        color: "from-slate-600 to-slate-800",
+        tagline: "Pour toute l'équipe",
+        features: [
+            "Une instance, plusieurs accès",
+            "Jusqu'à 5 collaborateurs",
+            "Séparation des données",
+            "Mode serveur sur Mac Mini",
+        ],
+        example: "Tu installes Elazya sur un Mac Mini distant (au bureau). Toi et 4 de tes collaborateurs pouvez piloter la même équipe d'agents en envoyant des requêtes depuis vos téléphones ou vos ordis respectifs.",
+        savings: "+5 licences gratuites",
+        setup: "Natif",
+    },
+    {
+        id: "health-monitoring",
+        name: "Health Monitoring Business",
+        emoji: "📈",
+        icon: BarChart3,
+        color: "from-orange-400 to-red-600",
+        tagline: "Coup d'œil sur la santé",
+        features: [
+            "Rapport hebdomadaire auto",
+            "Vue pipeline commercial",
+            "État de la facturation",
+            "Priorités de la semaine",
+        ],
+        example: "Chaque lundi matin, l'agent Strategy t'envoie un message récapitulatif avec l'état exact de ton entreprise : le pipeline de ventes, les factures en retard, et les tâches urgentes, sans que tu aies besoin d'ouvrir le moindre Dashboard.",
+        savings: "Tranquillité",
+        setup: "Natif",
+    },
+]
+
 const fadeUp = {
     initial: { opacity: 0, y: 30 },
     whileInView: { opacity: 1, y: 0 },
@@ -461,6 +567,54 @@ export default function AgentsPage() {
                                     <div className="flex items-center gap-2 text-sm">
                                         <Clock className="w-4 h-4 text-slate-400" />
                                         <span className="text-slate-500 font-semibold">{agent.setup}</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </section>
+
+
+                {/* ── AUTRES CAPACITÉS MOTEUR ──────────────────────────────── */}
+                <section className="max-w-6xl mx-auto mb-32">
+                    <motion.div {...fadeUp}>
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className="bg-slate-100 text-slate-800 p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                                <Zap className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h2 className="text-3xl font-bold tracking-tight text-slate-800">Les facultés du moteur</h2>
+                                <p className="text-slate-500 font-medium">Ce qu'Elazya est capable de faire sous le capot.</p>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {otherFaculties.map((agent, i) => (
+                            <motion.div
+                                key={agent.id}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: i * 0.1 }}
+                                className="bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-sm hover:shadow-md rounded-3xl p-6 md:p-8 group hover:scale-[1.02] transition-all flex flex-col relative overflow-hidden cursor-pointer" onClick={() => setSelectedAgent(agent)}
+                            >
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
+                                        <agent.icon className="w-7 h-7 text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-slate-800 tracking-tight">{agent.name}</h3>
+                                        <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Moteur</span>
+                                    </div>
+                                </div>
+
+                                <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed flex-1">{agent.tagline}</p>
+
+                                <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <Sparkles className="w-4 h-4 text-slate-400" />
+                                        <span className="text-slate-500 font-bold hover:text-primary transition-colors">Voir l'exemple complet →</span>
                                     </div>
                                 </div>
                             </motion.div>
