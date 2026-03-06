@@ -385,6 +385,278 @@ impl OpenClawBridge {
     }
 }
 
+pub fn setup_morning_briefing(state_dir: &std::path::Path) {
+    // 1. Setup Cron Job
+    let cron_dir = state_dir.join("cron");
+    let _ = std::fs::create_dir_all(&cron_dir);
+    let jobs_path = cron_dir.join("jobs.json");
+
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis() as u64;
+
+    let payload = serde_json::json!({
+        "kind": "agentTurn",
+        "message": "C'est l'heure du Morning Briefing. Résume les emails urgents et les tâches Notion pour aujourd'hui.",
+        "channel": "telegram",
+        "deliver": true
+    });
+
+    let job = serde_json::json!({
+        "id": "morning_briefing",
+        "agentId": "briefing",
+        "name": "Morning Briefing",
+        "description": "Routine matinale générant un résumé envoyé sur Telegram",
+        "enabled": true,
+        "createdAtMs": now,
+        "updatedAtMs": now,
+        "schedule": {
+            "kind": "cron",
+            "expr": "0 8 * * 1-5"
+        },
+        "sessionTarget": "isolated",
+        "wakeMode": "now",
+        "payload": payload,
+        "state": {}
+    });
+
+    let jobs_data = serde_json::json!({
+        "version": 1,
+        "jobs": [job]
+    });
+
+    let _ = std::fs::write(&jobs_path, serde_json::to_string_pretty(&jobs_data).unwrap_or_default());
+
+    // 2. Setup Markdown Agent
+    let agent_dir = state_dir.join("agents").join("briefing").join("agent");
+    let _ = std::fs::create_dir_all(&agent_dir);
+    let identity_path = agent_dir.join("IDENTITY.md");
+
+    let instructions = r#"# IDENTITY.md - Morning Briefing Agent
+
+Tu es l'agent responsable du Morning Briefing d'Elazya.
+Chaque matin (lundi à vendredi), tu es réveillé pour préparer un rapport proactif pour l'utilisateur.
+
+## TES OBJECTIFS :
+1. Lire les emails importants reçus depuis hier soir (utilise les outils Apple Mail si connectés).
+2. Consulter les tâches Notion prévues pour aujourd'hui (utilise les outils Notion si connectés).
+3. Rédiger un résumé structuré, concis et actionnable.
+
+## FORMAT DE SORTIE :
+Tu vas générer la réponse finale. Le système l'enverra automatiquement au canal Telegram (comme défini dans la charge utile du cron).
+Utilise des emojis :
+- 📧 Pour les emails
+- 📝 Pour les tâches
+- 🚨 Pour les urgences
+
+**Ne sois pas bavard.** Va droit au but.
+"#;
+
+    // Only write if it doesn't exist to allow user customization later
+    if !identity_path.exists() {
+        let _ = std::fs::write(&identity_path, instructions);
+    }
+}
+
+pub fn setup_pipeline_agents(state_dir: &std::path::Path) {
+    let base_agents_dir = state_dir.join("agents");
+
+    // 1. Qualification Agent
+    let qualif_dir = base_agents_dir.join("qualification").join("agent");
+    let _ = std::fs::create_dir_all(&qualif_dir);
+    let qualif_path = qualif_dir.join("IDENTITY.md");
+    if !qualif_path.exists() {
+        let qualif_instructions = r#"# IDENTITY.md - Qualification Leads
+
+Tu es l'agent chargé de qualifier les nouveaux leads.
+Évalue le lead fourni dans la requête.
+S'il est qualifié, tu DOIS obligatoirement utiliser l'outil `sessions_send` pour transmettre ses informations structurées à l'agent `crm-prospect`.
+N'utilise AUCUN AUTRE MOYEN de stockage. Fais-le silencieusement.
+"#;
+        let _ = std::fs::write(&qualif_path, qualif_instructions);
+    }
+
+    // 2. CRM Prospect Agent
+    let crm_dir = base_agents_dir.join("crm-prospect").join("agent");
+    let _ = std::fs::create_dir_all(&crm_dir);
+    let crm_path = crm_dir.join("IDENTITY.md");
+    if !crm_path.exists() {
+        let crm_instructions = r#"# IDENTITY.md - CRM Prospect
+
+Tu es l'agent chargé de l'insertion CRM.
+Tu vas recevoir des données d'un lead (depuis l'agent de qualification).
+Traite ces données (formate-les pour le CRM, simule l'enregistrement).
+Une fois terminé, tu DOIS obligatoirement utiliser l'outil `sessions_send` pour transmettre l'état d'avancement à l'agent `onboarding-client`.
+"#;
+        let _ = std::fs::write(&crm_path, crm_instructions);
+    }
+
+    // 3. Onboarding Client Agent
+    let onboard_dir = base_agents_dir.join("onboarding-client").join("agent");
+    let _ = std::fs::create_dir_all(&onboard_dir);
+    let onboard_path = onboard_dir.join("IDENTITY.md");
+    if !onboard_path.exists() {
+        let onboard_instructions = r#"# IDENTITY.md - Onboarding Client
+
+Tu es le dernier maillon de la chaîne de prospection.
+Tu reçois la confirmation d'enregistrement CRM.
+Ton rôle est de préparer le message de bienvenue, et FINI !
+Tu DOIS envoyer une confirmation finale décrivant brièvement tout le pipeline à l'utilisateur sur le canal `telegram` (via `sessions_send` ou l'outil `message`). 
+Sois bref et utilise des emojis de célébration.
+"#;
+        let _ = std::fs::write(&onboard_path, onboard_instructions);
+    }
+}
+
+pub fn setup_linkedin_agent(state_dir: &std::path::Path) {
+    let agent_dir = state_dir.join("agents").join("linkedin-digest").join("agent");
+    let _ = std::fs::create_dir_all(&agent_dir);
+    let identity_path = agent_dir.join("IDENTITY.md");
+
+    if !identity_path.exists() {
+        let instructions = r#"# IDENTITY.md - LinkedIn Digest (Browser Automation)
+
+Tu es un agent web autonome spécialisé dans la publication sur LinkedIn.
+Tu utilises EXCLUSIVEMENT l'outil natif `browser` basé sur le protocole CDP (Chrome DevTools Protocol). N'utilise jamais Playwright ou Puppeteer.
+
+## PROCESSUS DE PUBLICATION (Règle Human-in-the-loop)
+1. Ouvre la page de création de post sur LinkedIn avec `browser`.
+2. Utilise les 'snapshots sémantiques' (arbre d'accessibilité) de l'outil `browser` pour repérer les champs de texte et les boutons.
+3. Rédige un brouillon de publication.
+4. **ATTENTION : NE PUBLIE PAS ENCORE.**
+5. Envoie le brouillon sur Telegram à l'utilisateur via l'outil `message`.
+6. Demande "Dois-je procéder à la publication ? Réponds OUI pour confirmer".
+7. Si (et seulement si) la réponse est "OUI", utilise la fonction de clic de l'outil `browser` sur le bouton de publication que tu as repéré via l'arbre sémantique.
+"#;
+        let _ = std::fs::write(&identity_path, instructions);
+    }
+}
+
+pub fn setup_research_agent(state_dir: &std::path::Path) {
+    let agent_dir = state_dir.join("agents").join("research").join("agent");
+    let _ = std::fs::create_dir_all(&agent_dir);
+    let identity_path = agent_dir.join("IDENTITY.md");
+
+    if !identity_path.exists() {
+        let instructions = r#"# IDENTITY.md - Research Agent
+
+Tu es un agent d'investigation spécialisé dans la recherche profonde en 3 minutes.
+Tu as accès à internet pour récupérer des informations fiables.
+
+## TES OBJECTIFS :
+1. Cherche le web concernant le sujet demandé par l'utilisateur (utilise l'outil `web_search`).
+2. Récupère le contenu des ressources les plus pertinentes (utilise l'outil `web_fetch`).
+3. Agrège les sources de données en rédigeant un brief structuré.
+4. Sauvegarde ce brief au format Markdown en utilisant l'outil `write` à cet endroit exact : `~/Documents/Elazya_Workspace/Research/<nom_du_brief>.md`.
+5. Ne t'arrêtes pas avant d'avoir généré et écrit le fichier.
+6. Envoie ensuite un résumé court de 2-3 phrases sur le canal `telegram` (grâce à l'outil `message`) incluant expressément le chemin/lien vers le fichier généré.
+"#;
+        let _ = std::fs::write(&identity_path, instructions);
+    }
+}
+
+pub fn setup_devis_agent(state_dir: &std::path::Path) {
+    let agent_dir = state_dir.join("agents").join("devis-express").join("agent");
+    let _ = std::fs::create_dir_all(&agent_dir);
+    let identity_path = agent_dir.join("IDENTITY.md");
+
+    if !identity_path.exists() {
+        let instructions = r#"# IDENTITY.md - Devis Express Agent
+
+Tu es l'agent chargé de la création et de l'envoi des devis commerciaux.
+
+## TES OBJECTIFS :
+1. Rédige un devis clair et professionnel au format Markdown en fonction de la demande de l'utilisateur.
+2. Sauvegarde le devis dans `/tmp/devis.md`.
+3. Utilise l'outil `exec` pour exécuter le script local : `sh scripts/md_to_pdf.sh /tmp/devis.md /tmp/devis.pdf`.
+4. Prépare un brouillon d'e-mail d'accompagnement.
+5. **Règle Human-in-the-Loop** : Utilise l'outil `message` sur Telegram pour présenter le brouillon d'email ainsi que le lien vers `/tmp/devis.pdf` à l'utilisateur.
+6. Demande la confirmation explicite : "Dois-je envoyer le devis ? Réponds OUI".
+7. (Optionnel pour la suite : intégration d'un outil d'envoi d'email à condition que "OUI" soit répondu).
+"#;
+        let _ = std::fs::write(&identity_path, instructions);
+    }
+}
+
+pub fn setup_crm_audio_agent(state_dir: &std::path::Path) {
+    let agent_dir = state_dir.join("agents").join("crm-audio").join("agent");
+    let _ = std::fs::create_dir_all(&agent_dir);
+    let identity_path = agent_dir.join("IDENTITY.md");
+
+    if !identity_path.exists() {
+        let instructions = r#"# IDENTITY.md - CRM Audio Agent
+
+Tu es un agent traitant les transcriptions des notes vocales post-appel (moteur Whisper intégré).
+
+## TES OBJECTIFS :
+1. L'utilisateur t'envoie la transcription texte d'une note vocale qu'il vient de dicter.
+2. Identifie les éléments clés : Titre du compte-rendu ou nom du client, et contenu de l'appel.
+3. Utilise l'outil `update_notion_db` apporté par l'extension `notion-updater`.
+4. Passe le paramètre `title` (ex: "Appel avec Jean Dupont") et `content` (le résumé).
+5. Réponds de façon très concise à l'utilisateur sur le succès de l'opération ou envoie-lui le lien vers la page Notion créée.
+"#;
+        let _ = std::fs::write(&identity_path, instructions);
+    }
+}
+
+pub fn setup_team_agents(state_dir: &std::path::Path) {
+    let agents = vec![
+        ("manager", r#"# IDENTITY.md - Manager de l'Équipe
+Tu es le Manager d'un collectif de 4 agents experts (Strategy, Marketing, Business, Client).
+Ton rôle est d'intercepter les requêtes vagues ou complexes de l'utilisateur.
+
+## TES OBJECTIFS :
+1. Analyse la demande de l'utilisateur.
+2. Utilise l'outil `sessions_spawn` pour créer 4 sessions asynchrones en parallèle (si la plateforme le permet) ou séquentiellement, une pour chaque agent : `strategy`, `marketing`, `business`, `client`.
+3. Demande à chaque agent son avis critique et son plan d'action détaillé concernant la requête.
+4. Synthétise leurs réponses de façon claire et structurée.
+5. Envoie le rapport final consolidé à l'utilisateur sur Telegram via l'outil `message`."#),
+        ("strategy", r#"# IDENTITY.md - Agent de Stratégie Globale
+Tu es l'expert en vision à long terme et planification stratégique.
+Ton but est d'analyser le problème sous un angle macro, d'évaluer les concurrents et l'écosystème global de l'idée."#),
+        ("marketing", r#"# IDENTITY.md - Agent de Marketing & Acquisition
+Tu es l'expert du "Go-To-Market" et de l'acquisition.
+Ton but est de définir qui est la cible, comment l'atteindre aux moindres coûts et avec quels messages clés."#),
+        ("business", r#"# IDENTITY.md - Agent Business Model & Monétisation
+Tu es l'expert du chiffre d'affaires.
+Ton but est de définir comment cette idée peut générer de l'argent de façon pérenne, les coûts associés et la rentabilité."#),
+        ("client", r#"# IDENTITY.md - Agent Expérience & Support Client
+Tu es l'avocat du diable.
+Ton but est d'étudier le parcours utilisateur de bout en bout pour identifier l'ensemble des points de friction et de déception."#),
+    ];
+
+    for (agent_name, identity_content) in agents {
+        let agent_dir = state_dir.join("agents").join(agent_name).join("agent");
+        let _ = std::fs::create_dir_all(&agent_dir);
+        let identity_path = agent_dir.join("IDENTITY.md");
+        if !identity_path.exists() {
+            let _ = std::fs::write(&identity_path, identity_content);
+        }
+    }
+}
+
+pub fn setup_health_monitoring_agent(state_dir: &std::path::Path) {
+    let agent_dir = state_dir.join("agents").join("health-monitor").join("agent");
+    let _ = std::fs::create_dir_all(&agent_dir);
+    let identity_path = agent_dir.join("IDENTITY.md");
+
+    if !identity_path.exists() {
+        let instructions = r#"# IDENTITY.md - Health Monitoring Agent
+
+Tu es le garant de la santé du système Elazya et de ses intégrations.
+Chaque lundi matin, un job Cron fait appel à toi pour générer l'audit hebdomadaire.
+
+## TES OBJECTIFS :
+1. Lis les bases de données (si un outil SQL est fourni) ou inspecte les fichiers de logs (si tu as accès au terminal) pour calculer les KPIs de la semaine écoulée.
+2. Identifie toute activité anormale, de sécurité ou des requêtes en échec.
+3. Rédige un bref audit en Markdown avec des indicateurs clairs: "📈 Trafic", "🛑 Erreurs", etc.
+4. Envoie directement le compte-rendu sur le canal Telegram de l'utilisateur avec l'outil `message`.
+"#;
+        let _ = std::fs::write(&identity_path, instructions);
+    }
+}
+
 pub struct ManagedOpenClaw {
     #[allow(dead_code)]
     pub child: Mutex<Option<Child>>,
@@ -452,7 +724,7 @@ impl ManagedOpenClaw {
         let state_dir = std::path::Path::new(openclaw_dir).join("elazya-engine-state");
         let _ = std::fs::create_dir_all(&state_dir);
 
-        let config_path = state_dir.join("openclaw.json");
+        let _config_path = state_dir.join("openclaw.json");
         // Ensure the file exists with local mode to bypass "unconfigured" blocks
         let config_path = state_dir.join("openclaw.json");
         
@@ -478,6 +750,16 @@ impl ManagedOpenClaw {
         }
 
         let _ = std::fs::write(&config_path, serde_json::to_string_pretty(&config).unwrap());
+
+        // Setup Morning Briefing Cron and Agent
+        setup_morning_briefing(&state_dir);
+        setup_pipeline_agents(&state_dir);
+        setup_linkedin_agent(&state_dir);
+        setup_research_agent(&state_dir);
+        setup_devis_agent(&state_dir);
+        setup_crm_audio_agent(&state_dir);
+        setup_team_agents(&state_dir);
+        setup_health_monitoring_agent(&state_dir);
         let _log_dir = state_dir.join("logs");
         let _ = std::fs::create_dir_all(&_log_dir);
         let _cache_dir = state_dir.join("cache");
@@ -545,6 +827,7 @@ impl ManagedOpenClaw {
 pub fn enable_channel(openclaw_dir: &str, channel: &str, token: &str, user_id: Option<&str>, dm_policy: Option<&str>) -> Result<(), String> {
     let state_dir = std::path::Path::new(openclaw_dir).join("elazya-engine-state");
     let config_path = state_dir.join("openclaw.json");
+    let env_path = state_dir.join(".env");
 
     let mut config: Value = if config_path.exists() {
         let content = std::fs::read_to_string(&config_path)
@@ -559,10 +842,213 @@ pub fn enable_channel(openclaw_dir: &str, channel: &str, token: &str, user_id: O
         config["channels"] = serde_json::json!({});
     }
 
+    // Set dmScope to 'main' globally for shared session memory
+    if config.get("session").is_none() {
+        config["session"] = serde_json::json!({});
+    }
+    config["session"]["dmScope"] = serde_json::json!("main");
+
+    // Register Pipeline Agents and tools
+    if config.get("agents").is_none() {
+        config["agents"] = serde_json::json!({"list": []});
+    }
+
+    if let Some(list) = config["agents"].get_mut("list") {
+        if let Some(list_arr) = list.as_array_mut() {
+            // Function to ensure agent is in list with proper tools
+            let mut add_pipeline_agent = |id: &str| {
+                if !list_arr.iter().any(|a| a["id"] == id) {
+                    list_arr.push(serde_json::json!({
+                        "id": id,
+                        "tools": {
+                            "allow": ["sessions_spawn", "sessions_send", "message"]
+                        }
+                    }));
+                } else {
+                    for a in list_arr.iter_mut() {
+                        if a["id"] == id {
+                            a["tools"] = serde_json::json!({
+                                "allow": ["sessions_spawn", "sessions_send", "message"]
+                            });
+                        }
+                    }
+                }
+            };
+            add_pipeline_agent("qualification");
+            add_pipeline_agent("crm-prospect");
+            add_pipeline_agent("onboarding-client");
+            add_pipeline_agent("briefing"); 
+
+            // Update cron job file to include briefing AND health monitoring
+            let cron_dir = state_dir.join("cron");
+            let _ = std::fs::create_dir_all(&cron_dir);
+            let jobs_path = cron_dir.join("jobs.json");
+            
+            let mut jobs_val = serde_json::json!({
+                "jobs": []
+            });
+
+            if jobs_path.exists() {
+                if let Ok(content) = std::fs::read_to_string(&jobs_path) {
+                    if let Ok(parsed) = serde_json::from_str::<Value>(&content) {
+                        jobs_val = parsed;
+                    }
+                }
+            }
+
+            if let Some(jobs_arr) = jobs_val.get_mut("jobs").and_then(|v| v.as_array_mut()) {
+                // Ensure Morning Briefing job exists
+                if !jobs_arr.iter().any(|j| j["agentId"] == "briefing") {
+                    jobs_arr.push(serde_json::json!({
+                        "id": "morning-brief",
+                        "cron": "0 8 * * 1-5",
+                        "agentId": "briefing",
+                        "prompt": "Génère le morning briefing pour l'utilisateur."
+                    }));
+                }
+                
+                // Ensure Health Monitoring job exists
+                if !jobs_arr.iter().any(|j| j["agentId"] == "health-monitor") {
+                    jobs_arr.push(serde_json::json!({
+                        "id": "health-audit-weekly",
+                        "cron": "0 8 * * 1",
+                        "agentId": "health-monitor",
+                        "prompt": "Génère l'audit de santé système hebdomadaire."
+                    }));
+                }
+            }
+
+            let _ = std::fs::write(&jobs_path, serde_json::to_string_pretty(&jobs_val).unwrap());
+
+            // Add LinkedIn agent
+            if !list_arr.iter().any(|a| a["id"] == "linkedin-digest") {
+                list_arr.push(serde_json::json!({
+                    "id": "linkedin-digest",
+                    "tools": {
+                        "allow": ["browser", "message"]
+                    }
+                }));
+            } else {
+                for a in list_arr.iter_mut() {
+                    if a["id"] == "linkedin-digest" {
+                        a["tools"] = serde_json::json!({
+                            "allow": ["browser", "message"]
+                        });
+                    }
+                }
+            }
+            
+            // Add Research agent
+            if !list_arr.iter().any(|a| a["id"] == "research") {
+                list_arr.push(serde_json::json!({
+                    "id": "research",
+                    "tools": {
+                        "allow": ["web_search", "web_fetch", "write", "message"]
+                    }
+                }));
+            } else {
+                for a in list_arr.iter_mut() {
+                    if a["id"] == "research" {
+                        a["tools"] = serde_json::json!({
+                            "allow": ["web_search", "web_fetch", "write", "message"]
+                        });
+                    }
+                }
+            }
+
+            // Add Devis Express agent
+            if !list_arr.iter().any(|a| a["id"] == "devis-express") {
+                list_arr.push(serde_json::json!({
+                    "id": "devis-express",
+                    "tools": {
+                        "allow": ["exec", "message"]
+                    }
+                }));
+            } else {
+                for a in list_arr.iter_mut() {
+                    if a["id"] == "devis-express" {
+                        a["tools"] = serde_json::json!({
+                            "allow": ["exec", "message"]
+                        });
+                    }
+                }
+            }
+
+            // Add CRM Audio agent
+            if !list_arr.iter().any(|a| a["id"] == "crm-audio") {
+                list_arr.push(serde_json::json!({
+                    "id": "crm-audio",
+                    "tools": {
+                        "allow": ["update_notion_db", "message"]
+                    }
+                }));
+            } else {
+                for a in list_arr.iter_mut() {
+                    if a["id"] == "crm-audio" {
+                        a["tools"] = serde_json::json!({
+                            "allow": ["update_notion_db", "message"]
+                        });
+                    }
+                }
+            }
+
+            // Add 4-Agent Team
+            let team_agents = vec!["manager", "strategy", "marketing", "business", "client"];
+            for agent in team_agents {
+                if !list_arr.iter().any(|a| a["id"] == agent) {
+                    let mut agent_json = serde_json::json!({
+                        "id": agent,
+                    });
+                    
+                    if agent == "manager" {
+                        agent_json["tools"] = serde_json::json!({
+                            "allow": ["sessions_spawn", "message"]
+                        });
+                    }
+                    
+                    list_arr.push(agent_json);
+                } else {
+                    for a in list_arr.iter_mut() {
+                        if a["id"] == "manager" {
+                            a["tools"] = serde_json::json!({
+                                "allow": ["sessions_spawn", "message"]
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Add Health Monitor agent
+            if !list_arr.iter().any(|a| a["id"] == "health-monitor") {
+                list_arr.push(serde_json::json!({
+                    "id": "health-monitor",
+                    "tools": {
+                        "allow": ["message"]
+                    }
+                }));
+            } else {
+                for a in list_arr.iter_mut() {
+                    if a["id"] == "health-monitor" {
+                        a["tools"] = serde_json::json!({
+                            "allow": ["message"]
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    // Write token to .env if provided
+    if !token.is_empty() {
+        let env_content = format!("TELEGRAM_BOT_TOKEN={}\n", token);
+        let _ = std::fs::write(&env_path, env_content)
+            .map_err(|e| format!("Échec d'écriture .env: {}", e));
+    }
+
     // Build channel config with optional userId for security
     let mut channel_config = serde_json::json!({
         "enabled": true,
-        "botToken": token
+        "botToken": "${TELEGRAM_BOT_TOKEN}"
     });
 
     // Set DM policy (allowlist, pairing, open)
@@ -672,7 +1158,7 @@ pub fn health_check(openclaw_dir: &str) -> Result<serde_json::Value, String> {
 }
 
 /// B2: Create agent workspace with bootstrap files
-pub fn ensure_workspace(openclaw_dir: &str) -> Result<serde_json::Value, String> {
+pub fn ensure_workspace(_openclaw_dir: &str) -> Result<serde_json::Value, String> {
     let home_dir = dirs::home_dir().ok_or("Cannot find home directory")?;
     let workspace_dir = home_dir.join(".openclaw").join("workspace");
     let sessions_dir = home_dir.join(".openclaw").join("sessions");

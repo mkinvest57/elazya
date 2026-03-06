@@ -204,7 +204,7 @@ pub fn start_watcher(
 
                             let result = agent.run(&oc_client, &settings, &trigger).await;
                             println!("[Facturation] {} — {}", result.status, result.summary);
-                            log_agent_action(&app, &db, "facturation", &result).await;
+                            log_agent_action(&app, &db, "facturation", &result, None).await;
                         }
                     }
                 }

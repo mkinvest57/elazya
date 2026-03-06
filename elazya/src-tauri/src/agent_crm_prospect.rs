@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::collections::HashSet;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -196,7 +196,7 @@ pub fn start_crm_watcher(
 
                                         let result = agent.run(&oc_client, &settings, &trigger).await;
                                         println!("[CRM Prospect] {} — {}", result.status, result.summary);
-                                        log_agent_action(&app, &db, "crm-prospect", &result).await;
+                                        log_agent_action(&app, &db, "crm-prospect", &result, None).await;
                                     }
                                 }
                             }

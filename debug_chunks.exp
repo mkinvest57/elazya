@@ -1,0 +1,17 @@
+#!/usr/bin/expect -f
+set timeout 15
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+send "grep -o 'success/page-[a-z0-9]*\\.js' elazya/success.html | head -5\r"
+expect -re {[$#] ?$}
+send "ls -la elazya/_next/static/chunks/app/success/\r"
+expect -re {[$#] ?$}
+send "grep -l '15:25' elazya/_next/static/chunks/app/success/*\r"
+expect -re {[$#] ?$}
+send "grep -l '07:55' elazya/_next/static/chunks/app/success/*\r"
+expect -re {[$#] ?$}
+send "exit\r"

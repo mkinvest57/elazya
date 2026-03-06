@@ -1,0 +1,22 @@
+#!/usr/bin/expect -f
+set timeout 10
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+send "cat << 'EOF' > fix_cors.php\n"
+send "<?php\n"
+send "\$file = 'elazya/license-api/validate-license.php';\n"
+send "\$content = file_get_contents(\$file);\n"
+send "\$cors = \"header('Access-Control-Allow-Origin: *');\\nheader('Access-Control-Allow-Methods: POST, OPTIONS');\\nheader('Access-Control-Allow-Headers: Content-Type');\\nif (\$_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }\\n\";\n"
+send "\$content = str_replace('header(\"Content-Type: application/json\");', \"header('Content-Type: application/json');\\n\" . \$cors, \$content);\n"
+send "file_put_contents(\$file, \$content);\n"
+send "echo \"Fixed CORS headers\\n\";\n"
+send "?>\n"
+send "EOF\n"
+expect -re {[$#] ?$}
+send "php fix_cors.php\r"
+expect -re {[$#] ?$}
+send "exit\r"

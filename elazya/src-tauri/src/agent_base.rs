@@ -70,9 +70,16 @@ pub async fn log_agent_action(
     db: &SqlitePool,
     agent_id: &str,
     result: &AgentResult,
+    source: Option<&str>,
 ) -> i64 {
     let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
     let details_str = serde_json::to_string(&result.details).unwrap_or_default();
+
+    let final_summary = if source == Some("telegram") {
+        format!("[Telegram] {}", result.summary)
+    } else {
+        result.summary.clone()
+    };
 
     let _ = sqlx::query(
         "INSERT INTO agent_log (agent_id, timestamp, status, summary, details) VALUES (?, ?, ?, ?, ?)"
@@ -80,7 +87,7 @@ pub async fn log_agent_action(
         .bind(agent_id)
         .bind(&now)
         .bind(&result.status)
-        .bind(&result.summary)
+        .bind(&final_summary)
         .bind(&details_str)
         .execute(db)
         .await;
@@ -98,7 +105,7 @@ pub async fn log_agent_action(
             "id": id,
             "timestamp": now,
             "status": result.status,
-            "summary": result.summary,
+            "summary": final_summary,
         }
     }));
 

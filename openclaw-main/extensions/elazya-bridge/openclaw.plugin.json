@@ -1,0 +1,10 @@
+{
+    "id": "elazya-bridge",
+    "name": "Elazya Bridge",
+    "description": "Bridge to Elazya Mac App CLI",
+    "configSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+    }
+}

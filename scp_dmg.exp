@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+set timeout 600
+spawn scp /Users/sashimi/Documents/elazya/elazya/src-tauri/target/release/bundle/dmg/Elazya_2.0.0_aarch64.dmg su594661@access-5019523613.webspace-host.com:elazya/downloads/Elazya_2.0.0_aarch64.dmg
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect {
+    "100%" { puts "\nUpload complete!" }
+    timeout { puts "\nUpload timed out!" }
+    eof { puts "\nTransfer finished." }
+}

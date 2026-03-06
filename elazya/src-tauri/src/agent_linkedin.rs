@@ -185,7 +185,7 @@ pub fn start_linkedin_watcher(
                 let trigger = serde_json::json!({});
                 let result = agent.run(&oc_client, &settings, &trigger).await;
                 println!("[LinkedIn] {} — {}", result.status, result.summary);
-                log_agent_action(&app, &db, "linkedin-digest", &result).await;
+                log_agent_action(&app, &db, "linkedin-digest", &result, None).await;
             }
             
             // Poll every ~1 hour

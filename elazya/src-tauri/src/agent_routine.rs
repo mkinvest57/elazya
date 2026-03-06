@@ -27,7 +27,7 @@ impl ElAgent for RoutineMatinaleAgent {
         }
     }
 
-    async fn run(&self, client: &OpenClawAgentClient, settings: &Value, trigger: &Value) -> AgentResult {
+    async fn run(&self, client: &OpenClawAgentClient, _settings: &Value, trigger: &Value) -> AgentResult {
         let is_test = trigger.get("test").and_then(|v| v.as_bool()).unwrap_or(false);
         let today = chrono::Local::now().format("%Y-%m-%d").to_string();
 
@@ -188,7 +188,7 @@ pub fn start_routine_watcher(
                 let trigger = serde_json::json!({});
                 let result = agent.run(&oc_client, &settings, &trigger).await;
                 println!("[Routine] {} — {}", result.status, result.summary);
-                log_agent_action(&app, &db, "routine-matinale", &result).await;
+                log_agent_action(&app, &db, "routine-matinale", &result, None).await;
             }
             
             // Poll every 60 seconds (since we need minute precision for "H:M")

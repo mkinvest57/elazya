@@ -29,7 +29,7 @@
             }
         ],
         "security": {
-            "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' asset: https://asset.localhost blob: data:; connect-src 'self' https://api.stripe.com https://*.stripe.com;"
+            "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' asset: https://asset.localhost blob: data:; connect-src 'self' https://api.stripe.com https://*.stripe.com https://elazya.com https://*.elazya.com;"
         }
     },
     "plugins": {
@@ -47,6 +47,12 @@
                     "short": "t",
                     "description": "Tests a specific Elazya agent by ID",
                     "takesValue": true
+                },
+                {
+                    "name": "source",
+                    "short": "s",
+                    "description": "Source of the execution (e.g. telegram)",
+                    "takesValue": true
                 }
             ]
         }
@@ -63,6 +69,9 @@
         "targets": [
             "dmg"
         ],
+        "resources": {
+            "resources/engine": "resources/engine"
+        },
         "macOS": {
             "entitlements": "entitlements.plist",
             "exceptionDomain": "stripe.com",

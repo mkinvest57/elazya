@@ -649,8 +649,8 @@ async fn get_active_agent_count(state: State<'_, AppState>) -> Result<i32, Strin
 
 #[tauri::command]
 async fn run_agent(app: tauri::AppHandle, state: State<'_, AppState>, agent_id: String) -> Result<AgentLogEntry, String> {
-    // All agents go through the engine now
-    let result = state.engine.test_agent(&app, &state.db, &agent_id).await?;
+    // All agents go through the engine now. UI calls pass None as source.
+    let _result = state.engine.test_agent(&app, &state.db, &agent_id, None).await?;
 
     // Read back the last inserted log
     let row = sqlx::query("SELECT id, agent_id, timestamp, status, summary, details FROM agent_log WHERE agent_id = ? ORDER BY id DESC LIMIT 1")
@@ -688,6 +688,88 @@ async fn get_agent_settings(db: &SqlitePool, agent_id: &str) -> serde_json::Valu
 }
 
 /// Simple pseudo-random index for varied simulated outputs.
+// -----------------------------------------------------------------------------
+// NEW COMMAND: Visual Agent Builder (Mission 10)
+// -----------------------------------------------------------------------------
+#[tauri::command]
+fn create_custom_agent(id: String, identity: String, tools: Vec<String>, app_handle: tauri::AppHandle) -> Result<(), String> {
+    let app_dir = app_handle.path().app_data_dir()
+        .map_err(|e| format!("Erreur système pour get_app_data_dir : {}", e))?;
+    
+    let engine_state_dir = app_dir.join("elazya-engine-state");
+    let agents_dir = engine_state_dir.join("agents");
+    
+    // 1. Create the physical files
+    let specific_agent_dir = agents_dir.join(&id).join("agent");
+    std::fs::create_dir_all(&specific_agent_dir)
+        .map_err(|e| format!("Erreur création dossier agent: {}", e))?;
+        
+    let identity_path = specific_agent_dir.join("IDENTITY.md");
+    std::fs::write(&identity_path, identity)
+        .map_err(|e| format!("Erreur écriture IDENTITY.md: {}", e))?;
+        
+    // 2. Patch openclaw.json dynamically
+    let json_path = engine_state_dir.join("openclaw.json");
+    if json_path.exists() {
+        if let Ok(content) = std::fs::read_to_string(&json_path) {
+            if let Ok(mut parsed) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(agents_list) = parsed.get_mut("agents").and_then(|a| a.as_object_mut()).and_then(|o| o.get_mut("list")).and_then(|l| l.as_array_mut()) {
+                    let mut exists = false;
+                    for a in agents_list.iter_mut() {
+                        if a["id"] == id {
+                            a["tools"] = serde_json::json!({ "allow": tools });
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if !exists {
+                        agents_list.push(serde_json::json!({
+                            "id": id,
+                            "tools": { "allow": tools }
+                        }));
+                    }
+                    if let Ok(new_json) = serde_json::to_string_pretty(&parsed) {
+                        let _ = std::fs::write(&json_path, new_json);
+                    }
+                }
+            }
+        }
+    }
+        
+    Ok(())
+}
+
+// -----------------------------------------------------------------------------
+// NEW COMMAND: Global Configuration Module (Mission 13)
+// -----------------------------------------------------------------------------
+#[tauri::command]
+async fn apply_openclaw_config_and_restart(config_json: String, app_handle: tauri::AppHandle, state: tauri::State<'_, AppState>) -> Result<(), String> {
+    let app_dir = app_handle.path().app_data_dir()
+        .map_err(|e| format!("Erreur de répertoire : {}", e))?;
+    
+    let engine_state_dir = app_dir.join("elazya-engine-state");
+    
+    // Security check: ensure the provided config_json is valid JSON
+    let parsed: serde_json::Value = serde_json::from_str(&config_json)
+        .map_err(|e| format!("JSON invalide rejeté par mesure de sécurité : {}", e))?;
+    
+    // Extra security checks natively in Rust
+    let gateway_bind = parsed.get("gateway").and_then(|g| g.get("bind")).and_then(|b| b.as_str());
+    if gateway_bind != Some("127.0.0.1") {
+        return Err("Configuration rejetée : La Gateway OpenClaw DOIT être liée à 127.0.0.1 pour la sécurité.".into());
+    }
+
+    let json_path = engine_state_dir.join("openclaw.json");
+    
+    let formatted_json = serde_json::to_string_pretty(&parsed)
+        .map_err(|e| format!("Erreur de formatage JSON : {}", e))?;
+        
+    std::fs::write(&json_path, formatted_json)
+        .map_err(|e| format!("Erreur écriture openclaw.json: {}", e))?;
+        
+    Ok(())
+}
+
 fn rand_index(max: usize) -> usize {
     use std::time::SystemTime;
     let nanos = SystemTime::now()
@@ -902,17 +984,19 @@ fn main() {
             if let Ok(matches) = app.cli().matches() {
                 if let Some(arg) = matches.args.get("test-agent") {
                     if let Some(agent_id) = arg.value.as_str() {
-                        println!("[CLI] Testing agent: {}", agent_id);
+                        let source = matches.args.get("source").and_then(|s| s.value.as_str().map(|v| v.to_string()));
+                        println!("[CLI] Testing agent: {} (source: {:?})", agent_id, source);
+                        
                         let handle = app_handle.clone();
                         let db = pool.clone();
                         let agent_id: String = agent_id.to_string();
                         let engine = engine.clone();
-                        let oc_client_clone = oc_client.clone();
+                        let _oc_client_clone = oc_client.clone();
 
                         tauri::async_runtime::spawn(async move {
                             // Wait a tiny bit for app to settle before running tests
                             tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-                            match engine.test_agent(&handle, &db, &agent_id).await {
+                            match engine.test_agent(&handle, &db, &agent_id, source.as_deref()).await {
                                 Ok(res) => {
                                     println!("[CLI RESULT] {}", serde_json::to_string_pretty(&res).unwrap());
                                     if res.status == "success" {
@@ -935,6 +1019,8 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             greet, 
+            create_custom_agent,
+            apply_openclaw_config_and_restart,
             get_setting,
             set_setting,
             is_setup_complete,

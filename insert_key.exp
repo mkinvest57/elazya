@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+set timeout 10
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+send "cat << 'EOF' > insert_key.php\n"
+send "<?php\n"
+send "\$pdo = new PDO('mysql:host=db5019545004.hosting-data.io;port=3306;dbname=dbs15269470;charset=utf8mb4', 'dbu4443655', '\$Etudes.psych@.2025\$');\n"
+send "\$id = uniqid('cus_');\n"
+send "\$stmt = \$pdo->prepare('INSERT INTO Customer (id, email, firstName, lastName, licenseKey) VALUES (?, ?, ?, ?, ?)');\n"
+send "\$stmt->execute(array(\$id, 'test-biz@elazya.com', 'Test', 'Business', 'ELAZYA-BIZ-A1B2-C3D4'));\n"
+send "echo \"Done\\n\";\n"
+send "?>\n"
+send "EOF\n"
+expect -re {[$#] ?$}
+send "php insert_key.php\r"
+expect -re {[$#] ?$}
+send "exit\r"

@@ -204,7 +204,7 @@ pub fn start_content_watcher(
                      let result = agent.run(&oc_client, &settings, &trigger).await;
             
                      if result.status == "success" {
-                         log_agent_action(&app, &db, "content-linkedin", &result).await;
+                         log_agent_action(&app, &db, "content-linkedin", &result, None).await;
                      }
                  }
             }

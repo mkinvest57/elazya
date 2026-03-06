@@ -22,6 +22,8 @@ import {
 
 import ChatPanel from '@/components/panels/ChatPanel';
 import ConfigPanel from '@/components/panels/ConfigPanel';
+import OnboardingPanel from '@/components/panels/OnboardingPanel';
+import AgentBuilderPanel from '@/components/panels/AgentBuilderPanel';
 import MissionControl from '@/components/MissionControl';
 import AgentDetail from '@/components/AgentDetail';
 
@@ -41,11 +43,11 @@ function TierBadgeSmall({ tier }: { tier: string }) {
     );
 }
 
-type DashboardView = 'overview' | 'agent' | 'chat' | 'config';
+type DashboardView = 'overview' | 'agent' | 'chat' | 'config' | 'onboarding' | 'builder';
 
 export default function Dashboard() {
     const [plan, setPlan] = useState<ElazyaPlan>('solo');
-    const [view, setView] = useState<DashboardView>('overview');
+    const [view, setView] = useState<DashboardView>('onboarding');
     const [selectedAgent, setSelectedAgent] = useState<AgentDef | null>(null);
     const [activeAgentCount, setActiveAgentCount] = useState(0);
     const [engineStatus, setEngineStatus] = useState<'connected' | 'disconnected'>('disconnected');
@@ -93,8 +95,8 @@ export default function Dashboard() {
             <button
                 onClick={() => { setView(viewKey); setSelectedAgent(null); }}
                 className={`btn-base focus-ring w-full flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] text-left font-medium ${active
-                        ? 'bg-[var(--surface-active)] text-white'
-                        : 'text-white/35 hover:bg-[var(--surface-overlay)] hover:text-white/55'
+                    ? 'bg-[var(--surface-active)] text-white'
+                    : 'text-white/35 hover:bg-[var(--surface-overlay)] hover:text-white/55'
                     }`}
                 style={{ fontSize: 'var(--text-body)' }}
             >
@@ -129,9 +131,13 @@ export default function Dashboard() {
 
                 {/* ── Navigation ───────────────────────── */}
                 <div className="px-3 pt-3 pb-1.5 space-y-0.5">
+                    <NavItem icon={Plus} label="Onboarding" viewKey="onboarding" />
                     <NavItem icon={BarChart3} label="Mission Control" viewKey="overview" />
                     <NavItem icon={MessageCircle} label="Chat" viewKey="chat" />
                     <NavItem icon={Settings} label="Configuration" viewKey="config" />
+                    {(plan === 'pro' || plan === 'business') && (
+                        <NavItem icon={Plus} label="Agent Builder (Studio)" viewKey="builder" />
+                    )}
                 </div>
 
                 <div className="mx-4 my-1 h-px bg-[var(--border-subtle)]" />
@@ -240,6 +246,18 @@ export default function Dashboard() {
                         <motion.div key="config" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             transition={{ duration: 0.15 }} className="h-full overflow-y-auto">
                             <ConfigPanel />
+                        </motion.div>
+                    )}
+                    {view === 'onboarding' && (
+                        <motion.div key="onboarding" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            transition={{ duration: 0.15 }} className="h-full overflow-y-auto p-8">
+                            <OnboardingPanel />
+                        </motion.div>
+                    )}
+                    {view === 'builder' && (plan === 'pro' || plan === 'business') && (
+                        <motion.div key="builder" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            transition={{ duration: 0.15 }} className="h-full overflow-y-auto p-8">
+                            <AgentBuilderPanel />
                         </motion.div>
                     )}
                 </AnimatePresence>

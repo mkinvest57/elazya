@@ -211,7 +211,7 @@ pub fn start_qualification_watcher(
 
                             let result = agent.run(&oc_client, &settings, &trigger).await;
                             println!("[Qualification] {} — {}", result.status, result.summary);
-                            log_agent_action(&app, &db, "qualification", &result).await;
+                            log_agent_action(&app, &db, "qualification", &result, None).await;
                         }
                     }
                 }

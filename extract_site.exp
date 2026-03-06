@@ -1,0 +1,13 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+send "unzip -o site.zip -d elazya_temp && cp -a elazya_temp/out/* elazya/ && rm -rf elazya_temp site.zip\r"
+expect -re {[$#] ?$}
+send "grep '15:25' elazya/success.html\r"
+expect -re {[$#] ?$}
+send "exit\r"

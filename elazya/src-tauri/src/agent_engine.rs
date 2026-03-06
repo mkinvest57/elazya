@@ -26,7 +26,6 @@ use crate::agent_devis::DevisExpressAgent;
 use crate::agent_email::EmailIntelligentAgent;
 use crate::agent_compta::ComptaExportAgent;
 use crate::agent_content::ContentLinkedInAgent;
-use crate::agents::*;
 
 /// Central agent engine.
 pub struct AgentEngine {
@@ -71,13 +70,14 @@ impl AgentEngine {
         db: &SqlitePool,
         agent_id: &str,
         trigger: &serde_json::Value,
+        source: Option<&str>,
     ) -> Result<AgentResult, String> {
         let agent = self.agents.get(agent_id)
             .ok_or_else(|| format!("Agent '{}' non trouvé", agent_id))?;
 
         let settings = get_settings(db, agent_id).await;
         let result = agent.run(&self.client, &settings, trigger).await;
-        log_agent_action(app, db, agent_id, &result).await;
+        log_agent_action(app, db, agent_id, &result, source).await;
         Ok(result)
     }
 
@@ -87,13 +87,14 @@ impl AgentEngine {
         app: &AppHandle,
         db: &SqlitePool,
         agent_id: &str,
+        source: Option<&str>,
     ) -> Result<AgentResult, String> {
         let agent = self.agents.get(agent_id)
             .ok_or_else(|| format!("Agent '{}' non trouvé", agent_id))?;
 
         let settings = get_settings(db, agent_id).await;
         let result = agent.test(&self.client, &settings).await;
-        log_agent_action(app, db, agent_id, &result).await;
+        log_agent_action(app, db, agent_id, &result, source).await;
         Ok(result)
     }
 

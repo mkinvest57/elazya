@@ -266,7 +266,7 @@ pub fn start_email_watcher(
             
             if result.status == "success" {
                 println!("[Email Intelligent] {}", result.summary);
-                log_agent_action(&app, &db, "email-intelligent", &result).await;
+                log_agent_action(&app, &db, "email-intelligent", &result, None).await;
             }
         }
     });

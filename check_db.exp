@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+set timeout 10
+spawn ssh su594661@access-5019523613.webspace-host.com
+expect {
+    "password:" { send "Yassine.2011\r" }
+    "(yes/no)?" { send "yes\r"; exp_continue }
+}
+expect -re {[$#] ?$}
+send "cat << 'EOF' > check_db.php\n"
+send "<?php\n"
+send "\$pdo = new PDO('mysql:host=db5019545004.hosting-data.io;port=3306;dbname=dbs15269470;charset=utf8mb4', 'dbu4443655', '\$Etudes.psych@.2025\$');\n"
+send "\$stmt = \$pdo->query('DESCRIBE Customer');\n"
+send "print_r(\$stmt->fetchAll(PDO::FETCH_ASSOC));\n"
+send "?>\n"
+send "EOF\n"
+expect -re {[$#] ?$}
+send "php check_db.php\r"
+expect -re {[$#] ?$}
+send "exit\r"

@@ -25,38 +25,6 @@ impl OpenClawAgentClient {
 
     /// Send a free-form prompt to the LLM via OpenClaw and return the raw text response.
     pub async fn call_llm(&self, prompt: &str) -> Result<String, String> {
-        // --- Mocks for automated testing without valid LLM keys ---
-        if prompt.contains("Tu es un agent de facturation") {
-            return Ok(r#"{"client":"Test Client","montant":"1250.00","date_facture":"2026-03-01","date_echeance":"2026-04-01","numero":"FAC-TEST-001"}"#.to_string());
-        }
-        if prompt.contains("Tu es un assistant commercial expert. Le prospect") {
-            return Ok(r#"{"response":"Bonjour (Brouillon Mock)","prospect_name":"MockName","company_name":"MockCorp","project_type":"MockProject","budget":"MockBudget","deadline":"MockDeadline","interest_level":"Chaud"}"#.to_string());
-        }
-        if prompt.contains("Tu es un expert LinkedIn") {
-            return Ok(r#"{"post":"Mock LinkedIn digest post pour la Matinée","comments":["Mock comment 1","Mock comment 2"]}"#.to_string());
-        }
-        if prompt.contains("Tu es un Lead Manager expert") {
-            return Ok(r#"{"score":85,"budget":"Moyen","delai":"Rapide","action_suggeree":"Brouillon","raison":"Mock Raison Score"}"#.to_string());
-        }
-        if prompt.contains("Tu es l'assistant personnel") {
-            return Ok(r#"{"brief_markdown":"Mock brief Markdown quotidien","urgent_emails_count":1,"top_priority":"Mock priorité 1"}"#.to_string());
-        }
-        if prompt.contains("Tu es un expert en data extraction") {
-            return Ok(r#"{"contacts":[{"nom":"Mock Contact","email":"mock@test.com","tel":"06000000","societe":"Mock Corp","linkedin":"linkedin.com/mock"}]}"#.to_string());
-        }
-        if prompt.contains("Tu es un expert chiffrage. Analyse") {
-            return Ok(r#"{"livrables":["Mock Livrable 1"],"prix_total":"1500€","delai_estime":"1 mois","texte_devis":"Voici notre Devis pour vos livrables.","points_attention":["Mock point"]}"#.to_string());
-        }
-        if prompt.contains("Tu es un assistant gestionnaire de boîte mail") {
-            return Ok(r#"{"categorie":"Urgent","resume_ou_draft":"Action Inbox Requise","action_recommandee":"Draft"}"#.to_string());
-        }
-        if prompt.contains("Tu es un assistant comptable.") {
-            return Ok(r#"{"num":"F-MOCK-001","client":"Mock Client Export","ht":1000,"tva":200,"ttc":1200,"date":"2026-03-01","statut":"Payé"}"#.to_string());
-        }
-        if prompt.contains("Tu es un expert en copywriting LinkedIn") {
-            return Ok(r##"{"posts":[{"type":"Question","contenu":"Mock post 1","hashtags":["#mock"]},{"type":"Liste","contenu":"Mock posts 2","hashtags":["#mock"]}]}"##.to_string());
-        }
-        // ----------------------------------------------------
 
         let session_key = format!("agent-{}", uuid::Uuid::new_v4());
         let params = serde_json::json!({

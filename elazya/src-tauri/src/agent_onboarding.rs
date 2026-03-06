@@ -187,7 +187,7 @@ pub fn start_onboarding_watcher(
 
                             let result = agent.run(&oc_client, &serde_json::json!({}), &trigger).await;
                             println!("[Onboarding] {} — {}", result.status, result.summary);
-                            log_agent_action(&app, &db, "onboarding-client", &result).await;
+                            log_agent_action(&app, &db, "onboarding-client", &result, None).await;
                         }
                     }
                 }

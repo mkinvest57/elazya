@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -267,7 +266,7 @@ pub fn start_compta_watcher(
                      let result = agent.run(&oc_client, &settings, &trigger).await;
             
                      if result.status == "success" {
-                         log_agent_action(&app, &db, "compta-export", &result).await;
+                         log_agent_action(&app, &db, "compta-export", &result, None).await;
                      }
                  }
             }
