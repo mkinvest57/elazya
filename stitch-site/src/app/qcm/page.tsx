@@ -28,9 +28,9 @@ const questions = [
         id: "interest",
         title: "Ce qui t'intéresse le plus ?",
         options: [
-            { id: "finance", label: "Automatiser mes factures et ma compta" },
-            { id: "crm", label: "Gérer mes prospects et clients automatiquement" },
-            { id: "linkedin", label: "Générer mon contenu LinkedIn sans effort" },
+            { id: "vision", label: "Laisser une IA lire mon écran et cliquer dans mes vieux logiciels (sans API)" },
+            { id: "local", label: "Traiter des dossiers PDF lourds ou confidentiels 100% en local (Zéro cloud)" },
+            { id: "visual", label: "Créer des agents sur-mesure juste en montrant mon écran (No-code visuel)" },
             { id: "all", label: "Tout à la fois" }
         ]
     },
