@@ -626,7 +626,7 @@ export default function LandingPage() {
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-5 text-slate-800">Questions fréquentes</h2>
               </div>
-              <div className="space-y-4">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-4">
                 {[
                   { q: "Ça marche sur Windows ?", a: "Non, exclusivement Mac (macOS 12 minimum)." },
                   { q: "Mes données partent sur le cloud ?", a: "Non. Tout tourne en local sur ton Mac. Tes fichiers, mails et données ne quittent jamais ta machine." },
@@ -636,7 +636,7 @@ export default function LandingPage() {
                   { q: "Pourquoi seulement 47 places ?", a: "Pour garantir un support de qualité à chaque utilisateur au lancement. Les places suivantes seront au prix normal." },
                   { q: "C'est quoi OpenClaw ?", a: "Le moteur IA qui coordonne les agents d'Elazya sur ton Mac. Il tourne en local. Tu n'as pas besoin de comprendre comment ça marche." },
                 ].map((faq, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
+                  <div key={i}>
                     <details className="group p-6 rounded-2xl bg-[#f8fbff] border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all cursor-pointer">
                       <summary className="flex justify-between items-center font-bold text-slate-800 list-none">
                         <span>{faq.q}</span>
@@ -644,9 +644,9 @@ export default function LandingPage() {
                       </summary>
                       <p className="text-sm font-medium text-slate-600 mt-5 leading-relaxed bg-white p-5 rounded-xl border border-slate-100 shadow-sm">{faq.a}</p>
                     </details>
-                  </motion.div>
+                  </div>
                 ))}
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
