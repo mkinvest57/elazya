@@ -115,15 +115,16 @@ export default function LandingPage() {
           <div className="container relative z-10 px-4 sm:px-6 mx-auto">
             <div className="max-w-5xl mx-auto text-center mt-[-4vh] sm:mt-[-8vh]">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="flex flex-col items-center">
-                <p className="text-xs sm:text-base text-slate-400 font-medium mb-4 sm:mb-6 tracking-wide px-2">Tu passes encore des heures sur tes factures,<br className="hidden sm:block" />tes prospects et tes emails ?</p>
+                <p className="text-xs sm:text-base text-slate-400 font-medium mb-4 sm:mb-6 tracking-wide px-2">Et si tu arrêtais enfin de tout faire toi-même ?</p>
                 <h1 className="text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5.5rem] font-semibold tracking-tight mb-6 text-slate-800 leading-[1.15] sm:leading-[1.1]">
-                  L'app Mac<br />qui tourne ta structure<br />pendant que tu dors.
+                  Tu as une équipe<br />maintenant.
                 </h1>
                 <p className="text-sm md:text-lg text-slate-500 font-medium max-w-xl mx-auto mb-8 tracking-wide leading-relaxed px-4">
-                  10 agents IA coordonnés s'occupent de tes factures,<br className="hidden sm:block" />
-                  tes prospects, ton LinkedIn et tes emails.<br className="hidden sm:block" />
-                  Tout automatisé. Tout local sur ton Mac.<br className="hidden sm:block" />
-                  Tu reprends juste les décisions.
+                  Elazya tourne ta structure pendant que tu travailles,<br className="hidden sm:block" />
+                  pendant que tu dors, pendant que tu vis.<br className="hidden sm:block" />
+                  Pas un chatbot. Pas un assistant.<br className="hidden sm:block" />
+                  Une équipe IA qui agit vraiment — sur ton Mac,<br className="hidden sm:block" />
+                  sans cloud, sans abonnement.
                 </p>
                 <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-6 py-3.5 sm:px-8 sm:py-3.5 rounded-full font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
                 <p className="text-[11px] sm:text-xs font-medium text-slate-400 mt-4 px-4">47 places · Lancement le 5 avril · -50% · 9€ déduits du prix final</p>
@@ -137,10 +138,12 @@ export default function LandingPage() {
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 sm:mb-20">
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 mb-4 leading-[1.1]">
-                  Voici ce qui se passe quand<br className="hidden sm:block" /> Elazya tourne pour toi.
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 mb-6 leading-[1.1] max-w-3xl mx-auto">
+                  Tu bosses trop.<br />Pas parce que tu manques de talent.<br />Parce que tu passes tes journées à recoller des morceaux.
                 </h2>
-                <p className="text-base sm:text-lg text-slate-500 font-medium">Des situations réelles. Pas des promesses.</p>
+                <p className="text-base sm:text-lg text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">
+                  Retrouver où en est chaque dossier client. Vérifier qui t'a payé. Identifier quels projets sont en retard. Chercher quels mails importants tu as laissés sans réponse. Au lieu de diriger ton activité, tu passes ton temps à surveiller le pipeline, le cash qui rentre, et à éteindre des incendies. Elazya fait disparaître cette friction. Définitivement.
+                </p>
               </motion.div>
             </div>
 
@@ -524,77 +527,93 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {/* SOLO */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0 }} className="rounded-2xl border border-slate-200 bg-white p-7 flex flex-col">
-                <h3 className="text-xl font-bold text-slate-800 mb-1">SOLO</h3>
-                <p className="text-sm text-slate-500 font-medium mb-5">Tu ouvres Elazya le matin. Tout est déjà fait.</p>
-                <ul className="space-y-2.5 mb-6 flex-1">
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />10 agents Core actifs sur ton Mac</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />WhatsApp ou Telegram inclus — contrôle tout depuis ton téléphone</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Morning briefing automatique chaque matin</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Zéro configuration technique : tout en français depuis l'UI Mac</li>
+                <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight">Tu n'es plus seul à tout gérer.</h3>
+                <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed">
+                  Tu ouvres ton Mac le matin.<br />
+                  Ton brief est prêt. Tes factures sont classées.<br />
+                  Tes mails clients ont une réponse en brouillon.<br />
+                  Tu n'as plus qu'à valider.
+                </p>
+
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Ce que ça inclut</p>
+                <ul className="space-y-3 mb-8 flex-1">
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Les 10 agents Core qui tournent en local sur ton Mac.</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />WhatsApp ou Telegram inclus — tu pilotes tout depuis ton téléphone.</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Un morning briefing automatique chaque matin.</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Zéro configuration technique : tout se fait depuis l'UI Mac, en français.</li>
                 </ul>
+
                 <div className="border-t border-slate-100 pt-5 text-center sm:text-left">
                   <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1 mb-2">
                     <span className="line-through text-slate-400">197€</span>
                     <span className="hidden sm:inline"> · </span>
                     <span className="text-primary">88€</span> le 5 avril
                   </p>
-                  <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-                    Un assistant virtuel à 197€ une fois,<br />
-                    au lieu de 1 500€/mois pour un humain.
+                  <p className="text-xs text-slate-500 mb-5 leading-relaxed bg-[#f8fbff] p-3 rounded-lg border border-slate-100 italic shadow-sm">
+                    Un assistant humain coûte 1 500€/mois. Elazya Solo, c'est 197€ une seule fois.
                   </p>
-                  <button onClick={() => openModal("solo")} className="w-full bg-[#0f172a] hover:bg-slate-800 text-white py-3 rounded-full font-bold text-sm transition-colors text-center">Sécuriser ma place</button>
+                  <button onClick={() => openModal("solo")} className="w-full bg-[#0f172a] hover:bg-slate-800 text-white py-3.5 rounded-full font-bold text-sm transition-colors text-center shadow-md">Sécuriser ma place</button>
                 </div>
               </motion.div>
 
               {/* PRO */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="rounded-2xl border-2 border-primary bg-white p-7 flex flex-col relative scale-[1.02] shadow-xl">
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold text-white bg-primary px-4 py-1.5 rounded-full whitespace-nowrap shadow-sm">Le plus populaire</span>
-                <h3 className="text-xl font-bold text-slate-800 mb-1">PRO</h3>
-                <p className="text-sm text-slate-500 font-medium mb-5">Tes agents travaillent ensemble,<br />pas juste chacun de leur côté.</p>
-                <ul className="space-y-2.5 mb-6 flex-1">
-                  <li className="text-sm text-slate-800 font-bold flex items-start gap-2">Tout le Solo +</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Multi-agents coordonnés : Qualification → CRM → Onboarding</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />LinkedIn publie directement sur ton compte</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Research agent : un sujet → brief complet en 3 min</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Proposal agent : décris un client → devis PDF prêt</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />CRM post-appel : transcription → Notion mis à jour en 1 clic</li>
+                <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight">Un prospect intéressé devient un client signé sans que tu aies rien fait entre les deux.</h3>
+                <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed">
+                  Tes agents ne travaillent plus chacun de leur côté.<br />
+                  Ils se parlent. Ils s'enchaînent. Ils forment une machine.
+                </p>
+
+                <p className="text-xs font-bold uppercase tracking-wider text-primary mb-3">Ce que ça change par rapport au Solo</p>
+                <ul className="space-y-3 mb-8 flex-1">
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Multi‑agents coordonnés : Qualification Leads alimente automatiquement ton CRM, qui déclenche l'Onboarding Client. Les agents se parlent entre eux.</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Browser automation : l'agent LinkedIn publie vraiment sur ton compte, au lieu de juste générer un texte à copier‑coller.</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Research agent : tu donnes un sujet → tu reçois un brief de 2 000 mots avec ~15 sources, prêt en 3 minutes.</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />Proposal agent : tu décris un client → tu reçois un devis PDF envoyable directement.</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />CRM post‑appel : transcription → extraction → mise à jour Notion, tu valides en 1 clic.</li>
                 </ul>
+
                 <div className="border-t border-slate-100 pt-5 text-center sm:text-left">
                   <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1 mb-2">
                     <span className="line-through text-slate-400">497€</span>
                     <span className="hidden sm:inline"> · </span>
                     <span className="text-primary">238€</span> le 5 avril
                   </p>
-                  <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-                    Tes agents ne sont plus des îles.<br />
-                    Ils forment une équipe.
+                  <p className="text-xs text-slate-600 font-medium mb-5 leading-relaxed bg-primary/5 p-3 rounded-lg border border-primary/10 italic shadow-sm">
+                    Tes agents ne sont plus des îles. Ils forment une équipe.
                   </p>
-                  <button onClick={() => openModal("pro")} className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-full font-bold text-sm transition-colors text-center">Sécuriser ma place</button>
+                  <button onClick={() => openModal("pro")} className="w-full bg-primary hover:bg-primary/90 text-white py-3.5 rounded-full font-bold text-sm transition-colors text-center shadow-md">Sécuriser ma place</button>
                 </div>
               </motion.div>
 
               {/* STUDIO */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="rounded-2xl border border-slate-200 bg-white p-7 flex flex-col">
-                <h3 className="text-xl font-bold text-slate-800 mb-1">STUDIO</h3>
-                <p className="text-sm text-slate-500 font-medium mb-5">Elazya tourne ta structure pendant que tu dors.</p>
-                <ul className="space-y-2.5 mb-6 flex-1">
-                  <li className="text-sm text-slate-800 font-bold flex items-start gap-2">Tout le Pro +</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />4 agents coordonnés : Strategy · Marketing · Business · Client</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Créateur d'agents : décris en français → Elazya crée le skill</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Multi-Mac : 2 à 5 collaborateurs sur la même instance</li>
-                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Health monitoring : rapport business automatique chaque semaine</li>
+                <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight">Tu ne gères plus une app. Tu diriges une équipe.</h3>
+                <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed">
+                  Tu deviens CEO de ta propre structure à 1 personne.<br />
+                  Strategy, Marketing, Business, Client —<br />chacun a son rôle, ils s'escaladent entre eux.<br />
+                  Tu reprends juste les décisions.
+                </p>
+
+                <p className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-3">Ce que ça change par rapport au Pro</p>
+                <ul className="space-y-3 mb-8 flex-1">
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Équipe de 4 agents coordonnés, comme les solo founders qui récupèrent 25h par semaine : Strategy · Marketing · Business · Client.</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Créateur d'agents visuel : tu décris en français ce que tu veux, Elazya crée le skill OpenClaw correspondant.</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Multi‑Mac / multi‑utilisateur : 2 à 5 collaborateurs sur la même instance.</li>
+                  <li className="text-sm text-slate-600 font-medium flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />Health monitoring business : chaque semaine, un rapport automatique avec pipeline commercial, factures en attente, tâches prioritaires et opportunités.</li>
                 </ul>
+
                 <div className="border-t border-slate-100 pt-5 text-center sm:text-left">
                   <p className="text-sm font-bold text-slate-800 flex flex-col sm:block gap-1 mb-2">
                     <span className="line-through text-slate-400">997€</span>
                     <span className="hidden sm:inline"> · </span>
                     <span className="text-primary">488€</span> le 5 avril
                   </p>
-                  <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-                    Tu ne gères plus une app.<br />
-                    Tu gères une équipe IA.
+                  <p className="text-xs text-slate-500 mb-5 leading-relaxed bg-[#f8fbff] p-3 rounded-lg border border-slate-100 italic shadow-sm">
+                    Les solo founders qui utilisent Elazya Studio récupèrent en moyenne 25h par semaine.
                   </p>
-                  <button onClick={() => openModal("studio")} className="w-full bg-[#0f172a] hover:bg-slate-800 text-white py-3 rounded-full font-bold text-sm transition-colors text-center">Sécuriser ma place</button>
+                  <button onClick={() => openModal("studio")} className="w-full bg-[#0f172a] hover:bg-slate-800 text-white py-3.5 rounded-full font-bold text-sm transition-colors text-center shadow-md">Sécuriser ma place</button>
                 </div>
               </motion.div>
             </div>
@@ -639,8 +658,13 @@ export default function LandingPage() {
           </div>
           <div className="container mx-auto px-6 relative z-10 text-center">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex flex-col items-center">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 mb-4 leading-[1.1]">47 places. 9€ pour sécuriser la tienne.</h2>
-              <p className="text-base sm:text-lg text-slate-500 font-medium max-w-lg mx-auto mb-10">Le 5 avril, tu payes le reste à -50%. Après cette date, les prix remontent définitivement.</p>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 mb-6 leading-[1.1]">
+                Ce n'est pas une app de plus.<br />
+                C'est la dernière dont tu auras besoin.
+              </h2>
+              <p className="text-base sm:text-lg text-slate-500 font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
+                Tout est local sur ton Mac. Aucun serveur externe ne stocke tes données. Aucun abonnement. Tu paies une fois, tu possèdes pour toujours. Pendant que tout le monde empile les SaaS à l'abonnement, toi tu as une équipe IA qui travaille pour toi. Définitivement.
+              </p>
 
               {/* Plan recap */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto mb-10 w-full">
