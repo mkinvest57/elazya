@@ -620,7 +620,7 @@ export default function LandingPage() {
           </div>
         </section>
         \n                {/* ─── FAQ ─── */}
-        <section className="py-28 border-t border-slate-200/50 bg-white">
+        <section className="py-28 border-t border-slate-200/50 bg-transparent relative z-10">
           <div className="container mx-auto px-6">
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-16">
