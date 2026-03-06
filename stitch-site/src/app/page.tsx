@@ -115,16 +115,16 @@ export default function LandingPage() {
           <div className="container relative z-10 px-4 sm:px-6 mx-auto">
             <div className="max-w-5xl mx-auto text-center mt-[-4vh] sm:mt-[-8vh]">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }} className="flex flex-col items-center">
-                <p className="text-xs sm:text-base text-slate-400 font-medium mb-4 sm:mb-6 tracking-wide px-2">Et si tu arrêtais enfin de tout faire toi-même ?</p>
+                <p className="text-xs sm:text-base text-slate-400 font-medium mb-4 sm:mb-6 tracking-wide px-2">⚡️ Le collaborateur IA natif Apple Silicon</p>
                 <h1 className="text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5.5rem] font-semibold tracking-tight mb-6 text-slate-800 leading-[1.15] sm:leading-[1.1]">
-                  Tu as une équipe<br />maintenant.
+                  Arrêtez d'automatiser des APIs.<br />
+                  <span className="text-gradient-primary">Automatisez votre Mac.</span>
                 </h1>
                 <p className="text-sm md:text-lg text-slate-500 font-medium max-w-xl mx-auto mb-8 tracking-wide leading-relaxed px-4">
-                  Elazya tourne ta structure pendant que tu travailles,<br className="hidden sm:block" />
-                  pendant que tu dors, pendant que tu vis.<br className="hidden sm:block" />
-                  Pas un chatbot. Pas un assistant.<br className="hidden sm:block" />
-                  Une équipe IA qui agit vraiment — sur ton Mac,<br className="hidden sm:block" />
-                  sans cloud, sans abonnement.
+                  Elazya ne se connecte pas juste à vos outils web.<br className="hidden sm:block" />
+                  Il prend le contrôle de macOS en local.<br className="hidden sm:block" />
+                  Il lit vos PDF confidentiels, clique dans vos vieux logiciels sans API,<br className="hidden sm:block" />
+                  et rédige vos emails natifs. Exactement comme un assistant physique, mais 24/7.
                 </p>
                 <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-6 py-3.5 sm:px-8 sm:py-3.5 rounded-full font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
                 <p className="text-[11px] sm:text-xs font-medium text-slate-400 mt-4 px-4">47 places · Lancement le 5 avril · -50% · 9€ déduits du prix final</p>
@@ -152,44 +152,46 @@ export default function LandingPage() {
               {/* SCÉNARIO 1 — 8h00 */}
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/15">8h00</span>
-                  <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Tu te réveilles</h3>
+                  <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/15">9h00</span>
+                  <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Un logiciel bloqué sans API ? Pas de problème.</h3>
                 </div>
                 <p className="text-base text-slate-500 font-medium mb-6 leading-relaxed">
-                  Avant même d'ouvrir ton ordi, tout est résumé sur ton téléphone.
+                  Vous devez extraire 500 fiches clients d'un vieux CRM local.<br />
+                  Elazya ouvre la fenêtre, prend le contrôle de la souris,<br />
+                  navigue de page en page grâce à la vision par ordinateur,<br />
+                  lit les pixels de l'écran, et copie tout dans un Google Sheet propre. En 10 minutes.
                 </p>
                 {/* Bulle Telegram */}
                 <div className="bg-[#1c2b3a] border border-[#2a3f54] rounded-xl p-5 sm:p-6 max-w-lg font-mono text-sm text-[#e8e8e8] leading-relaxed">
-                  <p className="mb-3 font-sans text-xs text-slate-400 font-semibold uppercase tracking-wider">Telegram · Elazya Bot</p>
+                  <p className="mb-3 font-sans text-xs text-slate-400 font-semibold uppercase tracking-wider">Mission Control · Elazya</p>
                   <p>
-                    ☀️ <strong>BRIEF DU 04/03</strong><br />
-                    → 2 emails urgents (Client X, Prospect Paul)<br />
-                    → 3 tâches prioritaires du jour<br />
-                    → Facture FAC-002 en retard — relance envoyée automatiquement<br />
-                    → Ton post LinkedIn du jour est prêt à poster
+                    ✓ <strong>EXTRACTION TERMINÉE</strong><br />
+                    → Temps estimé humain : 4h30<br />
+                    → Temps Elazya : 8m45s<br />
+                    → 500 fiches copiées localement<br />
+                    [Voir le fichier extrait]
                   </p>
                 </div>
-                <p className="text-sm text-slate-500 font-medium mt-4">Tu sais exactement quoi faire. En 30 secondes.</p>
+                <p className="text-sm text-slate-500 font-medium mt-4">Pendant ce temps, vous faisiez autre chose.</p>
               </motion.div>
 
               {/* SCÉNARIO 2 — Un prospect */}
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/15">14h00</span>
-                  <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Un prospect t'écrit</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Le chaos des pièces jointes classé. Zéro cloud.</h3>
                 </div>
                 <p className="text-base text-slate-500 font-medium mb-6 leading-relaxed">
-                  Tu ne le vois même pas tout de suite.<br />
-                  Elazya a détecté que c'est un lead chaud,<br />
-                  préparé une réponse personnalisée,<br />
-                  proposé un créneau Calendly,<br />
-                  créé sa fiche dans ton CRM.<br />
-                  Il ne reste plus qu'à appuyer sur Envoyer.
+                  Un partenaire vous envoie un dossier de 40 PDF lourds.<br />
+                  Elazya détecte la réception, lit le contenu 100% en local secrètement<br />
+                  grâce à la mémoire de votre puce Apple Silicon,<br />
+                  renomme chaque fichier selon vos règles,<br />
+                  et les range dans le bon dossier réseau. Aucun document ne part chez OpenAI.
                 </p>
                 <div className="aspect-video rounded-xl bg-slate-800 border border-slate-700/50 flex items-center justify-center p-6">
                   <p className="text-xs text-slate-400 text-center italic leading-relaxed max-w-md">
                     VIDÉO 2 — Sera ajoutée ici<br />
-                    <span className="text-slate-500 text-[11px]">Email prospect reçu, Mission Control log visible, draft Apple Mail rédigé automatiquement, notification Telegram : « Lead chaud · Réponse prête. » Durée : 20-25s.</span>
+                    <span className="text-slate-500 text-[11px]">Finder : Dossier "Vrac" se vidant automatiquement, les fichiers sont renommés (ex: "CONTRAT_MAQUIS_2025.pdf") et déplacés instantanément.</span>
                   </p>
                 </div>
               </motion.div>
@@ -198,18 +200,18 @@ export default function LandingPage() {
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/15">16h30</span>
-                  <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Une facture arrive dans ton dossier</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Veille concurrentielle sur des sites fermés aux bots</h3>
                 </div>
                 <p className="text-base text-slate-500 font-medium mb-6 leading-relaxed">
-                  Tu n'ouvres pas le PDF.<br />
-                  Elazya l'a lu, classé dans le bon dossier,<br />
-                  mis à jour ton suivi,<br />
-                  créé un rappel 7 jours avant l'échéance.
+                  Vous voulez scraper les prix d'un concurrent qui bloque Zapier ?<br />
+                  Elazya ouvre un vrai navigateur Safari sur votre écran,<br />
+                  déplace le curseur comme un humain,<br />
+                  contourne les captchas comportementaux, et lit l'écran visuellement pour vous.
                 </p>
                 <div className="aspect-video rounded-xl bg-slate-800 border border-slate-700/50 flex items-center justify-center p-6">
                   <p className="text-xs text-slate-400 text-center italic leading-relaxed max-w-md">
                     VIDÉO 3 — Sera ajoutée ici<br />
-                    <span className="text-slate-500 text-[11px]">PDF glissé dans dossier Mac, Mission Control log : « Facture FAC-001 · 1250€ · classée · rappel 12/04 ». Durée : 15s.</span>
+                    <span className="text-slate-500 text-[11px]">Curseur de la souris qui bouge tout seul dans Safari avec une bannière "Agent Safari Actif", parcourant des fiches produits de manière aléatoire.</span>
                   </p>
                 </div>
               </motion.div>
@@ -218,17 +220,17 @@ export default function LandingPage() {
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/15">18h00</span>
-                  <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Après un appel client</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-slate-800">Vous montrez l'écran, il apprend.</h3>
                 </div>
                 <p className="text-base text-slate-500 font-medium mb-6 leading-relaxed">
-                  Tu envoies tes notes vocales sur Telegram.<br />
-                  Elazya transcrit, met à jour le CRM,<br />
-                  crée le rappel dans ton calendrier. En 20 secondes.
+                  Oubliez la création de scripts JSON complexes.<br />
+                  Dites simplement "Quand je reçois ce mail, regarde là, clique ici et remplis ça".<br />
+                  Elazya comprend l'instruction visuelle et exécute.
                 </p>
                 <div className="aspect-video rounded-xl bg-slate-800 border border-slate-700/50 flex items-center justify-center p-6">
                   <p className="text-xs text-slate-400 text-center italic leading-relaxed max-w-md">
                     VIDÉO 4 — Sera ajoutée ici<br />
-                    <span className="text-slate-500 text-[11px]">Note vocale Telegram envoyée, réponse agent : « Appel Client X · Devis avant 07/03 · Rappel créé. » Durée : 15s.</span>
+                    <span className="text-slate-500 text-[11px]">Sélecteur visuel "OpenClaw" dessinant un cadre d'enregistrement sur une fenêtre native. L'humain clique trois fois, l'agent rejoue avec des données variables.</span>
                   </p>
                 </div>
               </motion.div>
@@ -281,27 +283,27 @@ export default function LandingPage() {
             <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
                 {
-                  emoji: "💰",
-                  name: "Facturation Auto",
-                  desc: "PDF facture reçue → classée, Notion mise à jour, reminder créé.",
+                  emoji: "📂",
+                  name: "Le Démêleur Finder",
+                  desc: "Réorganise 10 ans de dossiers chaotiques en triant chaque fichier par son vrai contenu sémantique, lu en local.",
                   savings: "2h/semaine",
                   color: "from-green-50 to-green-50/10",
                   borderColor: "hover:border-green-200",
                   iconBg: "bg-green-100"
                 },
                 {
-                  emoji: "📧",
-                  name: "Onboarding Client",
-                  desc: "Prospect intéressé → Calendly envoyé, contrat préparé, paiement ready.",
+                  emoji: "🌐",
+                  name: "Le Pilote Safari",
+                  desc: "Pilote le navigateur visuellement pour gérer des extranets archaïques où aucune intégration Zapier n'est possible.",
                   savings: "1h/client",
                   color: "from-blue-50 to-blue-50/10",
                   borderColor: "hover:border-blue-200",
                   iconBg: "bg-blue-100"
                 },
                 {
-                  emoji: "📱",
-                  name: "LinkedIn Quotidien",
-                  desc: "Chaque matin → 3 posts prêts, 5 commentaires générés, feed résumé.",
+                  emoji: "✉️",
+                  name: "L'Erudit Apple Mail",
+                  desc: "Lit les longs fils de discussion dans Apple Mail et croise avec votre disque dur pour le brouillon parfait.",
                   savings: "3h30/semaine",
                   color: "from-sky-50 to-sky-50/10",
                   borderColor: "hover:border-sky-200",
@@ -379,14 +381,14 @@ export default function LandingPage() {
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
                     <Brain className="w-5 h-5 text-primary" />
                   </div>
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Mémoire contextuelle</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Vision par ordinateur</span>
                 </div>
-                <h3 className="text-3xl font-bold mb-4 text-slate-800 tracking-tight">Il vous connaît, sans cloud.</h3>
+                <h3 className="text-3xl font-bold mb-4 text-slate-800 tracking-tight">Il voit ce que vous voyez.</h3>
                 <p className="text-slate-500 leading-relaxed font-medium mb-8 max-w-xl">
-                  Elazya apprend vos préférences, votre style et vos habitudes. Tout est stocké localement sur votre machine — rien ne quitte jamais votre Mac.
+                  Le moteur OpenClaw lit l'écran et clique sur les pixels. Ça le rend compatible avec 100% de vos apps, que ce soit Safari, Excel, Finder, ou le vieux logiciel comptable de 2012. Pas besoin d'intégration API.
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  {['Préférences personnelles', 'Habitudes de travail', 'Style rédactionnel'].map((tag, i) => (
+                  {['Lecture des pixels', 'Reconnaissance visuelle', 'Navigation OCR'].map((tag, i) => (
                     <span key={i} className="text-[11px] font-bold text-slate-600 px-4 py-2 rounded-full bg-slate-100/80 border border-slate-200/80">
                       {tag}
                     </span>
@@ -402,12 +404,12 @@ export default function LandingPage() {
                 transition={{ delay: 0.1 }}
                 className="p-6 md:p-8 rounded-3xl bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300"
               >
-                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center mb-6 border border-accent/20">
-                  <Globe className="w-5 h-5 text-accent" />
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-6 border border-emerald-500/20">
+                  <Lock className="w-5 h-5 text-emerald-600" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-slate-800 tracking-tight">Multi-canal</h3>
+                <h3 className="text-xl font-bold mb-3 text-slate-800 tracking-tight">100% Local Inference</h3>
                 <p className="text-slate-500 leading-relaxed font-medium">
-                  Telegram, WhatsApp, Slack, Email — communiquez avec Elazya depuis n'importe où.
+                  Confidentialité de niveau militaire sur Mac. Aucune de vos données sensibles ne part entraîner les modèles externes.
                 </p>
               </motion.div>
 
@@ -419,12 +421,12 @@ export default function LandingPage() {
                 transition={{ delay: 0.15 }}
                 className="p-6 md:p-8 rounded-3xl bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300"
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-6 border border-emerald-500/20">
-                  <Lock className="w-5 h-5 text-emerald-600" />
+                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center mb-6 border border-accent/20">
+                  <Globe className="w-5 h-5 text-accent" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-slate-800 tracking-tight">Application native .dmg</h3>
+                <h3 className="text-xl font-bold mb-3 text-slate-800 tracking-tight">Contrôle Clavier/Souris</h3>
                 <p className="text-slate-500 leading-relaxed font-medium">
-                  S'installe comme un logiciel normal. Pas de lignes de commande complexes.
+                  S'il n'y a pas d'API, il tape. C'est un humain numérique caché derrière le Terminal.
                 </p>
               </motion.div>
 
@@ -439,11 +441,11 @@ export default function LandingPage() {
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
                     <Cpu className="w-5 h-5 text-primary" />
                   </div>
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Automatisations</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Vitesse RAM</span>
                 </div>
-                <h3 className="text-3xl font-bold mb-4 text-slate-800 tracking-tight">Des chaînes d'action intelligentes</h3>
+                <h3 className="text-3xl font-bold mb-4 text-slate-800 tracking-tight">Un cerveau, 10 bras asynchrones.</h3>
                 <p className="text-slate-500 leading-relaxed font-medium max-w-xl">
-                  Elazya ne fait pas qu'une chose à la fois. Il enchaîne ses compétences pour résoudre des problèmes complexes : de l'analyse de factures à la veille technologique.
+                  Pendant qu'un agent lit l'écran, un autre fouille votre disque SSD Finder et un troisième rédige la note finale. Ils communiquent en réseau local instantané, exécutant des scénarios complexes à la vitesse de votre puce ARM.
                 </p>
                 <div className="mt-8 flex flex-wrap items-center gap-3 text-xs font-mono font-semibold">
                   <span className="px-3 py-2 rounded-lg bg-white border border-slate-200 shadow-sm text-slate-600">Email reçu</span>
