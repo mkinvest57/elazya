@@ -108,7 +108,7 @@ export default function LandingPage() {
       <StickyBanner onCTA={() => openModal()} places={places} />
       <EmailModal open={modal} onClose={() => setModal(false)} plan={modalPlan} />
       <main className="min-h-screen text-slate-800 font-sans selection:bg-primary/20 selection:text-slate-900 overflow-hidden">
-          <GlassBackground />
+        <GlassBackground />
 
         {/* ─── HERO ─── */}
         <section className="relative min-h-screen flex items-center justify-center pt-32 pb-16 overflow-hidden bg-transparent">
@@ -526,7 +526,7 @@ export default function LandingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {/* SOLO */}
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0 }} className="rounded-2xl border border-slate-200 bg-white p-7 flex flex-col">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0 }} className="rounded-3xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-7 flex flex-col shadow-sm">
                 <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight">Tu n'es plus seul à tout gérer.</h3>
                 <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed">
                   Tu ouvres ton Mac le matin.<br />
@@ -557,7 +557,7 @@ export default function LandingPage() {
               </motion.div>
 
               {/* PRO */}
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="rounded-2xl border-2 border-primary bg-white p-7 flex flex-col relative scale-[1.02] shadow-xl">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="rounded-3xl border-2 border-primary/50 bg-white/90 backdrop-blur-xl p-7 flex flex-col relative scale-[1.02] shadow-xl">
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold text-white bg-primary px-4 py-1.5 rounded-full whitespace-nowrap shadow-sm">Le plus populaire</span>
                 <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight">Un prospect intéressé devient un client signé sans que tu aies rien fait entre les deux.</h3>
                 <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed">
@@ -588,7 +588,7 @@ export default function LandingPage() {
               </motion.div>
 
               {/* STUDIO */}
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="rounded-2xl border border-slate-200 bg-white p-7 flex flex-col">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="rounded-3xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-7 flex flex-col shadow-sm">
                 <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight">Tu ne gères plus une app. Tu diriges une équipe.</h3>
                 <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed">
                   Tu deviens CEO de ta propre structure à 1 personne.<br />
