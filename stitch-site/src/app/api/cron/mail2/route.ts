@@ -89,7 +89,7 @@ Tout ça sans que tu aies rien fait.
 </p>
 
 <div style="margin:32px 0;">
-<a href="${reservationLink}" style="display:inline-block;background:#0f172a;color:#fff;font-size:16px;font-weight:700;padding:14px 32px;border-radius:8px;text-decoration:none;">Sécuriser ma place n°${user.position} — 9€ →</a>
+<a href="${reservationLink}" style="display:inline-block;background:#0f172a;color:#fff;font-size:16px;font-weight:700;padding:14px 32px;border-radius:8px;text-decoration:none;">Sécuriser ma place n°${user.position} →</a>
 </div>
 
 <div style="text-align:left;padding:16px 0;border-top:1px solid #e2e8f0;">

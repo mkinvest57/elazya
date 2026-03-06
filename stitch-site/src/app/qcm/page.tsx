@@ -38,9 +38,9 @@ const questions = [
         id: "plan",
         title: "Quel plan t'attire le plus ?",
         options: [
-            { id: "solo", label: "Solo → 9€ maintenant · 88€ le 5 avril" },
-            { id: "pro", label: "Pro → 9€ maintenant · 238€ le 5 avril" },
-            { id: "studio", label: "Studio → 9€ maintenant · 488€ le 5 avril" }
+            { id: "solo", label: "Solo → 88€ le 5 avril au lieu de 197€" },
+            { id: "pro", label: "Pro → 238€ le 5 avril au lieu de 497€" },
+            { id: "studio", label: "Studio → 488€ le 5 avril au lieu de 997€" }
         ]
     }
 ]

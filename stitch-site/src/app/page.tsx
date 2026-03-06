@@ -127,7 +127,7 @@ export default function LandingPage() {
                   et rédige vos emails natifs. Exactement comme un assistant physique, mais 24/7.
                 </p>
                 <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-6 py-3.5 sm:px-8 sm:py-3.5 rounded-full font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
-                <p className="text-[11px] sm:text-xs font-medium text-slate-400 mt-4 px-4">47 places · Lancement le 5 avril · -50% · 9€ déduits du prix final</p>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-400 mt-4 px-4">47 places · Lancement le 5 avril · -50% garanti sur le prix final</p>
               </motion.div>
             </div>
           </div>
@@ -239,8 +239,8 @@ export default function LandingPage() {
 
             {/* 2nd CTA */}
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-20 sm:mt-24">
-              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 rounded-full font-bold text-base shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
-              <p className="text-xs font-medium text-slate-400 mt-3">9€ maintenant · -50% le 5 avril · Remboursé si l'app ne sort pas</p>
+              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 rounded-full font-bold text-base shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place (-50%)</motion.button>
+              <p className="text-xs font-medium text-slate-400 mt-3">Sans engagement · -50% le 5 avril · Remboursé si l'app ne sort pas</p>
             </motion.div>
           </div>
         </section>
@@ -522,7 +522,7 @@ export default function LandingPage() {
             <div className="text-center mb-16">
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 mb-4 leading-[1.1]">Choisis ton niveau d'automatisation.</h2>
-                <p className="text-base sm:text-lg text-slate-500 font-medium">9€ maintenant pour sécuriser ta place. Le reste le 5 avril à -50%.</p>
+                <p className="text-base sm:text-lg text-slate-500 font-medium">Sécurise ta place aujourd'hui pour geler le tarif. Le solde s'applique le 5 avril à -50%.</p>
               </motion.div>
             </div>
 
@@ -634,7 +634,7 @@ export default function LandingPage() {
                   { q: "Mes données partent sur le cloud ?", a: "Non. Tout tourne en local sur ton Mac. Tes fichiers, mails et données ne quittent jamais ta machine." },
                   { q: "J'ai besoin d'un abonnement IA en plus ?", a: "Tu as besoin d'une clé API. Google Gemini a un plan gratuit qui suffit pour commencer." },
                   { q: "Que se passe-t-il si mon Mac est éteint ?", a: "Les agents s'arrêtent quand le Mac dort. Pour les notifications Telegram et emails en temps réel, ton Mac doit rester allumé." },
-                  { q: "À quoi servent les 9€ ?", a: "C'est un dépôt pour sécuriser ta place parmi les 47 disponibles. Ces 9€ sont déduits intégralement du prix final le 5 avril. Si l'app ne sort pas : remboursement intégral, sans conditions." },
+                  { q: "Dois-je payer un acompte ?", a: "Oui, un petit dépôt de garantie est demandé pour réserver l'une des 47 places. Il sera intégralement déduit de ton prix final le 5 avril. Si l'app ne sort pas : remboursement intégral, sans conditions." },
                   { q: "Pourquoi seulement 47 places ?", a: "Pour garantir un support de qualité à chaque utilisateur au lancement. Les places suivantes seront au prix normal." },
                   { q: "C'est quoi OpenClaw ?", a: "Le moteur IA qui coordonne les agents d'Elazya sur ton Mac. Il tourne en local. Tu n'as pas besoin de comprendre comment ça marche." },
                 ].map((faq, i) => (
@@ -671,14 +671,14 @@ export default function LandingPage() {
               {/* Plan recap */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto mb-10 w-full">
                 {[
-                  { name: "Solo", now: "9€", after: "88€", save: "109€" },
-                  { name: "Pro", now: "9€", after: "238€", save: "259€" },
-                  { name: "Studio", now: "9€", after: "488€", save: "509€" },
+                  { name: "Solo", after: "88€", save: "109€" },
+                  { name: "Pro", after: "238€", save: "259€" },
+                  { name: "Studio", after: "488€", save: "509€" },
                 ].map((p, i) => (
                   <div key={i} className="bg-white rounded-xl p-4 border border-slate-200 text-center">
                     <p className="text-sm font-bold text-slate-800 mb-1">{p.name}</p>
-                    <p className="text-xs text-slate-500">{p.now} maintenant · {p.after} le 5 avril</p>
-                    <p className="text-xs text-emerald-600 font-semibold mt-1">tu économises {p.save}</p>
+                    <p className="text-xs text-slate-500">Tarif sécurisé : {p.after} le 5 avril</p>
+                    <p className="text-xs text-emerald-600 font-semibold mt-1">tu économiseras {p.save}</p>
                   </div>
                 ))}
               </div>
@@ -686,8 +686,8 @@ export default function LandingPage() {
               {/* Countdown */}
               <CountdownDisplay />
 
-              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="mt-8 bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 lg:px-12 lg:py-4 rounded-full font-bold text-base lg:text-lg shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
-              <p className="text-xs font-medium text-slate-400 mt-4 max-w-md">Paiement sécurisé via Stripe · Remboursé si l'app ne sort pas · 9€ déduits du prix final</p>
+              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="mt-8 bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 lg:px-12 lg:py-4 rounded-full font-bold text-base lg:text-lg shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place (-50%)</motion.button>
+              <p className="text-xs font-medium text-slate-400 mt-4 max-w-md">Sans engagement · Remboursé si l'app ne sort pas · Déductible du prix final</p>
             </motion.div>
           </div>
         </section>
