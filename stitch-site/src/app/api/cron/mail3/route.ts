@@ -57,9 +57,10 @@ Pour être prêt dès le premier matin :<br>
 
 <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;margin:bottom:24px;">
 <p style="font-size:15px;font-weight:700;color:#0f172a;margin:0 0 12px;">Ce que tu recevras le 5 avril à 9h00 :</p>
-<ul style="margin:0;padding-left:20px;color:#334155;font-size:15px;line-height:1.6;">
-  <li>Ton lien de téléchargement</li>
-  <li>Ton lien de paiement du solde (-50%)</li>
+<ul style="margin:0;padding-left:20px;color:#334155;font-size:16px;line-height:1.6;margin-bottom:24px;">
+  <li>Les instructions pour installer OpenClaw (mon moteur IA)</li>
+  <li>Le lien direct pour télécharger l'app macOS</li>
+  <li>Ton lien de paiement du solde (Tarif Fondateur)</li>
   <li>Ta clé de licence (générée automatiquement)</li>
   <li>Un guide de démarrage rapide (5 minutes pour tout configurer)</li>
 </ul>

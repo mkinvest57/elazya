@@ -127,7 +127,7 @@ export default function LandingPage() {
                   et rédige vos emails natifs. Exactement comme un assistant physique, mais 24/7.
                 </p>
                 <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-6 py-3.5 sm:px-8 sm:py-3.5 rounded-full font-bold text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place</motion.button>
-                <p className="text-[11px] sm:text-xs font-medium text-slate-400 mt-4 px-4">47 places · Lancement le 5 avril · -50% garanti sur le prix final</p>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-400 mt-4 px-4">47 places · Lancement le 5 avril · Tarif Fondateur garanti sur le prix final</p>
               </motion.div>
             </div>
           </div>
@@ -239,8 +239,8 @@ export default function LandingPage() {
 
             {/* 2nd CTA */}
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-20 sm:mt-24">
-              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 rounded-full font-bold text-base shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place (-50%)</motion.button>
-              <p className="text-xs font-medium text-slate-400 mt-3">Sans engagement · -50% le 5 avril · Remboursé si l'app ne sort pas</p>
+              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 rounded-full font-bold text-base shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place (Tarif Fondateur)</motion.button>
+              <p className="text-xs font-medium text-slate-400 mt-3">Sans engagement · Tarif Fondateur garanti · Remboursé si l'app ne sort pas</p>
             </motion.div>
           </div>
         </section>
@@ -522,7 +522,7 @@ export default function LandingPage() {
             <div className="text-center mb-16">
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 mb-4 leading-[1.1]">Choisis ton niveau d'automatisation.</h2>
-                <p className="text-base sm:text-lg text-slate-500 font-medium">Sécurise ta place aujourd'hui pour geler le tarif. Le solde s'applique le 5 avril à -50%.</p>
+                <p className="text-base sm:text-lg text-slate-500 font-medium">Sécurise ta place aujourd'hui pour geler le tarif. Le solde s'applique le 5 avril au Tarif Fondateur.</p>
               </motion.div>
             </div>
 
@@ -686,7 +686,7 @@ export default function LandingPage() {
               {/* Countdown */}
               <CountdownDisplay />
 
-              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="mt-8 bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 lg:px-12 lg:py-4 rounded-full font-bold text-base lg:text-lg shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place (-50%)</motion.button>
+              <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => openModal()} className="mt-8 bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 lg:px-12 lg:py-4 rounded-full font-bold text-base lg:text-lg shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place (Tarif Fondateur)</motion.button>
               <p className="text-xs font-medium text-slate-400 mt-4 max-w-md">Sans engagement · Remboursé si l'app ne sort pas · Déductible du prix final</p>
             </motion.div>
           </div>

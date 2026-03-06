@@ -89,7 +89,7 @@ function ReservationContent() {
                         {[
                             "Tu déposes 9€ maintenant pour bloquer ta place.",
                             "Ces 9€ sont déduits de ton prix final le 5 avril.",
-                            "Le 5 avril, tu reçois ton lien d'accès avec -50% sur le plan de ton choix.",
+                            "Le 5 avril, tu reçois ton lien d'accès au Tarif Fondateur.",
                             "Si l'app ne sort pas : remboursement intégral des 9€, sans conditions.",
                         ].map((step, i) => (
                             <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-white border border-slate-200">
