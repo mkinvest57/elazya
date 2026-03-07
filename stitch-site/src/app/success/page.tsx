@@ -176,7 +176,7 @@ function SuccessContent() {
                             >
                                 <Download className="w-5 h-5" />
                                 Télécharger le DMG
-                                <span className="text-sm font-normal opacity-80 ml-1">~184 MB (Mis à jour le 3 Mars 2026 à 21:44)</span>
+                                <span className="text-sm font-normal opacity-80 ml-1">~184 MB (Mis à jour le 7 Mars 2026 à 03:00)</span>
                             </a>
 
                             {/* Feature badges */}
