@@ -316,3 +316,5 @@ export default function SuccessPage() {
         </Suspense>
     )
 }
+
+export const dynamic = "force-static";
