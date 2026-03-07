@@ -93,7 +93,7 @@ function DownloadContent() {
                         <h2 className="font-bold text-slate-800 text-xl tracking-tight">Télécharger Elazya</h2>
                     </div>
                     <a
-                        href="https://elazya.com/downloads/Elazya_2.0.0_aarch64.dmg"
+                        href="https://github.com/mkinvest57/elazya/releases/download/v2.0.0/Elazya_2.0.0_aarch64.dmg"
                         className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-[#0f172a] hover:bg-slate-800 text-white font-bold text-lg shadow-[0_4px_14px_0_rgba(15,23,42,0.39)] hover:-translate-y-0.5 transition-all"
                     >
                         <Download className="w-5 h-5" />
