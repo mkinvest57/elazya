@@ -42,13 +42,13 @@ export function HeroSection() {
       >
         
         {/* Main Heading H1 */}
-        <motion.h1 variants={item} className="text-5xl md:text-[80px] font-geist leading-none text-[#0f172a] tracking-tight max-w-[1000px]">
-          Récupérez <span className="font-instrument italic text-6xl md:text-[100px] text-[#0f172a] font-normal">12 heures de temps libre</span> par semaine en automatisant votre administratif.
+        <motion.h1 variants={item} className="text-5xl md:text-[90px] leading-[1.1] md:leading-none font-geist tracking-tighter text-gray-900 font-extrabold mb-6 max-w-[1000px]">
+          ChatGPT discute. Elazya <span className="font-instrument italic text-blue-600 font-normal tracking-normal">exécute.</span>
         </motion.h1>
 
         {/* Description H2 */}
-        <motion.p variants={item} className="text-lg md:text-[18px] opacity-80 text-[#373a46] max-w-[554px] font-geist leading-relaxed">
-          Arrêtez de sacrifier vos soirées. Déléguez la gestion de vos prospects, devis et emails à une IA 100% locale qui travaille 24/7 sur votre Mac. Zéro abonnement.
+        <motion.p variants={item} className="text-lg md:text-[20px] font-geist text-[#373a46] opacity-80 max-w-[650px] mx-auto leading-relaxed mb-10">
+          Ne générez plus de texte, générez des actions. Déléguez la création de vos devis, l'envoi de vos emails et la gestion de votre CRM à un agent IA autonome qui clique et travaille à votre place sur votre Mac.
         </motion.p>
 
         {/* Interactive Component (Email & CTA) */}
