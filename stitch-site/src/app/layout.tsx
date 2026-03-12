@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className="dark scroll-smooth" data-theme="dark">
+    <html lang="fr" className="scroll-smooth">
       <body className={`${inter.variable} ${jakarta.variable} antialiased min-h-screen flex flex-col font-sans`}>
         <Header />
         <main className="flex-1 pt-20">

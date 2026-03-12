@@ -3,27 +3,24 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/Button"
-import { Menu, X } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { X, Menu } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function Header() {
     const [isScrolled, setIsScrolled] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-    const pathname = usePathname()
 
     useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20)
-        }
+        const handleScroll = () => setIsScrolled(window.scrollY > 20)
         window.addEventListener("scroll", handleScroll)
         return () => window.removeEventListener("scroll", handleScroll)
     }, [])
 
-    const navLinks = [
-        { href: "/agents", label: "Ton Équipe IA" },
-    ]
+    const scrollToPricing = () => {
+        setIsMobileMenuOpen(false)
+        document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })
+    }
 
     return (
         <header
@@ -37,55 +34,48 @@ export function Header() {
             <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2.5 group">
-                    <Image
-                        src="/logo.png"
-                        alt="Elazya"
-                        width={32}
-                        height={32}
-                        className="rounded-lg group-hover:scale-105 transition-transform"
-                    />
-                    <span className="text-xl font-bold tracking-tight text-slate-800">
-                        Elazya
-                    </span>
+                    <Image src="/logo.png" alt="Elazya" width={32} height={32} className="rounded-lg group-hover:scale-105 transition-transform" />
+                    <span className="text-xl font-bold tracking-tight text-slate-800">Elazya</span>
                 </Link>
 
                 {/* Desktop Nav */}
-                <nav className="hidden md:flex items-center gap-10">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.href}
-                            href={link.href}
-                            className="text-[15px] font-medium text-slate-500 hover:text-slate-900 transition-colors"
-                        >
-                            {link.label}
-                        </Link>
-                    ))}
+                <nav className="hidden md:flex items-center gap-8">
+                    <button
+                        onClick={scrollToPricing}
+                        className="px-5 py-2.5 text-[13px] font-bold text-white bg-[#0f172a] hover:bg-slate-800 rounded-full shadow-[0_4px_12px_rgb(15,23,42,0.2)] transition-all ring-1 ring-slate-800/20"
+                    >
+                        Voir les prix
+                    </button>
                 </nav>
 
                 {/* Mobile Toggle */}
                 <button
-                    className="md:hidden flex items-center justify-center px-4 py-2 text-[14px] font-medium text-slate-700 bg-white/50 border border-slate-300/80 rounded-full hover:bg-slate-50 transition-colors"
+                    className="md:hidden flex items-center justify-center w-10 h-10 text-slate-700 bg-white/50 border border-slate-300/80 rounded-full hover:bg-slate-50 transition-colors"
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
-                    Menu
+                    {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
                 </button>
             </div>
 
             {/* Mobile Menu */}
-            {isMobileMenuOpen && (
-                <div className="absolute top-full left-0 right-0 bg-white/95 backdrop-blur-2xl border-b border-slate-200/50 p-6 md:hidden flex flex-col gap-2">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.href}
-                            href={link.href}
-                            className="text-base font-medium py-3 px-4 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors"
-                            onClick={() => setIsMobileMenuOpen(false)}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute top-full left-0 right-0 bg-white/95 backdrop-blur-2xl border-b border-slate-200/50 p-6 md:hidden flex flex-col gap-2 shadow-lg"
+                    >
+                        <button
+                            onClick={scrollToPricing}
+                            className="block w-full text-center py-3 text-sm font-bold text-white bg-[#0f172a] rounded-full shadow-md"
                         >
-                            {link.label}
-                        </Link>
-                    ))}
-                </div>
-            )}
+                            Voir les prix
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </header>
     )
 }

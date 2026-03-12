@@ -1,70 +1,44 @@
-import Link from "next/link"
-import Image from "next/image"
+"use client"
+
+import { motion } from "framer-motion"
 
 export function Footer() {
+    const scrollToPricing = () => {
+        document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })
+    }
+
     return (
-        <footer className="relative border-t border-slate-200/60 bg-[#f8fbff] pt-16 pb-8 mt-0">
-            {/* Top gradient line */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        <footer className="relative bg-gradient-to-b from-[#f8fbff] to-white pt-24 pb-12 overflow-hidden border-t border-slate-200/50">
+            {/* Soft background glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
-            <div className="container mx-auto px-4 md:px-6">
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
-                    {/* Brand */}
-                    <div className="col-span-2 md:col-span-2">
-                        <Link href="/" className="flex items-center gap-2.5 mb-4 group">
-                            <Image src="/logo.png" alt="Elazya" width={28} height={28} className="rounded-lg group-hover:scale-105 transition-transform" />
-                            <span className="text-base font-bold tracking-tight text-slate-800">Elazya</span>
-                        </Link>
-                        <p className="text-sm text-slate-500 leading-relaxed max-w-[280px] mb-6 font-medium">
-                            L'assistant IA qui vit sur votre machine. Privé, local, et puissant.
-                        </p>
-                        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-                            <span className="inline-block w-2 h-2 rounded-full bg-success" />
-                            <span>Tous les systèmes opérationnels</span>
-                        </div>
-                    </div>
-
-                    {/* Product */}
-                    <div>
-                        <h4 className="font-semibold mb-4 text-sm text-slate-900">Produit</h4>
-                        <ul className="space-y-3 text-sm font-medium text-slate-500">
-                            <li><Link href="/#features" className="hover:text-primary transition-colors">Fonctionnalités</Link></li>
-                            <li><Link href="/pricing" className="hover:text-primary transition-colors">Tarifs</Link></li>
-                            <li><Link href="/changelog" className="hover:text-primary transition-colors">Changelog</Link></li>
-                            <li><Link href="/docs" className="hover:text-primary transition-colors">Documentation</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Resources */}
-                    <div>
-                        <h4 className="font-semibold mb-4 text-sm text-slate-900">Ressources</h4>
-                        <ul className="space-y-3 text-sm font-medium text-slate-500">
-                            <li><Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link></li>
-                            <li><Link href="/community" className="hover:text-primary transition-colors">Communauté</Link></li>
-                            <li><a href="https://discord.gg/elazya" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors">Discord</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Legal */}
-                    <div>
-                        <h4 className="font-semibold mb-4 text-sm text-slate-900">Légal</h4>
-                        <ul className="space-y-3 text-sm font-medium text-slate-500">
-                            <li><Link href="/privacy" className="hover:text-primary transition-colors">Confidentialité</Link></li>
-                            <li><Link href="/terms" className="hover:text-primary transition-colors">CGV</Link></li>
-                        </ul>
-                    </div>
+            <div className="container mx-auto px-6 relative z-10">
+                <div className="max-w-4xl mx-auto text-center mb-16">
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                        className="text-4xl md:text-5xl font-bold text-slate-800 mb-8 tracking-tight"
+                    >
+                        Prêt à récupérer 12h par semaine ?
+                    </motion.h2>
+                    <motion.button 
+                        initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}
+                        whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}
+                        onClick={scrollToPricing}
+                        className="bg-[#0f172a] hover:bg-slate-800 text-white text-lg md:text-xl font-bold px-10 py-5 rounded-full shadow-[0_12px_24px_rgb(15,23,42,0.25)] transition-all ring-1 ring-slate-800/10"
+                    >
+                        Obtenir mon équipe IA
+                    </motion.button>
                 </div>
 
-                {/* Bottom bar */}
-                <div className="border-t border-slate-200/60 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-xs font-bold text-slate-400">
-                        © 2026 Elazya AI. Tous droits réservés.
-                    </p>
-                    <div className="flex items-center gap-4 text-xs font-bold text-slate-400">
-                        <span>Conçu à Paris 🇫🇷</span>
-                        <span className="hidden md:inline">·</span>
-                        <span className="hidden md:inline">Privacy-first by design</span>
+                {/* Bottom line */}
+                <div className="border-t border-slate-200/80 pt-8 mt-16 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold text-slate-400">
+                    <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded bg-slate-200 shadow-inner flex items-center justify-center">
+                            <img src="/logo.png" alt="" className="w-4 h-4 rounded-sm" />
+                        </div>
+                        © 2026 Elazya. Tous droits réservés.
                     </div>
+                    <div>100% Native on Apple Silicon</div>
                 </div>
             </div>
         </footer>
