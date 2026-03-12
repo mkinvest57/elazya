@@ -6,15 +6,15 @@ export function ProblemsSection() {
   const problems = [
     {
       title: "Soirées perdues",
-      desc: "Vos nuits passent dans les devis et les mails."
+      desc: "Vos nuits passent dans la rédaction de devis et le tri de mails au lieu de développer votre boîte."
     },
     {
       title: "La peur du Cloud",
-      desc: "Vous refusez de donner vos factures à des IA en ligne."
+      desc: "Vous refusez de donner vos factures et données clients sensibles à des intelligences artificielles en ligne."
     },
     {
       title: "Complexité technique",
-      desc: "Vous n'avez pas le temps de coder des scripts complexes."
+      desc: "Vous savez que l'IA peut vous aider, mais vous n'avez ni le temps ni l'envie de coder des scripts complexes."
     }
   ]
 
@@ -28,16 +28,16 @@ export function ProblemsSection() {
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0, duration: 0.6 } }
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
   }
 
   return (
-    <section className="max-w-[1200px] mx-auto py-32 text-center px-6">
+    <section className="max-w-[1200px] mx-auto py-24 md:py-32 px-4 text-center">
       <motion.h2 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ type: "spring", bounce: 0, duration: 0.6 }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
         className="text-[32px] md:text-[40px] font-geist font-medium text-[#0f172a] max-w-3xl mx-auto leading-tight"
       >
         Vous êtes le goulot d'étranglement de votre propre business.
@@ -54,10 +54,10 @@ export function ProblemsSection() {
           <motion.div
             key={i}
             variants={item}
-            className="bg-[#fcfcfc] border border-gray-200 rounded-[24px] p-8 text-left transition-transform hover:-translate-y-1 hover:shadow-sm"
+            className="bg-[#fcfcfc] border border-gray-200 rounded-[24px] p-8 text-left hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
           >
             <h3 className="text-xl font-bold font-geist text-[#0f172a] mb-3">{prob.title}</h3>
-            <p className="text-base text-[#373a46] opacity-80 leading-relaxed font-geist">
+            <p className="text-base text-[#373a46] opacity-80 leading-relaxed font-geist font-medium">
               {prob.desc}
             </p>
           </motion.div>

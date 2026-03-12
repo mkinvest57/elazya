@@ -17,11 +17,11 @@ export function HeroSection() {
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0, duration: 0.8 } }
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
   }
 
   return (
-    <section className="min-h-screen relative flex flex-col justify-start items-center overflow-hidden">
+    <section className="min-h-screen relative flex flex-col justify-center items-center overflow-hidden pt-[120px] md:pt-[290px]">
       
       {/* Background Video */}
       <video 
@@ -38,43 +38,41 @@ export function HeroSection() {
         variants={container}
         initial="hidden"
         animate="show"
-        className="relative z-10 w-full max-w-[1200px] pt-[290px] flex flex-col items-center gap-[32px] px-4 text-center"
+        className="relative z-10 w-full max-w-[1200px] flex flex-col items-center gap-[32px] px-4 text-center"
       >
         
         {/* Main Heading H1 */}
-        <motion.h1 variants={item} className="text-5xl md:text-[80px] font-geist font-medium tracking-[-0.04em] text-[#0f172a] leading-[1.1] max-w-[1000px]">
-          Votre propre <span className="font-instrument text-6xl md:text-[100px] font-normal italic">équipe IA</span> sur votre Mac.
+        <motion.h1 variants={item} className="text-5xl md:text-[80px] font-geist leading-none text-[#0f172a] tracking-tight max-w-[1000px]">
+          Récupérez <span className="font-instrument italic text-6xl md:text-[100px] text-[#0f172a] font-normal">12 heures de temps libre</span> par semaine en automatisant votre administratif.
         </motion.h1>
 
-        {/* Description */}
-        <motion.p variants={item} className="text-[18px] opacity-80 text-[#373a46] max-w-[554px] leading-relaxed">
-          Déléguez votre prospection, vos devis et votre suivi CRM à des agents autonomes. 100% local et privé.
+        {/* Description H2 */}
+        <motion.p variants={item} className="text-lg md:text-[18px] opacity-80 text-[#373a46] max-w-[554px] font-geist leading-relaxed">
+          Arrêtez de sacrifier vos soirées. Déléguez la gestion de vos prospects, devis et emails à une IA 100% locale qui travaille 24/7 sur votre Mac. Zéro abonnement.
         </motion.p>
 
         {/* Interactive Component (Email & CTA) */}
         <motion.div variants={item} className="w-full max-w-lg mt-4">
-          <div className="flex flex-col sm:flex-row items-center gap-2 rounded-[40px] bg-[#fcfcfc] border border-gray-200 shadow-[0px_10px_40px_5px_rgba(194,194,194,0.25)] p-1.5 sm:p-2">
+          <div className="flex flex-col sm:flex-row items-center gap-2 rounded-[40px] bg-[#fcfcfc] border border-gray-200 shadow-[0px_10px_40px_5px_rgba(194,194,194,0.25)] p-2">
             <input 
               type="email" 
               placeholder="Entrez votre email..." 
-              className="flex-1 bg-transparent px-6 py-4 text-base text-[#373a46] placeholder:text-gray-400 outline-none min-w-0" 
+              className="flex-1 bg-transparent px-6 py-4 text-base font-geist text-[#373a46] placeholder:text-gray-400 outline-none w-full" 
             />
-            <button className="w-full sm:w-auto px-8 py-4 rounded-full font-geist font-medium text-white bg-gradient-to-b from-gray-800 to-black shadow-[inset_-4px_-6px_25px_0px_rgba(201,201,201,0.08),inset_4px_4px_10px_0px_rgba(29,29,29,0.24)] hover:scale-[1.02] active:scale-[0.98] transition-transform whitespace-nowrap">
+            <button className="w-full sm:w-auto px-8 py-4 rounded-full font-geist font-medium text-white bg-gradient-to-b from-gray-800 to-black shadow-[inset_-4px_-6px_25px_0px_rgba(201,201,201,0.08),inset_4px_4px_10px_0px_rgba(29,29,29,0.24)] hover:scale-105 transition-all duration-300 whitespace-nowrap">
               Obtenir Elazya
             </button>
           </div>
         </motion.div>
 
         {/* Social Proof */}
-        <motion.div variants={item} className="flex flex-col md:flex-row items-center gap-3 mt-4">
-          <div className="flex -space-x-1">
+        <motion.div variants={item} className="flex flex-col items-center gap-3 mt-4">
+          <span className="text-sm font-medium text-[#373a46] opacity-80 font-geist">Rejoint par +500 freelances et agences</span>
+          <div className="flex space-x-1">
             {[1, 2, 3, 4, 5].map((s) => (
-              <div key={s} className="w-6 h-6 rounded-full bg-yellow-100 flex items-center justify-center border-2 border-white z-10">
-                <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-              </div>
+              <Star key={s} className="w-4 h-4 text-yellow-400 fill-yellow-400 drop-shadow-sm" />
             ))}
           </div>
-          <span className="text-sm font-medium text-[#373a46] opacity-80 font-geist">Rejoint par +500 freelances</span>
         </motion.div>
 
       </motion.div>

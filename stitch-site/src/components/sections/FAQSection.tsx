@@ -39,13 +39,13 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 
 export function FAQSection() {
   const faqs = [
-    { q: "Faut-il savoir coder ?", a: "Non. L'interface Elazya gère toute la complexité d'OpenClaw en arrière-plan. Zéro ligne de commande." },
-    { q: "Mes données sont-elles privées ?", a: "Oui. La mémoire, les historiques et les fichiers restent stockés localement sur votre Mac." },
-    { q: "Dois-je payer l'API en plus ?", a: "Vous connectez votre propre clé (Google Gemini ou Anthropic). Cela vous coûte quelques centimes par jour, sans marge de notre part." },
+    { q: "Faut-il savoir coder ?", a: "Non. L'interface Elazya gère la complexité d'OpenClaw en arrière-plan. Zéro ligne de commande." },
+    { q: "Mes données sont-elles privées ?", a: "Oui. Rien ne part sur le cloud, tout reste sur votre Mac." },
+    { q: "Dois-je payer l'API en plus ?", a: "Vous connectez votre clé Gemini ou Anthropic. Cela coûte quelques centimes par jour, sans marge de notre part." },
   ]
 
   return (
-    <section className="max-w-[800px] mx-auto py-24 px-6">
+    <section className="max-w-[800px] mx-auto py-24 px-4">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -53,7 +53,10 @@ export function FAQSection() {
         transition={{ duration: 0.6 }}
         className="text-center mb-16"
       >
-        <h2 className="text-3xl font-geist font-medium text-[#0f172a]">Questions fréquentes</h2>
+        <div className="inline-flex items-center justify-center gap-2 bg-[#fcfcfc] border border-gray-200 rounded-full px-6 py-3 shadow-sm mb-12">
+            <span className="text-xl">🛡️</span>
+            <span className="text-sm font-geist font-bold text-[#0f172a]">Garantie 14 jours satisfait ou remboursé. Testez sans risque.</span>
+        </div>
       </motion.div>
 
       <div className="space-y-0">
