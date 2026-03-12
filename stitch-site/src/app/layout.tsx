@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google"; // Added Plus_Jakarta_Sans
+import localFont from "next/font/local";
+import { Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" }); // Configured Jakarta
+const geist = localFont({ src: "../fonts/GeistVF.woff2", variable: "--font-geist" });
+const instrument = Instrument_Serif({ weight: "400", style: "italic", subsets: ["latin"], variable: "--font-instrument" });
 
 export const metadata: Metadata = {
   title: "Elazya - Intelligence Artificielle Personnelle",
@@ -24,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="scroll-smooth">
-      <body className={`${inter.variable} ${jakarta.variable} antialiased min-h-screen flex flex-col font-sans`}>
+      <body className={`${geist.variable} ${instrument.variable} bg-white antialiased min-h-screen flex flex-col font-geist`}>
         <Header />
         <main className="flex-1 pt-20">
           {children}

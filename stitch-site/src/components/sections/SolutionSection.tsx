@@ -1,54 +1,62 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Check, MonitorPlay } from "lucide-react"
+import { Check } from "lucide-react"
 
 export function SolutionSection() {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  }
+
+  const item = {
+    hidden: { opacity: 0, x: -20 },
+    show: { opacity: 1, x: 0, transition: { type: "spring", bounce: 0, duration: 0.6 } }
+  }
+
   return (
-    <section className="py-24 max-w-6xl mx-auto px-6 relative z-10 border-b border-slate-200/50">
+    <section className="max-w-[1200px] mx-auto flex flex-col md:flex-row gap-12 items-center py-24 px-6 overflow-hidden">
+      
+      {/* Côté Gauche */}
       <motion.div 
-        initial={{ opacity: 0, scale: 0.98 }}
+        variants={container}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        className="flex-1 space-y-8"
+      >
+        <motion.h2 variants={item} className="text-4xl md:text-[40px] font-geist font-medium text-[#0f172a] leading-tight">
+          L'IA qui exécute vraiment.
+        </motion.h2>
+        
+        <ul className="space-y-6">
+          {["Pilotable sur Telegram", "100% Local", "Travaille 24/7 en fond"].map((text, i) => (
+            <motion.li key={i} variants={item} className="flex items-center gap-4">
+              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100/50 border border-emerald-200">
+                <Check className="w-4 h-4 text-emerald-600" />
+              </div>
+              <span className="text-lg font-geist text-[#373a46]">{text}</span>
+            </motion.li>
+          ))}
+        </ul>
+      </motion.div>
+      
+      {/* Côté Droit */}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="grid md:grid-cols-2 gap-12 items-center bg-[#0a0f1d] rounded-[2.5rem] p-8 md:p-14 shadow-2xl relative overflow-hidden"
+        transition={{ duration: 0.6, type: "spring", bounce: 0 }}
+        className="flex-1 w-full"
       >
-        {/* Subtle background glow */}
-        <div className="absolute top-1/2 left-1/4 w-96 h-96 -translate-y-1/2 -translate-x-1/2 bg-primary/20 blur-[100px] pointer-events-none" />
-        
-        <div className="relative z-10">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 tracking-tight leading-tight">
-            L'IA qui ne fait pas que discuter. Elle exécute.
-          </h2>
-          <ul className="space-y-6">
-            <li className="flex items-start gap-4">
-              <div className="bg-emerald-500/20 p-1.5 rounded-full shrink-0 border border-emerald-500/30">
-                <Check className="w-5 h-5 text-emerald-400" />
-              </div>
-              <span className="text-lg text-slate-300 font-medium">Pilotable par notes vocales sur WhatsApp ou Telegram.</span>
-            </li>
-            <li className="flex items-start gap-4">
-              <div className="bg-emerald-500/20 p-1.5 rounded-full shrink-0 border border-emerald-500/30">
-                <Check className="w-5 h-5 text-emerald-400" />
-              </div>
-              <span className="text-lg text-slate-300 font-medium">Interagit vraiment avec vos applications Mac natives.</span>
-            </li>
-            <li className="flex items-start gap-4">
-              <div className="bg-emerald-500/20 p-1.5 rounded-full shrink-0 border border-emerald-500/30">
-                <Check className="w-5 h-5 text-emerald-400" />
-              </div>
-              <span className="text-lg text-slate-300 font-medium">Travaille en tâche de fond 24/7 (Morning brief, alertes).</span>
-            </li>
-          </ul>
-        </div>
-        
-        <div className="relative z-10">
-          <div className="aspect-video bg-[#0f1523] rounded-2xl border border-slate-700/50 flex flex-col items-center justify-center text-slate-500 shadow-[0_0_40px_rgba(59,130,246,0.15)] overflow-hidden group">
-            <MonitorPlay className="w-12 h-12 mb-4 text-slate-600 group-hover:text-primary transition-colors duration-500" />
-            <span className="font-mono text-xs tracking-wider">Placeholder Iframe Arcade.software</span>
-          </div>
+        <div className="aspect-video bg-gray-100 border border-gray-200 rounded-[24px] shadow-xl flex items-center justify-center">
+          <span className="font-mono text-sm text-gray-500 font-medium">Placeholder Iframe Arcade</span>
         </div>
       </motion.div>
+      
     </section>
   )
 }

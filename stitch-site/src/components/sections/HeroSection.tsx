@@ -1,56 +1,84 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { Star } from "lucide-react"
 
 export function HeroSection() {
-  const scrollToPricing = () => {
-    document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.1,
+      }
+    }
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0, duration: 0.8 } }
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-32 pb-16 overflow-hidden bg-transparent">
-      {/* Background Blobs (Premium styling kept) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
+    <section className="min-h-screen relative flex flex-col justify-start items-center overflow-hidden">
       
-      <div className="container relative z-10 px-4 sm:px-6 mx-auto">
-        <div className="max-w-4xl mx-auto text-center mt-[-4vh] sm:mt-[-8vh]">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }} className="flex flex-col items-center">
-            
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-500 bg-white border border-slate-200 px-4 py-1.5 rounded-full shadow-sm mb-8">
-              Basé sur le moteur open-source OpenClaw
-            </span>
-            
-            <h1 className="text-4xl sm:text-5xl md:text-[4.5rem] lg:text-7xl font-extrabold tracking-tight mb-6 text-slate-800 leading-[1.1] max-w-4xl">
-              Arrêtez de travailler pour votre entreprise.<br />
-              <span className="text-gradient-primary">Laissez votre Mac travailler pour vous.</span>
-            </h1>
-            
-            <p className="text-base md:text-xl text-slate-500 font-medium max-w-2xl mx-auto mb-10 tracking-wide leading-relaxed px-4">
-              Déléguez votre prospection, vos devis et votre suivi CRM à une équipe d'agents IA autonomes. 100% local. 0 abonnement mensuel.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
-              <motion.button 
-                whileHover={{ scale: 1.02, y: -2 }} 
-                whileTap={{ scale: 0.98 }} 
-                onClick={scrollToPricing} 
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full font-bold text-base shadow-[0_12px_24px_rgba(59,130,246,0.3)] transition-all ring-1 ring-primary/20 w-full sm:w-auto"
-              >
-                Choisir mon plan
-              </motion.button>
-              
-              <motion.button 
-                whileHover={{ scale: 1.02, y: -2 }} 
-                whileTap={{ scale: 0.98 }} 
-                className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-8 py-4 rounded-full font-bold text-base shadow-sm transition-all w-full sm:w-auto"
-              >
-                Voir la démo
-              </motion.button>
-            </div>
-            
-          </motion.div>
-        </div>
-      </div>
+      {/* Background Video */}
+      <video 
+        autoPlay loop muted playsInline 
+        className="absolute inset-0 w-full h-full object-cover [transform:scaleY(-1)] -z-20"
+        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260302_085640_276ea93b-d7da-4418-a09b-2aa5b490e838.mp4" 
+      />
+      
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[rgba(255,255,255,0)] from-[26.416%] to-white to-[66.943%] -z-10" />
+
+      {/* Main Container */}
+      <motion.div 
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="relative z-10 w-full max-w-[1200px] pt-[290px] flex flex-col items-center gap-[32px] px-4 text-center"
+      >
+        
+        {/* Main Heading H1 */}
+        <motion.h1 variants={item} className="text-5xl md:text-[80px] font-geist font-medium tracking-[-0.04em] text-[#0f172a] leading-[1.1] max-w-[1000px]">
+          Votre propre <span className="font-instrument text-6xl md:text-[100px] font-normal italic">équipe IA</span> sur votre Mac.
+        </motion.h1>
+
+        {/* Description */}
+        <motion.p variants={item} className="text-[18px] opacity-80 text-[#373a46] max-w-[554px] leading-relaxed">
+          Déléguez votre prospection, vos devis et votre suivi CRM à des agents autonomes. 100% local et privé.
+        </motion.p>
+
+        {/* Interactive Component (Email & CTA) */}
+        <motion.div variants={item} className="w-full max-w-lg mt-4">
+          <div className="flex flex-col sm:flex-row items-center gap-2 rounded-[40px] bg-[#fcfcfc] border border-gray-200 shadow-[0px_10px_40px_5px_rgba(194,194,194,0.25)] p-1.5 sm:p-2">
+            <input 
+              type="email" 
+              placeholder="Entrez votre email..." 
+              className="flex-1 bg-transparent px-6 py-4 text-base text-[#373a46] placeholder:text-gray-400 outline-none min-w-0" 
+            />
+            <button className="w-full sm:w-auto px-8 py-4 rounded-full font-geist font-medium text-white bg-gradient-to-b from-gray-800 to-black shadow-[inset_-4px_-6px_25px_0px_rgba(201,201,201,0.08),inset_4px_4px_10px_0px_rgba(29,29,29,0.24)] hover:scale-[1.02] active:scale-[0.98] transition-transform whitespace-nowrap">
+              Obtenir Elazya
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Social Proof */}
+        <motion.div variants={item} className="flex flex-col md:flex-row items-center gap-3 mt-4">
+          <div className="flex -space-x-1">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <div key={s} className="w-6 h-6 rounded-full bg-yellow-100 flex items-center justify-center border-2 border-white z-10">
+                <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+              </div>
+            ))}
+          </div>
+          <span className="text-sm font-medium text-[#373a46] opacity-80 font-geist">Rejoint par +500 freelances</span>
+        </motion.div>
+
+      </motion.div>
+
     </section>
   )
 }
