@@ -21,7 +21,7 @@ export function HeroSection() {
   }
 
   return (
-    <section className="min-h-screen relative flex flex-col justify-center items-center overflow-hidden pt-[120px] md:pt-[290px]">
+    <section className="min-h-screen relative flex flex-col justify-center items-center overflow-hidden pt-[120px] md:pt-[290px] pb-24">
       
       {/* Background Video */}
       <video 
@@ -65,8 +65,20 @@ export function HeroSection() {
           </div>
         </motion.div>
 
-        {/* Social Proof */}
-        <motion.div variants={item} className="flex flex-col items-center gap-3 mt-4">
+        {/* Arcade Demo Showcase */}
+        <motion.div 
+          variants={item} 
+          className="w-full max-w-[1000px] mx-auto mt-20 relative z-20"
+        >
+          <div className="aspect-[16/9] bg-white border border-gray-200 rounded-[24px] shadow-[0px_20px_60px_rgba(0,0,0,0.08)] overflow-hidden transition-transform duration-500 hover:scale-[1.01]">
+            <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-400 font-geist">
+              Intégration Arcade.software ici
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Social Proof — below the Arcade demo */}
+        <motion.div variants={item} className="flex flex-col items-center gap-3 mt-24">
           <span className="text-sm font-medium text-[#373a46] opacity-80 font-geist">Rejoint par +500 freelances et agences</span>
           <div className="flex space-x-1">
             {[1, 2, 3, 4, 5].map((s) => (
