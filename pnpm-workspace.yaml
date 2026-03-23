@@ -1,6 +1,7 @@
 packages:
   - .
   - ui
+  - stitch-site
   - packages/*
   - extensions/*
 

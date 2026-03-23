@@ -1,75 +1,117 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { PhoneCall, Settings, Rocket, ArrowRight } from "lucide-react"
+
+const steps = [
+  {
+    num: "01",
+    icon: PhoneCall,
+    title: "Appel Stratégique",
+    badge: "30 min gratuites",
+    desc: "On analyse votre workflow et on identifie les 3-5 tâches qui vous font perdre le plus de temps.",
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+    border: "border-blue-100",
+    iconBg: "bg-blue-100/80",
+  },
+  {
+    num: "02",
+    icon: Settings,
+    title: "Configuration sur mesure",
+    badge: "Même jour",
+    desc: "On configure vos agents IA selon vos templates, votre CRM, et votre ton de communication.",
+    color: "text-violet-600",
+    bg: "bg-violet-50",
+    border: "border-violet-100",
+    iconBg: "bg-violet-100/80",
+  },
+  {
+    num: "03",
+    icon: Rocket,
+    title: "Autonomie complète",
+    badge: "Dès le jour 1",
+    desc: "Votre agent exécute vos tâches automatiquement. Vous récupérez 12h par semaine, dès le premier jour.",
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
+    border: "border-emerald-100",
+    iconBg: "bg-emerald-100/80",
+  },
+]
 
 export function HowItWorksSection() {
-  const steps = [
-    {
-      step: "1",
-      title: "Branchez votre cerveau",
-      desc: "Entrez votre propre clé API (Google Gemini ou Anthropic). Vous payez l'IA au prix coûtant, sans marge de notre part."
-    },
-    {
-      step: "2",
-      title: "Connectez Telegram",
-      desc: "Associez Elazya à votre compte Telegram ou WhatsApp en un clic pour piloter votre Mac à distance."
-    },
-    {
-      step: "3",
-      title: "Déléguez vos tâches",
-      desc: "Envoyez une simple note vocale. L'agent prend le contrôle de votre navigateur et de vos fichiers locaux pour exécuter la tâche."
-    }
-  ]
-
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15 }
-    }
-  }
-
-  const item = {
-    hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
-  }
-
   return (
-    <section className="max-w-[1200px] mx-auto py-24 px-4 text-center">
-      <motion.h2 
+    <section id="processus" className="max-w-[1100px] mx-auto py-20 md:py-28 px-4">
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="font-geist text-4xl font-medium text-[#0f172a] mb-16"
+        className="text-center mb-6"
       >
-        Votre équipe IA opérationnelle en 3 étapes.
-      </motion.h2>
-
-      <motion.div 
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-12 relative"
-      >
-        {/* Lignes de connexion visibles sur Desktop uniquement */}
-        <div className="hidden md:block absolute top-10 left-[16%] right-[16%] h-[2px] bg-gradient-to-r from-transparent via-gray-200 to-transparent -z-10" />
-
-        {steps.map((s, i) => (
-          <motion.div key={i} variants={item} className="flex flex-col items-center relative z-10">
-            <div className="w-20 h-20 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center mb-6">
-              <span className="font-instrument italic text-3xl text-blue-600">{s.step}</span>
-            </div>
-            <h3 className="font-geist text-xl font-bold text-[#0f172a] mb-4">
-              {s.title}
-            </h3>
-            <p className="font-geist text-[#373a46] opacity-80 leading-relaxed font-medium">
-              {s.desc}
-            </p>
-          </motion.div>
-        ))}
+        <h2 className="text-[28px] md:text-[40px] font-geist font-bold text-[#0f172a] leading-tight">
+          Opérationnel en{" "}
+          <span className="font-instrument italic text-blue-600 font-normal">3 étapes.</span>
+        </h2>
       </motion.div>
+
+      {/* CTA above steps — for pre-convinced visitors */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="text-center mb-14"
+      >
+        <a
+          href="#booking"
+          className="inline-flex items-center gap-2 text-sm font-geist font-semibold text-blue-600 hover:text-blue-700 transition-colors group cursor-pointer"
+        >
+          Déjà convaincu ? Réserver l'appel directement
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </a>
+      </motion.div>
+
+      <div className="relative">
+        {/* Connector line — desktop */}
+        <div className="hidden md:block absolute top-[72px] left-[16.67%] right-[16.67%] h-[2px] bg-gradient-to-r from-blue-200 via-violet-200 to-emerald-200 z-0" />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {steps.map((step, i) => {
+            const Icon = step.icon
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, type: "spring", stiffness: 100, damping: 20 }}
+                className="relative z-10 flex flex-col items-center text-center"
+              >
+                {/* Step number + icon */}
+                <div className={`group w-[88px] h-[88px] rounded-[24px] ${step.bg} border-2 ${step.border} flex items-center justify-center mb-6 hover:scale-110 transition-transform duration-300 cursor-default shadow-sm`}>
+                  <Icon className={`w-8 h-8 ${step.color} group-hover:rotate-12 transition-transform duration-300`} />
+                </div>
+
+                {/* Step number badge */}
+                <div className={`absolute top-0 right-1/2 translate-x-[52px] -translate-y-2 w-7 h-7 rounded-full bg-white border-2 ${step.border} flex items-center justify-center shadow-sm`}>
+                  <span className={`text-[10px] font-geist font-bold ${step.color}`}>{step.num}</span>
+                </div>
+
+                {/* Badge */}
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-geist font-bold ${step.bg} ${step.color} border ${step.border} mb-4 uppercase tracking-wider`}>
+                  {step.badge}
+                </span>
+
+                <h3 className="text-lg font-geist font-bold text-[#0f172a] mb-3">
+                  {step.title}
+                </h3>
+                <p className="text-sm font-geist text-[#373a46] opacity-70 leading-relaxed max-w-[280px]">
+                  {step.desc}
+                </p>
+              </motion.div>
+            )
+          })}
+        </div>
+      </div>
     </section>
   )
 }

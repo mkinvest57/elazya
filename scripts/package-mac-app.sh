@@ -5,10 +5,10 @@ set -euo pipefail
 # Outputs to dist/Moltbot.app
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-APP_ROOT="$ROOT_DIR/dist/Moltbot.app"
+PRODUCT="Elazya"
+APP_ROOT="$ROOT_DIR/dist/$PRODUCT.app"
 BUILD_ROOT="$ROOT_DIR/apps/macos/.build"
-PRODUCT="Moltbot"
-BUNDLE_ID="${BUNDLE_ID:-bot.molt.mac.debug}"
+BUNDLE_ID="${BUNDLE_ID:-com.elazya.mac}"
 PKG_VERSION="$(cd "$ROOT_DIR" && node -p "require('./package.json').version" 2>/dev/null || echo "0.0.0")"
 BUILD_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 GIT_COMMIT=$(cd "$ROOT_DIR" && git rev-parse --short HEAD 2>/dev/null || echo "unknown")
@@ -162,17 +162,17 @@ else
 fi
 
 echo "🚚 Copying binary"
-cp "$BIN_PRIMARY" "$APP_ROOT/Contents/MacOS/Moltbot"
+cp "$BIN_PRIMARY" "$APP_ROOT/Contents/MacOS/$PRODUCT"
 if [[ "${#BUILD_ARCHS[@]}" -gt 1 ]]; then
   BIN_INPUTS=()
   for arch in "${BUILD_ARCHS[@]}"; do
     BIN_INPUTS+=("$(bin_for_arch "$arch")")
   done
-  /usr/bin/lipo -create "${BIN_INPUTS[@]}" -output "$APP_ROOT/Contents/MacOS/Moltbot"
+  /usr/bin/lipo -create "${BIN_INPUTS[@]}" -output "$APP_ROOT/Contents/MacOS/$PRODUCT"
 fi
-chmod +x "$APP_ROOT/Contents/MacOS/Moltbot"
+chmod +x "$APP_ROOT/Contents/MacOS/$PRODUCT"
 # SwiftPM outputs ad-hoc signed binaries; strip the signature before install_name_tool to avoid warnings.
-/usr/bin/codesign --remove-signature "$APP_ROOT/Contents/MacOS/Moltbot" 2>/dev/null || true
+/usr/bin/codesign --remove-signature "$APP_ROOT/Contents/MacOS/$PRODUCT" 2>/dev/null || true
 
 SPARKLE_FRAMEWORK_PRIMARY="$(sparkle_framework_for_arch "$PRIMARY_ARCH")"
 if [ -d "$SPARKLE_FRAMEWORK_PRIMARY" ]; then
@@ -201,7 +201,24 @@ else
 fi
 
 echo "🖼  Copying app icon"
-cp "$ROOT_DIR/apps/macos/Sources/Moltbot/Resources/Moltbot.icns" "$APP_ROOT/Contents/Resources/Moltbot.icns"
+cp "$ROOT_DIR/apps/macos/Sources/Moltbot/Resources/Moltbot.icns" "$APP_ROOT/Contents/Resources/Elazya.icns"
+
+echo "🐳 Building VM Image"
+if command -v docker >/dev/null 2>&1; then
+  make -C "$ROOT_DIR/vm" all
+else
+  echo "WARN: docker not found, skipping VM image build" >&2
+fi
+
+echo "📦 Bundling VM components"
+mkdir -p "$APP_ROOT/Contents/Resources/VM"
+if [ -f "$ROOT_DIR/vm/build/vmlinuz" ]; then
+  cp "$ROOT_DIR/vm/build/vmlinuz" "$APP_ROOT/Contents/Resources/VM/"
+  cp "$ROOT_DIR/vm/build/initrd" "$APP_ROOT/Contents/Resources/VM/"
+  cp "$ROOT_DIR/vm/build/rootfs.img.gz" "$APP_ROOT/Contents/Resources/VM/"
+else
+  echo "WARN: VM build artifacts missing, app will require manual VM setup" >&2
+fi
 
 echo "📦 Copying device model resources"
 rm -rf "$APP_ROOT/Contents/Resources/DeviceModels"
@@ -259,3 +276,8 @@ echo "🔏 Signing bundle (auto-selects signing identity if SIGN_IDENTITY is uns
 "$ROOT_DIR/scripts/codesign-mac-app.sh" "$APP_ROOT"
 
 echo "✅ Bundle ready at $APP_ROOT"
+
+echo "📦 Creating distributable ZIP"
+ZIP_NAME="Elazya-macOS.zip"
+(cd "$ROOT_DIR/dist" && rm -f "$ZIP_NAME" && zip -r "$ZIP_NAME" "$PRODUCT.app")
+echo "🎁 ZIP ready at $ROOT_DIR/dist/$ZIP_NAME"

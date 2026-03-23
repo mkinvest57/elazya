@@ -11,8 +11,8 @@ let package = Package(
     products: [
         .library(name: "MoltbotIPC", targets: ["MoltbotIPC"]),
         .library(name: "MoltbotDiscovery", targets: ["MoltbotDiscovery"]),
-        .executable(name: "Moltbot", targets: ["Moltbot"]),
-        .executable(name: "moltbot-mac", targets: ["MoltbotMacCLI"]),
+        .executable(name: "Elazya", targets: ["Moltbot"]),
+        .executable(name: "elazya-mac", targets: ["MoltbotMacCLI"]),
     ],
     dependencies: [
         .package(url: "https://github.com/orchetect/MenuBarExtraAccess", exact: "1.2.2"),
@@ -22,6 +22,7 @@ let package = Package(
         .package(url: "https://github.com/steipete/Peekaboo.git", branch: "main"),
         .package(path: "../shared/MoltbotKit"),
         .package(path: "../../Swabble"),
+        .package(name: "swiftui-math", path: "../shared/swiftui-math"),
     ],
     targets: [
         .target(

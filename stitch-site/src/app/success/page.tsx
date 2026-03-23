@@ -90,7 +90,7 @@ function SuccessContent() {
                     >
                         <div className="inline-flex items-center gap-2 bg-white/70 border border-slate-200 shadow-sm rounded-full px-4 py-1.5 mb-6 backdrop-blur-md">
                             <Star className="w-3.5 h-3.5 text-primary fill-primary" />
-                            <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">v2.0.0</span>
+                            <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">v2.1.0</span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-bold mb-5 tracking-tight">
                             <span className="text-slate-800">Votre licence</span>
@@ -171,12 +171,12 @@ function SuccessContent() {
                             </div>
 
                             <a
-                                href="https://github.com/mkinvest57/elazya/releases/download/v2.0.0/Elazya_2.0.0_aarch64.dmg"
+                                href="/downloads/Elazya-macOS.zip"
                                 className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-full font-bold text-lg transition-all shadow-[0_4px_14px_0_rgba(99,102,241,0.39)] hover:shadow-[0_6px_20px_rgba(99,102,241,0.23)] hover:-translate-y-0.5"
                             >
                                 <Download className="w-5 h-5" />
-                                Télécharger le DMG
-                                <span className="text-sm font-normal opacity-80 ml-1">~318 MB (Mis à jour le 15 Mars 2026)</span>
+                                Télécharger le ZIP
+                                <span className="text-sm font-normal opacity-80 ml-1">~350 MB (Mis à jour le 23 Mars 2026)</span>
                             </a>
 
                             {/* Feature badges */}
@@ -263,7 +263,7 @@ function SuccessContent() {
                         <h4 className="text-base font-bold mb-5 text-slate-800">Inclus avec votre licence</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {[
-                                'Elazya v2.0.0 pour macOS',
+                                'Elazya v2.1.0 pour macOS',
                                 'Mises à jour à vie',
                                 '10 agents IA spécialisés',
                                 'Facture professionnelle',

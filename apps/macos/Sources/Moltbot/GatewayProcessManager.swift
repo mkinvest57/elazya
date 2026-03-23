@@ -78,21 +78,9 @@ final class GatewayProcessManager {
     }
 
     func ensureLaunchAgentEnabledIfNeeded() async {
+        // Obsolete in VM isolation architecture. VM boots via startIfNeeded().
         guard !CommandResolver.connectionModeIsRemote() else { return }
-        if GatewayLaunchAgentManager.isLaunchAgentWriteDisabled() {
-            self.appendLog("[gateway] launchd auto-enable skipped (attach-only)\n")
-            self.logger.info("gateway launchd auto-enable skipped (disable marker set)")
-            return
-        }
-        let enabled = await GatewayLaunchAgentManager.isLoaded()
-        guard !enabled else { return }
-        let bundlePath = Bundle.main.bundleURL.path
-        let port = GatewayEnvironment.gatewayPort()
-        self.appendLog("[gateway] auto-enabling launchd job (\(gatewayLaunchdLabel)) on port \(port)\n")
-        let err = await GatewayLaunchAgentManager.set(enabled: true, bundlePath: bundlePath, port: port)
-        if let err {
-            self.appendLog("[gateway] launchd auto-enable failed: \(err)\n")
-        }
+        self.appendLog("[gateway] launchd auto-enable skipped (using VM isolation)\n")
     }
 
     func startIfNeeded() {
@@ -132,12 +120,12 @@ final class GatewayProcessManager {
         if CommandResolver.connectionModeIsRemote() {
             return
         }
-        let bundlePath = Bundle.main.bundleURL.path
         Task {
-            _ = await GatewayLaunchAgentManager.set(
-                enabled: false,
-                bundlePath: bundlePath,
-                port: GatewayEnvironment.gatewayPort())
+            // Tell the VM to stop the internal Node process gracefully via RPC
+            try? await VMBridge.shared.stopGateway()
+            
+            // Then shut down the persistent VM itself
+            await VMManager.shared.shutdown()
         }
     }
 
@@ -299,61 +287,57 @@ final class GatewayProcessManager {
 
     private func enableLaunchdGateway() async {
         self.existingGatewayDetails = nil
-        let resolution = await Task.detached(priority: .utility) {
-            GatewayEnvironment.resolveGatewayCommand()
-        }.value
-        await MainActor.run { self.environmentStatus = resolution.status }
-        guard resolution.command != nil else {
-            await MainActor.run {
-                self.status = .failed(resolution.status.message)
-            }
-            self.logger.error("gateway command resolve failed: \(resolution.status.message)")
-            return
-        }
+        
+        // 1. Boot the persistent VM (provisions on first launch, reuses on subsequent)
+        self.appendLog("[gateway] Booting persistent VM\n")
+        self.logger.info("gateway booting persistent VM")
+        await VMManager.shared.boot()
 
-        if GatewayLaunchAgentManager.isLaunchAgentWriteDisabled() {
-            let message = "Launchd disabled; start the Gateway manually or disable attach-only."
-            self.status = .failed(message)
-            self.lastFailureReason = "launchd disabled"
-            self.appendLog("[gateway] launchd disabled; skipping auto-start\n")
-            self.logger.info("gateway launchd enable skipped (disable marker set)")
-            return
-        }
-
-        let bundlePath = Bundle.main.bundleURL.path
-        let port = GatewayEnvironment.gatewayPort()
-        self.appendLog("[gateway] enabling launchd job (\(gatewayLaunchdLabel)) on port \(port)\n")
-        self.logger.info("gateway enabling launchd port=\(port)")
-        let err = await GatewayLaunchAgentManager.set(enabled: true, bundlePath: bundlePath, port: port)
-        if let err {
+        guard VMManager.shared.state == .running else {
+            let err = VMManager.shared.lastError ?? "VM failed to boot"
             self.status = .failed(err)
             self.lastFailureReason = err
-            self.logger.error("gateway launchd enable failed: \(err)")
+            self.logger.error("VM boot failed: \(err)")
+            self.appendLog("[gateway] error: \(err)\n")
             return
         }
 
-        // Best-effort: wait for the gateway to accept connections.
-        let deadline = Date().addingTimeInterval(6)
+        self.appendLog("[gateway] VM running, connecting bridge...\n")
+        self.logger.info("VM running, connecting bridge")
+
+        // 2. Instruct the VM to start the gateway via JSON-RPC vsock bridge
+        do {
+            try await VMBridge.shared.startGateway()
+            self.appendLog("[gateway] Sent start command to VM bridge\n")
+        } catch {
+            self.status = .failed(error.localizedDescription)
+            self.lastFailureReason = error.localizedDescription
+            self.logger.error("VMBridge gateway start failed: \(error.localizedDescription)")
+            return
+        }
+
+        // 3. Best-effort wait for the gateway (now inside the VM) to accept connections
+        let port = GatewayEnvironment.gatewayPort()
+        let deadline = Date().addingTimeInterval(10) // Give the VM a bit more time
         while Date() < deadline {
             if !self.desiredActive { return }
             do {
                 _ = try await self.connection.requestRaw(method: .health, timeoutMs: 1500)
-                let instance = await PortGuardian.shared.describe(port: port)
-                let details = instance.map { "pid \($0.pid)" }
+                let details = "VM (port \(port))"
                 self.clearLastFailure()
                 self.status = .running(details: details)
-                self.logger.info("gateway started details=\(details ?? "ok")")
-                self.refreshControlChannelIfNeeded(reason: "gateway started")
+                self.logger.info("gateway started inside VM")
+                self.refreshControlChannelIfNeeded(reason: "gateway started in VM")
                 self.refreshLog()
                 return
             } catch {
-                try? await Task.sleep(nanoseconds: 400_000_000)
+                try? await Task.sleep(nanoseconds: 600_000_000)
             }
         }
 
-        self.status = .failed("Gateway did not start in time")
-        self.lastFailureReason = "launchd start timeout"
-        self.logger.warning("gateway start timed out")
+        self.status = .failed("VM Gateway did not start in time")
+        self.lastFailureReason = "VM gateway start timeout"
+        self.logger.warning("VM gateway start timed out")
     }
 
     private func appendLog(_ chunk: String) {

@@ -1,92 +1,84 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useState, useEffect, useCallback } from "react"
+import { ArrowRight, Sparkles } from "lucide-react"
 
-const LAUNCH = new Date("2026-04-05T00:00:00+02:00").getTime()
-
-function useCountdown() {
-  const calc = useCallback(() => {
-    const d = Math.max(0, LAUNCH - Date.now())
-    return {
-      days: Math.floor(d / 86400000),
-      hours: Math.floor((d % 86400000) / 3600000),
-      minutes: Math.floor((d % 3600000) / 60000),
-      seconds: Math.floor((d % 60000) / 1000),
-    }
-  }, [])
-  const [t, setT] = useState(calc)
-  useEffect(() => {
-    const id = setInterval(() => setT(calc()), 1000)
-    return () => clearInterval(id)
-  }, [calc])
-  return t
-}
-
-function CountdownDisplay() {
-  const c = useCountdown()
+export function FinalCTASection() {
   return (
-    <div className="flex items-center justify-center gap-3">
-      {[
-        { v: c.days, l: "jours" },
-        { v: c.hours, l: "heures" },
-        { v: c.minutes, l: "min" },
-        { v: c.seconds, l: "sec" },
-      ].map((u, i) => (
-        <div key={i} className="flex items-center gap-3">
-          <div className="flex flex-col items-center">
-            <span className="font-mono text-2xl sm:text-3xl font-bold tabular-nums text-slate-800">{String(u.v).padStart(2, "0")}</span>
-            <span className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mt-1">{u.l}</span>
-          </div>
-          {i < 3 && <span className="text-slate-300 font-bold text-lg">:</span>}
+    <section className="px-4 py-10">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ type: "spring", stiffness: 80, damping: 20 }}
+        className="max-w-[1100px] mx-auto relative rounded-[28px] overflow-hidden"
+      >
+        {/* Animated gradient background — Magic UI inspired */}
+        <div className="absolute inset-0 bg-[#0f172a]">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-blue-600/20 to-transparent rounded-full blur-[100px] -translate-y-1/3 translate-x-1/4 animate-[float_8s_ease-in-out_infinite]" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-violet-600/15 to-transparent rounded-full blur-[80px] translate-y-1/3 -translate-x-1/4 animate-[float_10s_ease-in-out_infinite_3s]" />
+          <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] bg-gradient-to-br from-indigo-500/10 to-transparent rounded-full blur-[60px] -translate-x-1/2 -translate-y-1/2 animate-[float_12s_ease-in-out_infinite_5s]" />
         </div>
-      ))}
-    </div>
-  )
-}
 
-interface FinalCTASectionProps {
-  onCTA: () => void
-}
+        <div className="relative z-10 px-8 py-16 md:px-16 md:py-24 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex justify-center mb-8"
+          >
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full px-4 py-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+              <span className="text-xs font-geist font-bold text-blue-300 uppercase tracking-wider">
+                Offre limitée
+              </span>
+            </div>
+          </motion.div>
 
-export function FinalCTASection({ onCTA }: FinalCTASectionProps) {
-  return (
-    <section className="py-28 sm:py-32 relative overflow-hidden border-t border-slate-200/50 bg-[#f8fbff]">
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[140px] rounded-full pointer-events-none" />
-      </div>
-      <div className="container mx-auto px-6 relative z-10 text-center">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex flex-col items-center">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-800 mb-6 leading-[1.1]">
-            Ce n&apos;est pas une app de plus.<br />
-            C&apos;est la dernière dont tu auras besoin.
-          </h2>
-          <p className="text-base sm:text-lg text-slate-500 font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
-            Tout est local sur ton Mac. Aucun serveur externe ne stocke tes données. Aucun abonnement. Tu paies une fois, tu possèdes pour toujours. Pendant que tout le monde empile les SaaS à l&apos;abonnement, toi tu as une équipe IA qui travaille pour toi. Définitivement.
-          </p>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-[28px] md:text-[48px] font-geist font-bold text-white leading-tight max-w-[700px] mx-auto"
+          >
+            Ne laissez pas vos concurrents{" "}
+            <span className="font-instrument italic text-blue-400 font-normal">prendre l'avance.</span>
+          </motion.h2>
 
-          {/* Plan recap */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto mb-10 w-full">
-            {[
-              { name: "Solo", after: "88€", save: "109€" },
-              { name: "Pro", after: "238€", save: "259€" },
-              { name: "Studio", after: "488€", save: "509€" },
-            ].map((p, i) => (
-              <div key={i} className="bg-white rounded-xl p-4 border border-slate-200 text-center hover:border-primary/30 hover:shadow-sm transition-all">
-                <p className="text-sm font-bold text-slate-800 mb-1">{p.name}</p>
-                <p className="text-xs text-slate-500">Tarif sécurisé : {p.after} le 5 avril</p>
-                <p className="text-xs text-emerald-600 font-semibold mt-1">tu économiseras {p.save}</p>
-              </div>
-            ))}
-          </div>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="mt-6 text-base md:text-lg font-geist text-white/50 max-w-[550px] mx-auto leading-relaxed"
+          >
+            +60 entreprises utilisent déjà Elazya pour automatiser ce que vous faites encore à la main. Garantie 14 jours, risque zéro.
+          </motion.p>
 
-          {/* Countdown */}
-          <CountdownDisplay />
-
-          <motion.button whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={onCTA} className="mt-8 bg-[#0f172a] hover:bg-slate-800 text-white px-8 py-4 lg:px-12 lg:py-4 rounded-full font-bold text-base lg:text-lg shadow-[0_12px_24px_rgb(15,23,42,0.3)] transition-all ring-1 ring-slate-800/20">Sécuriser ma place (Tarif Fondateur)</motion.button>
-          <p className="text-xs font-medium text-slate-400 mt-4 max-w-md">Sans engagement · Remboursé si l&apos;app ne sort pas · Déductible du prix final</p>
-        </motion.div>
-      </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="mt-10"
+          >
+            {/* Shimmer CTA — Magic UI animated border */}
+            <a
+              href="#booking"
+              className="group relative inline-flex items-center gap-2 px-10 py-5 rounded-full font-geist font-semibold text-sm overflow-hidden"
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-blue-400 via-violet-400 to-indigo-400 rounded-full" />
+              <span className="absolute inset-[1.5px] bg-white rounded-full" />
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-50/80 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+              <span className="relative z-10 flex items-center gap-2 text-[#0f172a]">
+                Planifier un Appel Gratuit
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </a>
+          </motion.div>
+        </div>
+      </motion.div>
     </section>
   )
 }

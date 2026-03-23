@@ -1,0 +1,5 @@
+out/
+.next/
+*.dmg
+node_modules/
+public/*.dmg

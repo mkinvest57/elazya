@@ -225,11 +225,12 @@
     "@mariozechner/mini-lit": "0.2.1",
     "@remotion/bundler": "4.0.410",
     "@remotion/cli": "4.0.410",
+    "@remotion/google-fonts": "^4.0.410",
     "@remotion/renderer": "4.0.410",
     "@types/body-parser": "^1.19.6",
     "@types/express": "^5.0.6",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^25.0.10",
+    "@types/node": "^25.5.0",
     "@types/proper-lockfile": "^4.1.4",
     "@types/qrcode-terminal": "^0.12.2",
     "@types/react": "^19.2.10",
@@ -251,8 +252,7 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18",
-    "wireit": "^0.14.12",
-    "@remotion/google-fonts": "^4.0.410"
+    "wireit": "^0.14.12"
   },
   "overrides": {
     "tar": "7.5.4"

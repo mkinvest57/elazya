@@ -1,9 +1,0 @@
-{
-    "name": "notion-updater",
-    "version": "1.0.0",
-    "description": "Met à jour une base de données Notion avec un nouvel enregistrement.",
-    "main": "index.ts",
-    "dependencies": {
-        "@notionhq/client": "^2.2.14"
-    }
-}
