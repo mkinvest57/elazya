@@ -114,7 +114,7 @@ function DownloadContent() {
                     <h2 className="font-bold text-slate-800 text-xl tracking-tight mb-8">Installation en 3 étapes</h2>
                     <div className="space-y-6">
                         {[
-                            { step: "1", title: "Installez", desc: "Ouvrez le .dmg et glissez Elazya dans Applications" },
+                            { step: "1", title: "Installez", desc: "Ouvrez le .zip et glissez Elazya dans Applications" },
                             { step: "2", title: "Activez", desc: "Lancez Elazya et collez votre clé de licence" },
                             { step: "3", title: "Configurez", desc: "Connectez votre IA (OpenAI, Anthropic…) et activez votre premier agent" },
                         ].map((item, i) => (

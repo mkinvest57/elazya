@@ -71,8 +71,8 @@ export default function DocsPage() {
 
                     <div className="space-y-6 bg-white/70 backdrop-blur-xl border border-slate-200 shadow-sm p-8 rounded-3xl">
                         {[
-                            { step: "1", title: "Télécharger", desc: "Récupérez le fichier .dmg depuis votre page de confirmation d'achat ou depuis le lien reçu par email." },
-                            { step: "2", title: "Installer", desc: "Ouvrez le .dmg et glissez l'icône Elazya dans le dossier Applications." },
+                            { step: "1", title: "Télécharger", desc: "Récupérez le fichier .zip depuis votre page de confirmation d'achat ou depuis le lien reçu par email." },
+                            { step: "2", title: "Installer", desc: "Ouvrez le .zip et glissez l'icône Elazya dans le dossier Applications." },
                             { step: "3", title: "Autoriser macOS", desc: "macOS peut bloquer l'ouverture car l'app n'est pas signée Apple. Exécutez la commande ci-dessous dans le Terminal.", terminal: true },
                             { step: "4", title: "Lancer", desc: "Double-cliquez sur Elazya dans le dossier Applications. L'assistant de configuration se lance automatiquement." }
                         ].map((item, i) => (
@@ -711,7 +711,7 @@ export default function DocsPage() {
                     <section>
                         <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 shadow-sm rounded-full px-4 py-1.5 mb-6">
                             <Book className="w-3.5 h-3.5 text-primary" />
-                            <span className="text-[10px] font-bold text-primary tracking-widest uppercase">Documentation v2.0</span>
+                            <span className="text-[10px] font-bold text-primary tracking-widest uppercase">Documentation v2.1</span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight text-slate-800">
                             Documentation

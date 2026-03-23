@@ -166,7 +166,7 @@ function SuccessContent() {
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-bold text-slate-800">Téléchargez Elazya</h3>
-                                    <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">v2.0.0 • macOS Universal</p>
+                                    <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">v2.1.0 • macOS Universal</p>
                                 </div>
                             </div>
 
@@ -207,7 +207,7 @@ function SuccessContent() {
                         <h4 className="text-base font-bold mb-6 text-slate-800">Installation en 4 étapes</h4>
                         <div className="space-y-6">
                             {[
-                                { step: '1', text: <>Ouvrez le fichier <code className="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-primary text-xs font-mono shadow-inner">.dmg</code> téléchargé</> },
+                                { step: '1', text: <>Ouvrez le fichier <code className="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-primary text-xs font-mono shadow-inner">.zip</code> téléchargé</> },
                                 { step: '2', text: <>Glissez <strong className="text-slate-800">Elazya</strong> dans le dossier <strong className="text-slate-800">Applications</strong></> },
                                 { step: '3', text: <>Lancez <strong className="text-slate-800">Elazya</strong> et collez votre <strong className="text-emerald-600">clé de licence</strong></> },
                                 { step: '4', text: <>Configurez vos <strong className="text-slate-800">premiers agents</strong> et c&apos;est parti !</> },
